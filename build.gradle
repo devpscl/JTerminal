@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.github.johnrengelman:shadow:8.1.1'
+    }
+}
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+subprojects {
+
+    apply plugin: "java"
+    apply plugin: "com.github.johnrengelman.shadow"
+
+    project.group = 'net.jterminal'
+    project.version = '1.0-SNAPSHOT'
+
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+
+    tasks.register('buildDebug', ShadowJar) {
+        group = "jterminal"
+        manifest {
+            attributes["Main-Class"] = "net.jterminal.test.Main"
+        }
+        from sourceSets.main.output
+        from sourceSets.test.output
+        configurations = [project.configurations.testRuntimeClasspath]
+        setArchiveClassifier "DEBUG"
+    }
+
+    tasks.register('buildRelease', ShadowJar) {
+        group = "jterminal"
+        from sourceSets.main.output
+        configurations = [project.configurations.testRuntimeClasspath]
+        setArchiveClassifier "RELEASE"
+    }
+
+
+}
