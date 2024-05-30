@@ -47,19 +47,19 @@ struct Dim {
   Dim() : Dim(0, 0) {}
 };
 
-bool operator==(const Pos& a, const Pos& b) {
+inline bool operator==(const Pos& a, const Pos& b) {
   return a.x == b.x && a.y == b.y;
 }
 
-bool operator!=(const Pos& a, const Pos& b) {
+inline bool operator!=(const Pos& a, const Pos& b) {
   return a.x != b.x || a.y != b.y;
 }
 
-bool operator==(const Dim& a, const Dim& b) {
+inline bool operator==(const Dim& a, const Dim& b) {
   return a.width == b.width && a.height == b.height;
 }
 
-bool operator!=(const Dim& a, const Dim& b) {
+inline bool operator!=(const Dim& a, const Dim& b) {
   return a.width != b.width || a.height != b.height;
 }
 

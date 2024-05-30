@@ -7,8 +7,8 @@
 namespace jterminal {
 
 class Terminal {
-  static bool disposed_;
-  static uint8_t flags_;
+  inline static bool disposed_ = false;
+  inline static uint8_t flags_ = 0;
 
  public:
 
