@@ -36,6 +36,9 @@ size_t InputPipeline::read(uint8_t *bytes, size_t len) {
                                [this](){
     return available();
   });
+  if(!buf.in_avail()) {
+    return -1;
+  }
   size_t out_len = buf.sgetn(reinterpret_cast<char*>(bytes), len);
   return out_len;
 }
