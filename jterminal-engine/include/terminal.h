@@ -3,12 +3,24 @@
 #include "termdef.h"
 #include "terminput.h"
 #include <string>
+#include <vector>
+#include <thread>
 
 namespace jterminal {
 
 class Terminal {
-  inline static bool disposed_ = false;
-  inline static uint8_t flags_ = 0;
+  inline static volatile bool               disposed_ = false;
+  inline static volatile uint8_t            flags_ = 0;
+  inline static std::vector<InputPipeline*> pipelines_;
+  inline static uint8_t                     cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
+
+  inline static std::condition_variable     input_thread_cv_;
+  inline static std::mutex                  input_thread_mutex_;
+  inline static std::thread*                input_thread_;
+
+  static void sendInput(uint8_t* bytes, size_t len);
+
+  static void threadRead();
 
  public:
 
@@ -53,6 +65,10 @@ class Terminal {
     static void getDimension(dim_t* dim_ptr);
 
     static bool requestCursorPosition(pos_t* pos_ptr);
+
+    static void setCursorFlags(uint8_t flags);
+
+    static uint8_t getCursorFlags();
 
 #ifdef TERMINAL_WIN
 
