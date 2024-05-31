@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <deque>
 #include <sstream>
+#include "../include/bufnio.h"
 
 namespace jterminal {
 
@@ -85,6 +86,46 @@ namespace jterminal {
 #define INPUT_PRIO_HIGH               2
 #define INPUT_PRIO_HIGHEST_SINGLETON  0xFF
 
+#define MOUSE_ACTION_CLICK   0x1
+#define MOUSE_ACTION_MOVE    0x2
+
+#define MOUSE_NONE                    0
+#define MOUSE_LEFT_BUTTON_PRESS       1
+#define MOUSE_RIGHT_BUTTON_PRESS      2
+#define MOUSE_LEFT_BUTTON_RELEASE     3
+#define MOUSE_RIGHT_BUTTON_RELEASE    4
+#define MOUSE_WHEEL_UP                5
+#define MOUSE_WHEEL_DOWN              6
+
+#define KS_NONE     0
+#define KS_SHIFT    1
+#define KS_CONTROL  2
+
+enum class InputType {
+  Keyboard,
+  Mouse,
+  Window,
+  Unknown
+};
+
+struct InputEvent {
+  InputType type = InputType::Unknown;
+  uint32_t symbol = 0;
+  struct {
+    uint8_t key = KEY_UNKNOWN;
+    uint8_t state = KS_NONE;
+  } Keyboard;
+  struct {
+    uint8_t action = MOUSE_ACTION_CLICK;
+    uint8_t state = MOUSE_NONE;
+    pos_t position;
+  } Mouse;
+  struct {
+    dim_t old_size;
+    dim_t new_size;
+  } Window;
+};
+
 class InputPipeline {
   uint8_t priority_;
   uint32_t timeout_millis_;
@@ -107,6 +148,8 @@ class InputPipeline {
   size_t read(uint8_t* bytes, size_t len);
 
 };
+
+bool translateInput(InputEvent* event, MemoryBuffer* buffer);
 
 }
 
