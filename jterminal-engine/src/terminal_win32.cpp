@@ -36,7 +36,6 @@ void Terminal::threadRead() {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   HANDLE handle = STDIN_HANDLE;
   wchar_t buf[INPUT_BUFFER_SIZE + 1];
-  buf[INPUT_BUFFER_SIZE] = '\0';
   unsigned long input_count;
   std::unique_lock<std::mutex> lock(input_thread_mutex_);
   while(!disposed_) {
@@ -45,6 +44,7 @@ void Terminal::threadRead() {
     }
     ReadConsoleW(handle, buf,INPUT_BUFFER_SIZE,
                  &input_count, nullptr);
+    buf[input_count] = '\0';
     std::string str = converter.to_bytes(buf);
     size_t len = str.length();
     const char* arr = str.c_str();
