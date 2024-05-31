@@ -12,16 +12,23 @@ class Terminal;
 #define TERMINAL_UNIX
 #endif
 
-#define FLAG_LINE_INPUT         0x01
-#define FLAG_ECHO               0x02
-#define FLAG_MOUSE_INPUT        0x04
-#define FLAG_ENHANCED_INPUT     0x08
-#define FLAG_SIGNAL_INPUT       0x10
+#define FLAG_LINE_INPUT           0x01
+#define FLAG_ECHO                 0x02
+#define FLAG_MOUSE_INPUT          0x04
+#define FLAG_MOUSE_EXTENDED_INPUT 0x08
+#define FLAG_ENHANCED_INPUT       0x10
+#define FLAG_SIGNAL_INPUT         0x20
+
+#define CURSOR_FLAG_VISIBLE       0x01
+#define CURSOR_FLAG_BLINKING      0x02
+
 #ifdef TERMINAL_UNIX
 #define FLAG_ALTERNATIVE_BUFFER 0x80
 #endif
 
 #define FLAG_DEFAULT (FLAG_ECHO | FLAG_LINE_INPUT | FLAG_SIGNAL_INPUT)
+
+#define INPUT_BUFFER_SIZE 128
 
 struct Pos;
 struct Dim;
@@ -35,7 +42,7 @@ struct Pos {
 
   Pos(uint16_t x, uint16_t y) : x(x), y(y) {}
 
-  Pos() : Pos(0, 0) {}
+  Pos() : Pos(1, 1) {}
 };
 
 struct Dim {
@@ -44,7 +51,7 @@ struct Dim {
 
   Dim(uint16_t width, uint16_t height) : width(width), height(height) {}
 
-  Dim() : Dim(0, 0) {}
+  Dim() : Dim(1, 1) {}
 };
 
 inline bool operator==(const Pos& a, const Pos& b) {
