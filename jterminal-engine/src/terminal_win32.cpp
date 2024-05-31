@@ -38,12 +38,10 @@ void Terminal::threadRead() {
   wchar_t buf[INPUT_BUFFER_SIZE + 1];
   buf[INPUT_BUFFER_SIZE] = '\0';
   unsigned long input_count;
+  std::unique_lock<std::mutex> lock(input_thread_mutex_);
   while(!disposed_) {
     while(!(flags_ & FLAG_ENHANCED_INPUT)) {
-      std::unique_lock<std::mutex> lock;
-      input_thread_cv_.wait(lock, [](){
-        return flags_ & FLAG_ENHANCED_INPUT;
-      });
+      input_thread_cv_.wait(lock);
     }
     ReadConsoleW(handle, buf,INPUT_BUFFER_SIZE,
                  &input_count, nullptr);
@@ -102,8 +100,8 @@ void Terminal::detachInputPipeline(InputPipeline *input_pipeline) {
 
 void Terminal::setFlags(uint8_t flags) {
   flags_ = flags;
-  update();
   input_thread_cv_.notify_all();
+  update();
 }
 
 void Terminal::getFlags(uint8_t *flags_ptr) {
@@ -148,6 +146,7 @@ void Terminal::update() {
 void Terminal::reset(bool clear_screen) {
   flags_ = FLAG_DEFAULT;
   cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
+  input_thread_cv_.notify_all();
   write("\033[0m");
   update();
   if(clear_screen) {
@@ -308,5 +307,4 @@ bool Terminal::Window::isOnFocus() {
   HWND console_window = GetConsoleWindow();
   return GetForegroundWindow() == console_window;
 }
-
 }
