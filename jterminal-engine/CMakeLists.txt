@@ -12,6 +12,7 @@ set(HEADER_FILES
         include/terminal.h
         include/terminput.h
         include/bufnio.h
+        include/escseq.h
 )
 set(SOURCE_FILES
         src/input_pipeline.cpp
