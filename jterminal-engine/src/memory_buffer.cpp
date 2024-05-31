@@ -55,7 +55,7 @@ size_t MemoryBuffer::cursor() const {
 }
 
 void MemoryBuffer::cursor(const size_t &index) {
-  cursor_ = index < len_ ? cursor_ : len_;
+  cursor_ = index < len_ ? index : len_;
 }
 
 bool MemoryBuffer::write(uint8_t element) {
