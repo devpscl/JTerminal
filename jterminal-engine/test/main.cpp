@@ -1,16 +1,22 @@
 #include <iostream>
-#include "../include/bufnio.h"
+#include "../include/terminal.h"
+#include <conio.h>
+#include <Windows.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace jterminal;
 
 int main() {
-  StringBuffer buf(14);
-  buf.writeString("Hello ");
-  buf.write(' ');
-  buf.writeString("World!");
-  buf.erase();
-  std::cout << buf.str() << "; " << buf;
+  Terminal::create();
+  Terminal::setFlags(FLAG_ENHANCED_INPUT | FLAG_MOUSE_INPUT);
+  Terminal::Window::setCursor({5, 1});
+  Terminal::Window::setTitle("Test");
+  pos_t pos;
+  bool state = Terminal::Window::requestCursorPosition(&pos);
+  std::cout << state << ": " << pos.x << " " << pos.y << endl;
+  while(1) {
 
-  return 0;
+
+  }
 }
