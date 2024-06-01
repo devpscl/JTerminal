@@ -151,6 +151,8 @@ class InputPipeline {
 
 bool translateInput(InputEvent* event, MemoryBuffer* buffer);
 
+bool translateInput(InputEvent* event, const uint64_t& hash);
+
 }
 
 #endif //JTERMINAL_ENGINE_INCLUDE_TERMINPUT_H_
