@@ -114,16 +114,16 @@ struct InputEvent {
   struct {
     uint8_t key = KEY_UNKNOWN;
     uint8_t state = KS_NONE;
-  } Keyboard;
+  } keyboard;
   struct {
     uint8_t action = MOUSE_ACTION_CLICK;
     uint8_t state = MOUSE_NONE;
     pos_t position;
-  } Mouse;
+  } mouse;
   struct {
     dim_t old_size;
     dim_t new_size;
-  } Window;
+  } window;
 };
 
 class InputPipeline {
