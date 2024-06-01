@@ -18,6 +18,7 @@ set(SOURCE_FILES
         src/input_pipeline.cpp
         src/memory_buffer.cpp
         src/string_buffer.cpp
+        src/input_translator.cpp
 )
 set(NATIVE_SOURCE_FILES_WIN
         src/terminal_win32.cpp
