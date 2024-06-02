@@ -68,13 +68,13 @@ class MemoryBuffer {
 
 };
 
-class StringBuffer : public MemoryBuffer {
+class StringBuffer : public MemoryBuffer<uint8_t> {
  public:
-  StringBuffer(const size_t& capacity);
+  explicit StringBuffer(const size_t& capacity);
 
-  StringBuffer(uint8_t * array, size_t len);
+  StringBuffer(uint8_t* array, size_t len);
 
-  StringBuffer(const std::string& str);
+  explicit StringBuffer(const std::string& str);
 
   bool equal(std::string str, uint8_t flags = 0);
 
@@ -88,9 +88,23 @@ class StringBuffer : public MemoryBuffer {
 
   short readNumberFormat16();
 
+  size_t peekWideCharLength();
+
+  wchar_t readWideChar();
+
+  wchar_t peekWideChar();
+
   [[nodiscard]] std::string str() const;
 
 };
+
+template class MemoryBuffer<wchar_t>;
+template class MemoryBuffer<uint8_t>;
+template class MemoryBuffer<int8_t>;
+template class MemoryBuffer<uint16_t>;
+template class MemoryBuffer<int16_t>;
+template class MemoryBuffer<uint32_t>;
+template class MemoryBuffer<int32_t>;
 
 }
 

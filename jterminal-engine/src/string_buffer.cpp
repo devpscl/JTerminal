@@ -1,4 +1,6 @@
+#include <codecvt>
 #include <cstring>
+#include <locale>
 #include "../include/bufnio.h"
 
 namespace jterminal {
@@ -87,6 +89,56 @@ short StringBuffer::readNumberFormat16() {
     value = value * 10 + digit_byte;
   }
   return value;
+}
+
+size_t StringBuffer::peekWideCharLength() {
+  size_t avail = available();
+  if(avail == 0) {
+    return 0;
+  }
+  uint8_t first = peek();
+  if(first & 0x80) {
+    if(((first & 0xE0) == 0xC0) && avail >= 2) {
+      return 2;
+    }
+    if (((first & 0xF0) == 0xE0) && avail >= 3) {
+      return 3;
+    }
+    if (((first & 0xF8) == 0xF0) && avail >= 4) {
+      return 4;
+    }
+  }
+  return 1;
+}
+
+wchar_t StringBuffer::readWideChar() {
+  size_t len = peekWideCharLength();
+  if(len <= 1) {
+    return read();
+  }
+  char* bytes;
+  bytes = reinterpret_cast<char*>(malloc(len));
+  read(bytes, len);
+  std::string utf_bytes(bytes, len);
+  std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+  std::wstring wstr = converter.from_bytes(utf_bytes);
+  free(bytes);
+  return wstr[0];
+}
+
+wchar_t StringBuffer::peekWideChar() {
+  size_t len = peekWideCharLength();
+  if(len <= 1) {
+    return peek();
+  }
+  char* bytes;
+  bytes = reinterpret_cast<char*>(malloc(len));
+  peek(bytes, len);
+  std::string utf_bytes(bytes, len);
+  std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+  std::wstring wstr = converter.from_bytes(utf_bytes);
+  free(bytes);
+  return wstr[0];
 }
 
 std::string StringBuffer::str() const {
