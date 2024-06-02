@@ -42,7 +42,11 @@ struct Pos {
 
   Pos(uint16_t x, uint16_t y) : x(x), y(y) {}
 
-  Pos() : Pos(1, 1) {}
+  Pos(int16_t x, int16_t y) : x(x), y(y) {}
+
+  Pos(int x, int y) : x(x), y(y) {}
+
+  Pos() : x(1), y(1) {}
 };
 
 struct Dim {
