@@ -86,16 +86,19 @@ namespace jterminal {
 #define INPUT_PRIO_HIGH               2
 #define INPUT_PRIO_HIGHEST_SINGLETON  0xFF
 
-#define MOUSE_ACTION_CLICK   0x1
-#define MOUSE_ACTION_MOVE    0x2
+#define MOUSE_ACTION_PRESS      1
+#define MOUSE_ACTION_RELEASE    2
+#define MOUSE_ACTION_MOVE       3
+#define MOUSE_ACTION_WHEEL_UP   4
+#define MOUSE_ACTION_WHEEL_DOWN 5
 
-#define MOUSE_NONE                    0
-#define MOUSE_LEFT_BUTTON_PRESS       1
-#define MOUSE_RIGHT_BUTTON_PRESS      2
-#define MOUSE_LEFT_BUTTON_RELEASE     3
-#define MOUSE_RIGHT_BUTTON_RELEASE    4
-#define MOUSE_WHEEL_UP                5
-#define MOUSE_WHEEL_DOWN              6
+#define MOUSE_NONE              0
+#define MOUSE_LEFT_BUTTON       1
+#define MOUSE_WHEEL_BUTTON      2
+#define MOUSE_RIGHT_BUTTON      3
+#define MOUSE_WHEEL_UP          4
+#define MOUSE_WHEEL_DOWN        5
+
 
 #define KS_NONE     0
 #define KS_SHIFT    1
@@ -116,8 +119,8 @@ struct InputEvent {
     uint8_t state = KS_NONE;
   } keyboard;
   struct {
-    uint8_t action = MOUSE_ACTION_CLICK;
-    uint8_t state = MOUSE_NONE;
+    uint8_t action = MOUSE_ACTION_PRESS;
+    uint8_t button = MOUSE_NONE;
     pos_t position;
   } mouse;
   struct {
@@ -149,7 +152,7 @@ class InputPipeline {
 
 };
 
-bool translateInput(InputEvent* event, MemoryBuffer* buffer);
+bool translateInput(InputEvent* event, StringBuffer* buffer);
 
 bool translateInput(InputEvent* event, const uint64_t& hash);
 
