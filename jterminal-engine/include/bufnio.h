@@ -1,6 +1,7 @@
 #ifndef JTERMINAL_ENGINE_INCLUDE_BUFIO_H_
 #define JTERMINAL_ENGINE_INCLUDE_BUFIO_H_
 #include "termdef.h"
+#include "escseq.h"
 #include <string>
 
 #define EN_FLAG_IGNORE_CASE   0x1
@@ -95,6 +96,47 @@ class StringBuffer : public MemoryBuffer<uint8_t> {
   wchar_t peekWideChar();
 
   [[nodiscard]] std::string str() const;
+};
+
+class ESCBuffer : public StringBuffer {
+ public:
+  explicit ESCBuffer(const size_t& capacity);
+
+  ESCBuffer(uint8_t* array, size_t len);
+
+  bool jumpNextESC();
+
+  void writeIntroducer(uint8_t type);
+
+  void writeParamSequence(const int* arr, size_t len);
+
+  bool isESCByte(uint8_t offset = 0);
+
+  bool isPrivateModifierByte(uint8_t offset = 0);
+
+  bool isParamByte(uint8_t offset = 0);
+
+  bool isEndByte(uint8_t offset = 0);
+
+  bool isValidByte(uint8_t offset = 0);
+
+  uint8_t readIntroducer();
+
+  uint8_t peekIntroducer();
+
+  size_t readParamSequence(int* arr, size_t len);
+
+  size_t scanESCLength();
+
+  size_t peekEscapeSequence(void* arr, size_t arr_len);
+
+  size_t readEscapeSequence(void* arr, size_t arr_len);
+
+  size_t peekSequenceFormat(uint8_t type, const char* format, int* data_array,
+                            size_t len, uint8_t* status = nullptr);
+
+  size_t readSequenceFormat(uint8_t type, const char* format, int* data_array,
+                            size_t len, uint8_t* status = nullptr);
 
 };
 
