@@ -153,6 +153,8 @@ bool translateInput(InputEvent* event, MemoryBuffer* buffer);
 
 bool translateInput(InputEvent* event, const uint64_t& hash);
 
+uint64_t hashInput(const uint8_t* bytes, size_t len);
+
 }
 
 #endif //JTERMINAL_ENGINE_INCLUDE_TERMINPUT_H_
