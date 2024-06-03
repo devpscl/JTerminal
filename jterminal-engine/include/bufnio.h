@@ -1,6 +1,7 @@
 #ifndef JTERMINAL_ENGINE_INCLUDE_BUFIO_H_
 #define JTERMINAL_ENGINE_INCLUDE_BUFIO_H_
 #include "termdef.h"
+#include "escseq.h"
 #include <string>
 
 #define EN_FLAG_IGNORE_CASE   0x1
@@ -10,23 +11,24 @@
 namespace jterminal {
 
 
+template <typename T>
 class MemoryBuffer {
  protected:
-  uint8_t* array_;
+  T* array_;
   size_t len_;
   size_t cursor_ = 0;
   bool local_arr_ = false;
  public:
 
-  MemoryBuffer(const size_t& capacity);
+  explicit MemoryBuffer(const size_t& capacity);
 
-  MemoryBuffer(uint8_t* array, size_t len, bool copy = false);
+  MemoryBuffer(void* array, size_t len, bool copy = false);
 
-  MemoryBuffer(const char* array, size_t len);
+  MemoryBuffer(const void* array, size_t len);
 
   ~MemoryBuffer();
 
-  uint8_t* ptr();
+  T* ptr(bool offset_by_cursor = false);
 
   [[nodiscard]] size_t capacity() const;
 
@@ -36,35 +38,19 @@ class MemoryBuffer {
 
   void cursor(const size_t& index);
 
-  bool write(uint8_t element);
+  bool write(T element);
 
   bool write(const void* ptr, size_t len);
 
-  bool writeUInt8(uint8_t value);
+  T read();
 
-  bool writeUInt16(uint16_t value);
+  T peek(size_t offset = 0);
 
-  bool writeUInt32(uint32_t value);
+  size_t read(void* ptr, size_t len);
 
-  uint8_t read();
+  size_t peek(void* ptr, size_t len, size_t offset = 0);
 
-  uint8_t readUInt8();
-
-  int8_t readInt8();
-
-  uint16_t readUInt16();
-
-  int16_t readInt16();
-
-  uint32_t readUInt32();
-
-  int32_t readInt32();
-
-  uint8_t peek(size_t offset = 0);
-
-  size_t read(uint8_t * ptr, size_t len);
-
-  bool hasNext() const;
+  [[nodiscard]] bool hasNext() const;
 
   void skip(size_t count = 1);
 
@@ -72,19 +58,24 @@ class MemoryBuffer {
 
   void erase();
 
-  operator bool() {
+  explicit operator bool() {
     return available();
+  }
+
+  template<class C>
+  C& downcast() {
+    return static_cast<C&>(*this);
   }
 
 };
 
-class StringBuffer : public MemoryBuffer {
+class StringBuffer : public MemoryBuffer<uint8_t> {
  public:
-  StringBuffer(const size_t& capacity);
+  explicit StringBuffer(const size_t& capacity);
 
-  StringBuffer(uint8_t * array, size_t len);
+  StringBuffer(uint8_t* array, size_t len);
 
-  StringBuffer(const std::string& str);
+  explicit StringBuffer(const std::string& str);
 
   bool equal(std::string str, uint8_t flags = 0);
 
@@ -98,9 +89,64 @@ class StringBuffer : public MemoryBuffer {
 
   short readNumberFormat16();
 
+  size_t peekWideCharLength();
+
+  wchar_t readWideChar();
+
+  wchar_t peekWideChar();
+
   [[nodiscard]] std::string str() const;
+};
+
+class ESCBuffer : public StringBuffer {
+ public:
+  explicit ESCBuffer(const size_t& capacity);
+
+  ESCBuffer(uint8_t* array, size_t len);
+
+  bool jumpNextESC();
+
+  void writeIntroducer(uint8_t type);
+
+  void writeParamSequence(const int* arr, size_t len);
+
+  bool isESCByte(uint8_t offset = 0);
+
+  bool isPrivateModifierByte(uint8_t offset = 0);
+
+  bool isParamByte(uint8_t offset = 0);
+
+  bool isEndByte(uint8_t offset = 0);
+
+  bool isValidByte(uint8_t offset = 0);
+
+  uint8_t readIntroducer();
+
+  uint8_t peekIntroducer();
+
+  size_t readParamSequence(int* arr, size_t len);
+
+  size_t scanESCLength();
+
+  size_t peekEscapeSequence(void* arr, size_t arr_len);
+
+  size_t readEscapeSequence(void* arr, size_t arr_len);
+
+  size_t peekSequenceFormat(uint8_t type, const char* format, int* data_array,
+                            size_t len, uint8_t* status = nullptr);
+
+  size_t readSequenceFormat(uint8_t type, const char* format, int* data_array,
+                            size_t len, uint8_t* status = nullptr);
 
 };
+
+template class MemoryBuffer<wchar_t>;
+template class MemoryBuffer<uint8_t>;
+template class MemoryBuffer<int8_t>;
+template class MemoryBuffer<uint16_t>;
+template class MemoryBuffer<int16_t>;
+template class MemoryBuffer<uint32_t>;
+template class MemoryBuffer<int32_t>;
 
 }
 

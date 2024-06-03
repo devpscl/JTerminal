@@ -100,8 +100,8 @@ void Terminal::detachInputPipeline(InputPipeline *input_pipeline) {
 
 void Terminal::setFlags(uint8_t flags) {
   flags_ = flags;
-  input_thread_cv_.notify_all();
   update();
+  input_thread_cv_.notify_all();
 }
 
 void Terminal::getFlags(uint8_t *flags_ptr) {
@@ -225,18 +225,17 @@ bool Terminal::Window::requestCursorPosition(pos_t *pos_ptr) {
     detachInputPipeline(&pipeline);
     return false;
   }
-  StringBuffer strbuf(buf, len);
-  if(strbuf.equal("\u001B[", EN_FLAG_SKIP_IF_TRUE)) {
-    short y = strbuf.readNumberFormat16();
-    strbuf.skip();
-    short x = strbuf.readNumberFormat16();
-
-    if(strbuf.equal('R', EN_FLAG_SKIP_IF_TRUE))  {
-      detachInputPipeline(&pipeline);
-      pos_ptr->x = x;
-      pos_ptr->y = y;
-      return true;
-    }
+  ESCBuffer buffer(buf, len);
+  if(!buffer.jumpNextESC()) {
+    detachInputPipeline(&pipeline);
+    return false;
+  }
+  int coord_array[2];
+  if(buffer.readSequenceFormat(ESC_CSI, "#,#R", coord_array, 2)) {
+    detachInputPipeline(&pipeline);
+    pos_ptr->x = coord_array[1];
+    pos_ptr->y = coord_array[0];
+    return true;
   }
   detachInputPipeline(&pipeline);
   return false;
