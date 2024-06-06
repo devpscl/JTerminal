@@ -134,7 +134,8 @@ class InputPipeline {
   uint32_t timeout_millis_;
   std::mutex mutex_;
   std::condition_variable condition_variable_;
-  std::stringbuf buf;
+  std::stringbuf buf_;
+  size_t buf_size_ = 0xFFFF;
 
   void write(const uint8_t* bytes, size_t len);
 
@@ -144,11 +145,17 @@ class InputPipeline {
 
   explicit InputPipeline(uint8_t priority = INPUT_PRIO_LOW, uint32_t timeout_millis = 0xFFFF);
 
+  ~InputPipeline();
+
+  void setBufferSize(size_t size);
+
   size_t available();
 
   [[nodiscard]] uint8_t priority() const;
 
   size_t read(uint8_t* bytes, size_t len);
+
+  void detach();
 
 };
 
