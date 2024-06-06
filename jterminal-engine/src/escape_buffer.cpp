@@ -19,6 +19,18 @@ void ESCBuffer::writeIntroducer(uint8_t type) {
   write(type);
 }
 
+void ESCBuffer::writeParamSequence(std::initializer_list<int> list) {
+  bool first = true;
+  for(const auto& param : list) {
+    if(!first) {
+      write(0x3B);
+    }
+    writeString(std::to_string(param));
+    first = false;
+  }
+
+}
+
 void ESCBuffer::writeParamSequence(const int *arr, size_t len) {
   for(size_t idx = 0; idx < len; idx++) {
     if(idx == 1) {

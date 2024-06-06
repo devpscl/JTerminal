@@ -112,6 +112,8 @@ class ESCBuffer : public StringBuffer {
 
   void writeIntroducer(uint8_t type);
 
+  void writeParamSequence(std::initializer_list<int> list);
+
   void writeParamSequence(const int* arr, size_t len);
 
   bool isESCByte(uint8_t offset = 0);
