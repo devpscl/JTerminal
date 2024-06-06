@@ -58,6 +58,10 @@ class MemoryBuffer {
 
   void erase();
 
+  [[nodiscard]] size_t size() const;
+
+  void reset();
+
   explicit operator bool() {
     return available();
   }

@@ -155,4 +155,14 @@ void MemoryBuffer<T>::erase() {
   len_ = cursor_;
 }
 
+template<typename T>
+size_t MemoryBuffer<T>::size() const {
+  return len_;
+}
+
+template<typename T>
+void MemoryBuffer<T>::reset() {
+  cursor_ = 0;
+}
+
 }
