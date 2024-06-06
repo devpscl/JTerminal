@@ -1,3 +1,4 @@
+#ifdef TERMINAL_WIN
 #include "../include/terminal.h"
 #include <Windows.h>
 #include <conio.h>
@@ -38,13 +39,13 @@ void Terminal::threadRead() {
   wchar_t buf[INPUT_BUFFER_SIZE + 1];
   unsigned long input_count;
   std::unique_lock<std::mutex> lock(input_thread_mutex_);
+
   while(!disposed_) {
-    while(!(flags_ & FLAG_ENHANCED_INPUT)) {
+    while(!(flags_ & FLAG_EXTENDED_INPUT)) {
       input_thread_cv_.wait(lock);
     }
     ReadConsoleW(handle, buf,INPUT_BUFFER_SIZE,
                  &input_count, nullptr);
-    buf[input_count] = '\0';
     std::string str = converter.to_bytes(buf);
     size_t len = str.length();
     const char* arr = str.c_str();
@@ -56,10 +57,39 @@ void Terminal::threadRead() {
   }
 }
 
-void Terminal::create() {
+void Terminal::threadWindowEvent() {
+  std::unique_lock<std::mutex> lock(window_thread_mutex_);
+  uint16_t delay_millis = option_byte_ & 0x1 ? 1000 : 200;
+  dim_t old_dim;
+  dim_t current_dim;
+  Window::getDimension(&old_dim);
+  ESCBuffer esc_buffer(24);
+  while(!disposed_) {
+    while(!(flags_ & FLAG_WINDOW_INPUT)) {
+      window_thread_cv_.wait(lock);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay_millis));
+    Window::getDimension(&current_dim);
+    if(current_dim != old_dim) {
+      esc_buffer.reset();
+      esc_buffer.writeIntroducer(ESC_CSI);
+      esc_buffer.write(':');
+      esc_buffer.writeParamSequence(
+          {current_dim.width, current_dim.height, old_dim.width, old_dim.height});
+      esc_buffer.write('W');
+      old_dim = current_dim;
+      sendInput(esc_buffer.ptr(), esc_buffer.cursor());
+    }
+  }
+}
+
+void Terminal::create(uint8_t mode) {
+  option_byte_ |= mode ? 0x1 : 0;
+  option_byte_ |= 0x2;
   flags_ = FLAG_DEFAULT;
   update();
   input_thread_ = new std::thread(threadRead);
+  window_thread_ = new std::thread(threadWindowEvent);
 }
 
 void Terminal::dispose() {
@@ -68,7 +98,7 @@ void Terminal::dispose() {
 }
 
 bool Terminal::isValid() {
-  return !disposed_;
+  return !disposed_ && option_byte_ & 0x2;
 }
 
 bool Terminal::isDisposed() {
@@ -102,6 +132,7 @@ void Terminal::setFlags(uint8_t flags) {
   flags_ = flags;
   update();
   input_thread_cv_.notify_all();
+  window_thread_cv_.notify_all();
 }
 
 void Terminal::getFlags(uint8_t *flags_ptr) {
@@ -125,7 +156,7 @@ void Terminal::update() {
   if(flags_ & FLAG_SIGNAL_INPUT) {
     mode |= ENABLE_WINDOW_INPUT;
   }
-  if(flags_ & FLAG_ENHANCED_INPUT) {
+  if(flags_ & FLAG_EXTENDED_INPUT) {
     mode |= ENABLE_PROCESSED_INPUT;
     mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
   }
@@ -169,7 +200,7 @@ void Terminal::beep() {
 
 void Terminal::Window::setTitle(const char *cstr) {
   if(cstr == nullptr) {
-    cstr = "JTerminal";
+    cstr = TERMINAL_DEFAULT_TITLE;
   }
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wstr = converter.from_bytes(std::string(cstr));
@@ -307,3 +338,4 @@ bool Terminal::Window::isOnFocus() {
   return GetForegroundWindow() == console_window;
 }
 }
+#endif

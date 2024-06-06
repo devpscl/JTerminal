@@ -13,18 +13,32 @@ class Terminal {
   inline static volatile uint8_t            flags_ = 0;
   inline static std::vector<InputPipeline*> pipelines_;
   inline static uint8_t                     cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
+  inline static uint8_t                     option_byte_ = 0;
 
   inline static std::condition_variable     input_thread_cv_;
   inline static std::mutex                  input_thread_mutex_;
   inline static std::thread*                input_thread_;
+  inline static std::condition_variable     window_thread_cv_;
+  inline static std::mutex                  window_thread_mutex_;
+  inline static std::thread*                window_thread_;
 
   static void sendInput(uint8_t* bytes, size_t len);
 
   static void threadRead();
 
+#if defined(TERMINAL_WIN)
+
+  static void threadWindowEvent();
+
+#elif defined(TERMINAL_UNIX)
+
+  static void signalWindowEvent(int);
+
+#endif
+
  public:
 
-  static void create();
+  static void create(uint8_t mode = TERMINAL_MODE_PERFORMANCE);
 
   static void dispose();
 

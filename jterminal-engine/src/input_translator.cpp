@@ -20,10 +20,10 @@ bool jterminal::translateInput(jterminal::InputEvent *event, jterminal::StringBu
     event->type = InputType::Keyboard;
     return true;
   }
-  int param_data[3];
+  int param_data[4];
   uint8_t esf_status;
   size_t esc_len = esc_buffer.peekSequenceFormat(ESC_CSI, "<#;#;#M", param_data,
-                                                 3, &esf_status);
+                                                 4, &esf_status);
   if(esf_status == ESC_FORMAT_OK) {
     esc_buffer.skip(esc_len);
     event->mouse.position = pos_t{param_data[1], param_data[2]};
@@ -66,9 +66,10 @@ bool jterminal::translateInput(jterminal::InputEvent *event, jterminal::StringBu
     event->type = InputType::Mouse;
     return true;
   }
-  esc_len = esc_buffer.readSequenceFormat(ESC_CSI, "<#;#;#m", param_data,
-                                          3, &esf_status);
+  esc_len = esc_buffer.peekSequenceFormat(ESC_CSI, "<#;#;#m", param_data,
+                                          4, &esf_status);
   if(esf_status == ESC_FORMAT_OK) {
+    esc_buffer.skip(esc_len);
     event->mouse.position = pos_t{param_data[1], param_data[2]};
     switch (param_data[0]) {
       case 0:
@@ -91,6 +92,17 @@ bool jterminal::translateInput(jterminal::InputEvent *event, jterminal::StringBu
         return false;
     }
     event->type = InputType::Mouse;
+    return true;
+  }
+  esc_len = esc_buffer.peekSequenceFormat(ESC_CSI, ":#;#;#;#W", param_data,
+                                          4, &esf_status);
+  if(esf_status == ESC_FORMAT_OK) {
+    esc_buffer.skip(esc_len);
+    event->window.new_size.width = param_data[0];
+    event->window.new_size.height = param_data[1];
+    event->window.old_size.width = param_data[2];
+    event->window.old_size.width = param_data[3];
+    event->type == InputType::Window;
     return true;
   }
   return false;

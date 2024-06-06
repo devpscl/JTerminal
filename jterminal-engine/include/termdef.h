@@ -16,8 +16,9 @@ class Terminal;
 #define FLAG_ECHO                 0x02
 #define FLAG_MOUSE_INPUT          0x04
 #define FLAG_MOUSE_EXTENDED_INPUT 0x08
-#define FLAG_ENHANCED_INPUT       0x10
+#define FLAG_EXTENDED_INPUT       0x10
 #define FLAG_SIGNAL_INPUT         0x20
+#define FLAG_WINDOW_INPUT         0x40
 
 #define CURSOR_FLAG_VISIBLE       0x01
 #define CURSOR_FLAG_BLINKING      0x02
@@ -29,6 +30,11 @@ class Terminal;
 #define FLAG_DEFAULT (FLAG_ECHO | FLAG_LINE_INPUT | FLAG_SIGNAL_INPUT)
 
 #define INPUT_BUFFER_SIZE 128
+
+#define TERMINAL_MODE_PERFORMANCE 0
+#define TERMINAL_MODE_EFFICIENCY  1
+
+#define TERMINAL_DEFAULT_TITLE "Terminal"
 
 struct Pos;
 struct Dim;
