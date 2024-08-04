@@ -15,3 +15,12 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+### CLION ###
+!**/cmake-build-release/
+!**/cmake-build-debug/
+!**/cmake-build-release-ssh/
+!**/cmake-build-debug-ssh/
+!**/cmake-build-release-wsl/
+!**/cmake-build-debug-wsl/
+
