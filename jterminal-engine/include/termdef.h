@@ -36,11 +36,17 @@ class Terminal;
 
 #define TERMINAL_DEFAULT_TITLE "Terminal"
 
+
 struct Pos;
 struct Dim;
 
 typedef Pos pos_t;
 typedef Dim dim_t;
+
+struct Settings {
+  uint8_t mode = TERMINAL_MODE_PERFORMANCE;
+  uint32_t input_buffer_size = 4096;
+};
 
 struct Pos {
   uint16_t x;
@@ -50,7 +56,7 @@ struct Pos {
 
   Pos(int16_t x, int16_t y) : x(x), y(y) {}
 
-  Pos(int x, int y) : x(x), y(y) {}
+  Pos(uint32_t x, uint32_t y) : x(x), y(y) {}
 
   Pos() : x(1), y(1) {}
 };

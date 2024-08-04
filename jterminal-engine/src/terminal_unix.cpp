@@ -1,3 +1,6 @@
+
+#ifdef TERMINAL_UNIX
+
 #include "../include/terminal.h"
 #include <bits/stdc++.h>
 #include <sys/ioctl.h>
@@ -5,8 +8,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/signal.h>
-
-#ifdef TERMINAL_UNIX
 
 namespace jterminal {
 
@@ -26,14 +27,11 @@ void Terminal::signalWindowEvent(int) {
     return;
   }
   esc_buffer.reset();
-  esc_buffer.writeIntroducer(ESC_CSI);
-  esc_buffer.write(':');
-  esc_buffer.writeParamSequence(
-      {current_dim.width,
-       current_dim.height,
-       window_event_old_dim_.width,
-       window_event_old_dim_.height});
-  esc_buffer.write('W');
+  CSISequence sequence = CSI_SEQUENCE_PRIVATE('=','W',current_dim.width,
+                                              current_dim.height,
+                                              window_event_old_dim_.width,
+                                              window_event_old_dim_.height);
+  esc_buffer.writeSequence(sequence);
   window_event_old_dim_ = current_dim;
   sendInput(esc_buffer.ptr(), esc_buffer.cursor());
 }
@@ -60,7 +58,7 @@ void Terminal::threadRead() {
     while(!(flags_ & FLAG_EXTENDED_INPUT)) {
       input_thread_cv_.wait(lock);
     }
-    size_t len = read(STDIN_FILENO, buf, INPUT_BUFFER_SIZE);
+    size_t len = ::read(STDIN_FILENO, buf, INPUT_BUFFER_SIZE);
     uint8_t data[len];
     for(size_t idx = 0; idx < len; idx++) {
       data[idx] = buf[idx];
@@ -69,21 +67,26 @@ void Terminal::threadRead() {
   }
 }
 
-void Terminal::create(uint8_t mode) {
-  option_byte_ |= mode ? 0x1 : 0;
-  option_byte_ |= 0x2;
+void Terminal::create(Settings settings) {
+  main_pipeline_ = new InputPipeline(INPUT_PRIO_HIGH);
+  pipelines_.push_back(main_pipeline_);
+  settings_ = settings;
+  flags_ = FLAG_DEFAULT;
   Window::getDimension(&window_event_old_dim_);
   update();
   input_thread_ = new std::thread(threadRead);
   signal(SIGWINCH, signalWindowEvent);
+  enabled_ = true;
 }
 
 void Terminal::dispose() {
   disposed_ = true;
+  reset(false);
+  input_thread_->detach();
 }
 
 bool Terminal::isValid() {
-  return !disposed_ && option_byte_ & 0x2;
+  return !disposed_ && enabled_;
 }
 
 bool Terminal::isDisposed() {
@@ -151,12 +154,12 @@ void Terminal::update() {
   attributes.c_cc[VTIME] = 1;
   tcsetattr(STDIN_FILENO, TCSANOW, &attributes);
   strstream buf;
-  buf << ESC_TITLE_START << window_title_ << ESC_TITLE_END;
   buf << (cursor_flags_ & CURSOR_FLAG_VISIBLE ? ESC_ENABLE_CURSOR : ESC_DISABLE_CURSOR);
   buf << (cursor_flags_ & CURSOR_FLAG_BLINKING
              ? ESC_ENABLE_CURSOR_BLINKING : ESC_DISABLE_CURSOR_BLINKING);
   buf << (flags_ & FLAG_MOUSE_EXTENDED_INPUT ? ESC_ENABLE_MOUSE_EXTENDED :
              ((flags_ & FLAG_MOUSE_INPUT) ? ESC_ENABLE_MOUSE : ESC_DISABLE_MOUSE));
+  buf << ESC_TITLE_START << window_title_ << ESC_TITLE_END;
   write(buf.str().c_str());
 }
 
@@ -177,11 +180,19 @@ void Terminal::write(uint8_t *bytes, size_t len) {
 }
 
 void Terminal::write(const char *cstr) {
-  std::cout << cstr;
+  ::write(STDOUT_FILENO, cstr, strlen(cstr));
 }
 
 void Terminal::beep() {
   write("\a");
+}
+
+size_t Terminal::read(uint8_t *bytes, size_t size) {
+  return main_pipeline_->read(bytes, size);
+}
+
+void Terminal::readInput(InputEvent *input_event) {
+  main_pipeline_->readInput(input_event);
 }
 
 void Terminal::Window::setTitle(const char *cstr) {
@@ -201,18 +212,16 @@ void Terminal::Window::setDimension(const dim_t &dim) {
   size.ws_col = dim.width;
   size.ws_row = dim.height;
   ioctl(STDOUT_FILENO, TIOCSWINSZ, &size);
+  CSISequence sequence = CSI_SEQUENCE('t', 8, dim.height, dim.width);
   ESCBuffer buffer(16);
-  buffer.writeIntroducer(ESC_CSI);
-  buffer.writeParamSequence({8, dim.height, dim.width});
-  buffer.write('t');
+  buffer.writeSequence(sequence);
   write(buffer.ptr(), buffer.size());
 }
 
 void Terminal::Window::setCursor(const pos_t &pos) {
+  CSISequence sequence = CSI_SEQUENCE('f', 8, pos.y, pos.x);
   ESCBuffer buffer(16);
-  buffer.writeIntroducer(ESC_CSI);
-  buffer.writeParamSequence({pos.y, pos.x});
-  buffer.write('f');
+  buffer.writeSequence(sequence);
   write(buffer.ptr(), buffer.size());
 }
 
@@ -224,25 +233,29 @@ void Terminal::Window::getDimension(dim_t *dim_ptr) {
 }
 
 bool Terminal::Window::requestCursorPosition(pos_t *pos_ptr) {
-  InputPipeline pipeline(INPUT_PRIO_HIGHEST_SINGLETON, 500);
+  InputPipeline pipeline(INPUT_PRIO_HIGHEST_SINGLETON, 24);
   uint8_t buf[8];
   attachInputPipeline(&pipeline);
   write(ESC_CURSOR_REQUEST);
-  size_t len = pipeline.read(buf, 8);
-  if(len == -1) {
+  size_t len = pipeline.read(buf, 8, std::chrono::milliseconds(10));
+  if(len == -1 || len == 0) {
     detachInputPipeline(&pipeline);
     return false;
   }
   ESCBuffer buffer(buf, len);
-  if(!buffer.jumpNextESC()) {
+  if(!buffer.skipToNextSequence()) {
     detachInputPipeline(&pipeline);
     return false;
   }
-  int coord_array[2];
-  if(buffer.readSequenceFormat(ESC_CSI, "#,#R", coord_array, 2)) {
+  CSISequenceString sequence_string;
+  if(!buffer.readSequence(&sequence_string)) {
     detachInputPipeline(&pipeline);
-    pos_ptr->x = coord_array[1];
-    pos_ptr->y = coord_array[0];
+    return false;
+  }
+  if(sequence_string.endSymbol() == 'R' && sequence_string.paramCount() == 2) {
+    detachInputPipeline(&pipeline);
+    pos_ptr->x = sequence_string[1];
+    pos_ptr->y = sequence_string[0];
     return true;
   }
   detachInputPipeline(&pipeline);

@@ -11,10 +11,12 @@ namespace jterminal {
 class Terminal {
   inline static volatile bool               disposed_ = false;
   inline static volatile uint8_t            flags_ = 0;
+  inline static volatile bool               enabled_ = false;
+  inline static Settings                    settings_;
   inline static std::vector<InputPipeline*> pipelines_;
   inline static uint8_t                     cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
-  inline static uint8_t                     option_byte_ = 0;
 
+  inline static InputPipeline*              main_pipeline_;
   inline static std::condition_variable     input_thread_cv_;
   inline static std::mutex                  input_thread_mutex_;
   inline static std::thread*                input_thread_;
@@ -38,7 +40,7 @@ class Terminal {
 
  public:
 
-  static void create(uint8_t mode = TERMINAL_MODE_PERFORMANCE);
+  static void create(Settings settings = {});
 
   static void dispose();
 
@@ -65,6 +67,10 @@ class Terminal {
   static void write(const char* cstr);
 
   static void beep();
+
+  static size_t read(uint8_t* bytes, size_t size);
+
+  static void readInput(InputEvent* input_event);
 
   union Window {
 

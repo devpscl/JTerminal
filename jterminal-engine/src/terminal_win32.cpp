@@ -8,8 +8,6 @@
 #include <sstream>
 #include <bits/stdc++.h>
 #include <thread>
-#include "../include/escseq.h"
-#include "../include/bufnio.h"
 
 using strstream = std::stringstream;
 
@@ -46,6 +44,7 @@ void Terminal::threadRead() {
     }
     ReadConsoleW(handle, buf,INPUT_BUFFER_SIZE,
                  &input_count, nullptr);
+    buf[input_count] = 0;
     std::string str = converter.to_bytes(buf);
     size_t len = str.length();
     const char* arr = str.c_str();
@@ -59,7 +58,7 @@ void Terminal::threadRead() {
 
 void Terminal::threadWindowEvent() {
   std::unique_lock<std::mutex> lock(window_thread_mutex_);
-  uint16_t delay_millis = option_byte_ & 0x1 ? 1000 : 200;
+  uint16_t delay_millis = settings_.mode == TERMINAL_MODE_EFFICIENCY ? 1000 : 200;
   dim_t old_dim;
   dim_t current_dim;
   Window::getDimension(&old_dim);
@@ -72,24 +71,24 @@ void Terminal::threadWindowEvent() {
     Window::getDimension(&current_dim);
     if(current_dim != old_dim) {
       esc_buffer.reset();
-      esc_buffer.writeIntroducer(ESC_CSI);
-      esc_buffer.write(':');
-      esc_buffer.writeParamSequence(
-          {current_dim.width, current_dim.height, old_dim.width, old_dim.height});
-      esc_buffer.write('W');
+      CSISequence sequence = CSI_SEQUENCE_PRIVATE('=','W',current_dim.width, current_dim.height,
+                                                  old_dim.width, old_dim.height);
+      esc_buffer.writeSequence(sequence);
       old_dim = current_dim;
       sendInput(esc_buffer.ptr(), esc_buffer.cursor());
     }
   }
 }
 
-void Terminal::create(uint8_t mode) {
-  option_byte_ |= mode ? 0x1 : 0;
-  option_byte_ |= 0x2;
+void Terminal::create(Settings settings) {
+  main_pipeline_ = new InputPipeline(INPUT_PRIO_HIGH);
+  pipelines_.push_back(main_pipeline_);
+  settings_ = settings;
   flags_ = FLAG_DEFAULT;
   update();
   input_thread_ = new std::thread(threadRead);
   window_thread_ = new std::thread(threadWindowEvent);
+  enabled_ = true;
 }
 
 void Terminal::dispose() {
@@ -98,7 +97,7 @@ void Terminal::dispose() {
 }
 
 bool Terminal::isValid() {
-  return !disposed_ && option_byte_ & 0x2;
+  return !disposed_ && enabled_;
 }
 
 bool Terminal::isDisposed() {
@@ -120,7 +119,7 @@ void Terminal::attachInputPipeline(InputPipeline *input_pipeline) {
 }
 
 void Terminal::detachInputPipeline(InputPipeline *input_pipeline) {
-  for(uint8_t idx = 0; idx < pipelines_.size(); idx++) {
+  for(size_t idx = 0; idx < pipelines_.size(); idx++) {
     if(pipelines_[idx] == input_pipeline) {
       pipelines_.erase(pipelines_.begin() + idx);
       return;
@@ -198,6 +197,14 @@ void Terminal::beep() {
   write("\a");
 }
 
+size_t Terminal::read(uint8_t *bytes, size_t size) {
+  return main_pipeline_->read(bytes, size);
+}
+
+void Terminal::readInput(InputEvent *input_event) {
+  main_pipeline_->readInput(input_event);
+}
+
 void Terminal::Window::setTitle(const char *cstr) {
   if(cstr == nullptr) {
     cstr = TERMINAL_DEFAULT_TITLE;
@@ -247,25 +254,27 @@ void Terminal::Window::getDimension(dim_t *dim_ptr) {
 }
 
 bool Terminal::Window::requestCursorPosition(pos_t *pos_ptr) {
-  InputPipeline pipeline(INPUT_PRIO_HIGHEST_SINGLETON, 500);
+  InputPipeline pipeline(INPUT_PRIO_HIGHEST_SINGLETON, 24);
   uint8_t buf[8];
   attachInputPipeline(&pipeline);
   write(ESC_CURSOR_REQUEST);
-  size_t len = pipeline.read(buf, 8);
+  size_t len = pipeline.read(buf, 8, std::chrono::milliseconds(10));
   if(len == -1) {
     detachInputPipeline(&pipeline);
     return false;
   }
   ESCBuffer buffer(buf, len);
-  if(!buffer.jumpNextESC()) {
+  while(buffer.hasNext() && !buffer.isESCByte());
+  CSISequenceString sequence_string;
+
+  if(!buffer.readSequence(&sequence_string)) {
     detachInputPipeline(&pipeline);
     return false;
   }
-  int coord_array[2];
-  if(buffer.readSequenceFormat(ESC_CSI, "#,#R", coord_array, 2)) {
+  if(sequence_string.endSymbol() == 'R' && sequence_string.paramCount() == 2) {
     detachInputPipeline(&pipeline);
-    pos_ptr->x = coord_array[1];
-    pos_ptr->y = coord_array[0];
+    pos_ptr->x = sequence_string[1];
+    pos_ptr->y = sequence_string[0];
     return true;
   }
   detachInputPipeline(&pipeline);
