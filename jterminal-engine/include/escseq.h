@@ -1,7 +1,9 @@
 #ifndef JTERMINAL_ENGINE_INCLUDE_ESCSEQ_H_
 #define JTERMINAL_ENGINE_INCLUDE_ESCSEQ_H_
 #include "termdef.h"
-#include <string_view>
+#include <utility>
+#include <vector>
+#include <string>
 
 #define ESC_RESET                   "\u001B[0m"
 #define ESC_ENABLE_CURSOR           "\u001B[?25h"
@@ -11,8 +13,8 @@
 #define ESC_DISABLE_MOUSE           "\u001B[?1000l\x1B[?1003l"
 #define ESC_ENABLE_CURSOR_BLINKING  "\u001B[?12h"
 #define ESC_DISABLE_CURSOR_BLINKING "\u001B[?12l"
-#define ESC_TITLE_START             "\u001B[0;"
-#define ESC_TITLE_END               "\x7"
+#define ESC_TITLE_START             "\u001B]0;"
+#define ESC_TITLE_END               "\007"
 #define ESC_ENABLE_ALT_BUFFER       "\u001B[?1049h"
 #define ESC_DISABLE_ALT_BUFFER      "\u001B[?1049l"
 #define ESC_CURSOR_REQUEST          "\u001B[6n"
@@ -50,60 +52,76 @@
 #define ESC_FCOLOR_WHITE_B          "\u001B[37m"
 
 #define ESC                   0x1B
-
-#define ESC_SS3          0x4F
-#define ESC_CSI          0x5B
-
-#define ESC_BYTE_UNKNOWN      0
-#define ESC_BYTE_PARAM        1
-#define ESC_BYTE_END          2
-#define ESC_BYTE_INTERMEDIATE 3
+#define CSI_TYPE              0x5B
 
 #define ESC_IS_VALID_BYTE(b) (b >= 0x20 && b <= 0x7E)
 #define ESC_IS_PRIVATE_BYTE(b) ((b >= 0x70 && b <= 0x7E) || (b >= 0x3C && b <= 0x3F))
 #define ESC_IS_END_BYTE(b) (b >= 0x40 && b <= 0x7E)
 #define ESC_IS_PARAM_BYTE(b) (b >= 0x30 && b <= 0x3F)
 #define ESC_IS_INTERMEDIATE_BYTE(b) (b >= 0x20 && b <= 0x2F)
+#define ESC_IS_CODE(b) (b >= 0x41 && b <= 0x60)
 
-#define ESC_FORMAT_NOT_MATCH      0
-#define ESC_FORMAT_COMPILE_ERROR  1
-#define ESC_FORMAT_OK             2
+#define CSI_SEQUENCE(end,...) CSISequence(0,{__VA_ARGS__},end)
+#define CSI_SEQUENCE_PRIVATE(prv_char,end,...) CSISequence(prv_char,{__VA_ARGS__},end)
 
-struct EscapeSequenceFormat {
-  uint8_t type = 0;
-  uint8_t private_param_char = 0;
-  uint8_t param_count = 0;
-  uint8_t end_char = 0;
+class CSISequence {
+  char private_char_;
+  std::vector<uint32_t> value_vector_;
+  char end_symbol_;
+
+ public:
+
+  CSISequence(char private_char, const std::vector<uint32_t> &value_vector, char end_symbol) : private_char_(
+      private_char), value_vector_(value_vector), end_symbol_(end_symbol) {}
+
+  CSISequence() : CSISequence(false, {}, 0) {}
+
+  [[nodiscard]] char privateChar() const {
+    return private_char_;
+  }
+
+  [[nodiscard]] char endSymbol() const {
+    return end_symbol_;
+  }
+
+  uint32_t operator [](size_t index) {
+    return value_vector_[index];
+  };
+
+  uint32_t param(size_t index) {
+    return value_vector_[index];
+  }
+
+  size_t paramCount() {
+    return value_vector_.size();
+  }
+
+  operator bool() {
+    return end_symbol_ != 0;
+  }
+
 };
 
-constexpr bool compileESCFormat(uint8_t type, const char* str, EscapeSequenceFormat* escape_sequence_format) {
-  escape_sequence_format->type = type;
-  escape_sequence_format->param_count = 0;
-  size_t cursor = 0;
-  std::string_view sv(str);
-  if(sv.empty()) {
-    return false;
-  }
-  char next = sv[cursor++];
-  escape_sequence_format->private_param_char = ESC_IS_PRIVATE_BYTE(next) ? next : 0;
+class CSISequenceString : public CSISequence {
+  std::string str_;
 
-  while(sv[cursor] == '#') {
-    escape_sequence_format->param_count++;
-    cursor++;
-    if(sv[cursor] == ';') {
-      cursor++;
-      continue;
-    }
-    break;
+ public:
+
+  CSISequenceString() : CSISequenceString(0, {}, 0, "") {};
+
+  CSISequenceString(char private_char,
+                    const std::vector<uint32_t> &value_vector,
+                    char end_symbol,
+                    std::string str) : CSISequence(private_char, value_vector, end_symbol), str_(std::move(str)) {}
+
+  std::string str() {
+    return str_;
   }
-  if((sv.length() - cursor) == 1) {
-    char last = sv[cursor];
-    if(ESC_IS_END_BYTE(last)) {
-      escape_sequence_format->end_char = last;
-      return true;
-    }
+
+  size_t length() {
+    return str_.length();
   }
-  return false;
-}
+
+};
 
 #endif //JTERMINAL_ENGINE_INCLUDE_ESCSEQ_H_
