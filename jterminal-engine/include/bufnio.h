@@ -3,13 +3,14 @@
 #include "termdef.h"
 #include "escseq.h"
 #include <string>
+#include <mutex>
+#include <condition_variable>
 
 #define EN_FLAG_IGNORE_CASE   0x1
 #define EN_FLAG_SKIP_IF_TRUE  0x2
 #define EN_FLAG_TO_BUF_END    0x4
 
 namespace jterminal {
-
 
 template <typename T>
 class MemoryBuffer {
@@ -91,9 +92,11 @@ class StringBuffer : public MemoryBuffer<uint8_t> {
 
   int readNumberFormat32();
 
+  int peekNumberFormat32(size_t offset = 0, size_t* len = nullptr);
+
   short readNumberFormat16();
 
-  size_t peekWideCharLength();
+  size_t scanWideCharLength();
 
   wchar_t readWideChar();
 
@@ -108,13 +111,9 @@ class ESCBuffer : public StringBuffer {
 
   ESCBuffer(uint8_t* array, size_t len);
 
-  bool jumpNextESC();
+  bool skipToNextSequence();
 
   void writeIntroducer(uint8_t type);
-
-  void writeParamSequence(std::initializer_list<int> list);
-
-  void writeParamSequence(const int* arr, size_t len);
 
   bool isESCByte(uint8_t offset = 0);
 
@@ -130,19 +129,99 @@ class ESCBuffer : public StringBuffer {
 
   uint8_t peekIntroducer();
 
-  size_t readParamSequence(int* arr, size_t len);
-
   size_t scanESCLength();
 
-  size_t peekEscapeSequence(void* arr, size_t arr_len);
+  bool peekSequence(CSISequenceString* sequence_string);
 
-  size_t readEscapeSequence(void* arr, size_t arr_len);
+  bool readSequence(CSISequenceString* sequence_string);
 
-  size_t peekSequenceFormat(uint8_t type, const char* format, int* data_array,
-                            size_t len, uint8_t* status = nullptr);
+  void writeSequence(CSISequence& sequence);
 
-  size_t readSequenceFormat(uint8_t type, const char* format, int* data_array,
-                            size_t len, uint8_t* status = nullptr);
+};
+
+template <typename T>
+class QueuedBuffer {
+ private:
+  T* array_;
+  size_t len_;
+  size_t head_index_ = 0;
+  size_t tail_index_ = 0;
+  std::mutex global_sync_mutex_{};
+  std::mutex sync_write_mutex_{};
+  std::mutex sync_read_mutex_{};
+  std::mutex write_notify_mutex_{};
+  std::mutex read_notify_mutex_{};
+  std::condition_variable write_cv_{};
+  std::condition_variable read_cv_{};
+
+ protected:
+
+  void notifyWrite() {
+    write_cv_.notify_one();
+  }
+
+  void notifyRead() {
+    read_cv_.notify_one();
+  }
+
+ public:
+
+  explicit QueuedBuffer(size_t capacity);
+
+  ~QueuedBuffer();
+
+  size_t writeNB(void* ptr, size_t len);
+
+  size_t readNB(void* ptr, size_t len);
+
+  template<typename Rep, typename Period>
+  size_t write(void* ptr, size_t len, std::chrono::duration<Rep, Period> timeout) {
+    std::unique_lock<std::mutex> lock(write_notify_mutex_);
+    write_cv_.wait_for(lock, timeout, [this](){
+      return free();
+    });
+    return writeNB(ptr, len);
+  }
+
+  template<typename Rep, typename Period>
+  size_t read(void* ptr, size_t len, std::chrono::duration<Rep, Period> timeout) {
+    std::unique_lock<std::mutex> lock(read_notify_mutex_);
+    read_cv_.wait_for(lock, timeout, [this](){
+      return available();
+    });
+    return readNB(ptr, len);
+  }
+
+  size_t write(void* ptr, size_t len) {
+    std::unique_lock<std::mutex> lock(write_notify_mutex_);
+    write_cv_.wait(lock, [this](){
+      return free();
+    });
+    return writeNB(ptr, len);
+  }
+
+  size_t read(void* ptr, size_t len) {
+    std::unique_lock<std::mutex> lock(read_notify_mutex_);
+    read_cv_.wait(lock, [this](){
+      size_t avail = available();
+      return avail;
+    });
+    return readNB(ptr, len);
+  }
+
+  size_t peek(void* ptr, size_t len);
+
+  bool isEmpty();
+
+  bool isFull();
+
+  size_t available();
+
+  size_t free();
+
+  size_t size();
+
+  void clear();
 
 };
 
@@ -153,6 +232,14 @@ template class MemoryBuffer<uint16_t>;
 template class MemoryBuffer<int16_t>;
 template class MemoryBuffer<uint32_t>;
 template class MemoryBuffer<int32_t>;
+
+template class QueuedBuffer<wchar_t>;
+template class QueuedBuffer<uint8_t>;
+template class QueuedBuffer<int8_t>;
+template class QueuedBuffer<uint16_t>;
+template class QueuedBuffer<int16_t>;
+template class QueuedBuffer<uint32_t>;
+template class QueuedBuffer<int32_t>;
 
 }
 
