@@ -1,33 +1,37 @@
 #include "../include/terminput.h"
 
+namespace jterminal {
 
-bool jterminal::translateInput(jterminal::InputEvent *event, jterminal::StringBuffer* buffer) {
-  if(!buffer->hasNext()) {
-    return false;
-  }
-  auto& esc_buffer = buffer->downcast<ESCBuffer>();
+void translateInput(InputEvent* event, uint8_t* bytes, size_t len) {
+  event->sequence_opt = std::nullopt;
   event->type = InputType::Unknown;
-  event->symbol = buffer->peekWideChar();
-  size_t len = esc_buffer.scanESCLength();
-  if(len == 0) {
-    len = esc_buffer.peekWideCharLength();
+  ESCBuffer buffer(bytes, len);
+  if(!buffer.hasNext()) {
+    event->keyboard.wide_char = 0;
+    event->keyboard.key = KEY_UNKNOWN;
+    event->keyboard.state = KS_NONE;
+    event->type = InputType::Keyboard;
+    return;
   }
-  uint8_t bytes[len];
-  esc_buffer.peek(bytes, len);
   uint64_t hashcode = hashInput(bytes, len);
   if(translateInput(event, hashcode)) {
-    esc_buffer.skip(len);
+    event->keyboard.wide_char = buffer.readWideChar();
     event->type = InputType::Keyboard;
-    return true;
+    return;
   }
-  int param_data[4];
-  uint8_t esf_status;
-  size_t esc_len = esc_buffer.peekSequenceFormat(ESC_CSI, "<#;#;#M", param_data,
-                                                 4, &esf_status);
-  if(esf_status == ESC_FORMAT_OK) {
-    esc_buffer.skip(esc_len);
-    event->mouse.position = pos_t{param_data[1], param_data[2]};
-    switch (param_data[0]) {
+  CSISequenceString sequence;
+  if(!buffer.readSequence(&sequence)) {
+    wchar_t wch = buffer.readWideChar();
+    event->keyboard.wide_char = wch;
+    event->keyboard.key = KEY_UNKNOWN;
+    event->keyboard.state = KS_NONE;
+    event->type = InputType::Keyboard;
+    return;
+  }
+  event->sequence_opt = sequence;
+  if(sequence.endSymbol() == 'M' && sequence.paramCount() == 3 && sequence.privateChar() == '<') {
+    event->mouse.position = pos_t{sequence[1], sequence[2]};
+    switch (sequence[0]) {
       case 0:
         event->mouse.button = MOUSE_LEFT_BUTTON;
         event->mouse.action = MOUSE_ACTION_PRESS;
@@ -61,17 +65,14 @@ bool jterminal::translateInput(jterminal::InputEvent *event, jterminal::StringBu
         event->mouse.action = MOUSE_ACTION_MOVE;
         break;
       default:
-        return false;
+        return;
     }
     event->type = InputType::Mouse;
-    return true;
+    return;
   }
-  esc_len = esc_buffer.peekSequenceFormat(ESC_CSI, "<#;#;#m", param_data,
-                                          4, &esf_status);
-  if(esf_status == ESC_FORMAT_OK) {
-    esc_buffer.skip(esc_len);
-    event->mouse.position = pos_t{param_data[1], param_data[2]};
-    switch (param_data[0]) {
+  if(sequence.endSymbol() == 'm' && sequence.paramCount() == 3 && sequence.privateChar() == '<') {
+    event->mouse.position = pos_t{sequence[1], sequence[2]};
+    switch (sequence[0]) {
       case 0:
         event->mouse.button = MOUSE_LEFT_BUTTON;
         event->mouse.action = MOUSE_ACTION_RELEASE;
@@ -89,21 +90,20 @@ bool jterminal::translateInput(jterminal::InputEvent *event, jterminal::StringBu
         event->mouse.action = MOUSE_ACTION_MOVE;
         break;
       default:
-        return false;
+        return;
     }
     event->type = InputType::Mouse;
-    return true;
+    return;
   }
-  esc_len = esc_buffer.peekSequenceFormat(ESC_CSI, ":#;#;#;#W", param_data,
-                                          4, &esf_status);
-  if(esf_status == ESC_FORMAT_OK) {
-    esc_buffer.skip(esc_len);
-    event->window.new_size.width = param_data[0];
-    event->window.new_size.height = param_data[1];
-    event->window.old_size.width = param_data[2];
-    event->window.old_size.width = param_data[3];
-    event->type == InputType::Window;
-    return true;
+  if(sequence.endSymbol() == 'W' && sequence.paramCount() == 4 && sequence.privateChar() == ':') {
+    event->window.new_size.width = sequence[0];
+    event->window.new_size.height = sequence[1];
+    event->window.old_size.width = sequence[2];
+    event->window.old_size.width = sequence[3];
+    event->type = InputType::Window;
+    return;
   }
-  return false;
+
+}
+
 }
