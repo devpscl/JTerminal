@@ -2,61 +2,59 @@
 #include <chrono>
 #include <mutex>
 #include "../include/terminal.h"
+#include <iostream> //todo remove
 
 namespace jterminal {
 
-InputPipeline::InputPipeline(uint8_t priority, uint32_t timeout_millis) {
+InputPipeline::InputPipeline(uint8_t priority, size_t capacity) {
   priority_ = priority;
-  timeout_millis_ = timeout_millis;
+  buf_ = new QueuedBuffer<uint8_t>(capacity);
 }
 
 InputPipeline::~InputPipeline() {
   detach();
+  delete buf_;
 }
 
-void InputPipeline::setBufferSize(size_t size) {
-  buf_size_ = size;
-}
-
-void InputPipeline::write(const uint8_t *bytes, size_t len) {
-  size_t current_size = buf_.in_avail();
-  size_t remaining_size = current_size >= buf_size_ ? 0 : buf_size_ - current_size;
-
-  size_t real_len = len >= remaining_size ? remaining_size : len;
-  if(real_len == 0) {
-    return;
-  }
-  std::unique_lock<std::mutex> lock(mutex_);
-  buf_.sputn(reinterpret_cast<const char*>(bytes), real_len);
-  condition_variable_.notify_one();
+void InputPipeline::write(void *bytes, size_t len) {
+  buf_->writeNB(bytes, len);
 }
 
 size_t InputPipeline::available() {
-  return buf_.in_avail();
+  return buf_->available();
 }
 
 uint8_t InputPipeline::priority() const {
   return priority_;
 }
 
-size_t InputPipeline::read(uint8_t *bytes, size_t len) {
-  std::unique_lock<std::mutex> lock(mutex_);
-  if(timeout_millis_ == 0xFFFF) {
-    condition_variable_.wait(lock, [this](){
-      return available();
-    });
-    size_t out_len = buf_.sgetn(reinterpret_cast<char*>(bytes), len);
-    return out_len;
-  }
-  condition_variable_.wait_for(lock,std::chrono::milliseconds(timeout_millis_),
-                               [this](){
-    return available();
-  });
-  if(!buf_.in_avail()) {
-    return -1;
-  }
-  size_t out_len = buf_.sgetn(reinterpret_cast<char*>(bytes), len);
-  return out_len;
+size_t InputPipeline::peek(void *bytes, size_t len) {
+  return buf_->peek(bytes, len);
+}
+
+size_t InputPipeline::read(void *bytes, size_t len) {
+  std::unique_lock<std::mutex> lock(read_sync_mutex_M);
+  return buf_->read(bytes, len);
+}
+
+void InputPipeline::readInput(InputEvent *input_event) {
+  std::unique_lock<std::mutex> lock(read_sync_mutex_M);
+  buf_->read(nullptr, 0);
+
+  uint8_t bytes[32];
+  size_t peek_len = peek(bytes, 32);
+  size_t input_length = scanInputLength(bytes, peek_len);
+  input_length = buf_->read(bytes, input_length);
+
+  translateInput(input_event, bytes, input_length);
+}
+
+size_t InputPipeline::peekInput(InputEvent *input_event) {
+  uint8_t bytes[32];
+  size_t peek_len = peek(bytes, 32);
+  size_t input_length = scanInputLength(bytes, peek_len);
+  translateInput(input_event, bytes, input_length);
+  return input_length;
 }
 
 void InputPipeline::detach() {

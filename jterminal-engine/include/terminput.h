@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <deque>
 #include <sstream>
+#include <optional>
 #include "../include/bufnio.h"
 
 namespace jterminal {
@@ -96,9 +97,6 @@ namespace jterminal {
 #define MOUSE_LEFT_BUTTON       1
 #define MOUSE_WHEEL_BUTTON      2
 #define MOUSE_RIGHT_BUTTON      3
-#define MOUSE_WHEEL_UP          4
-#define MOUSE_WHEEL_DOWN        5
-
 
 #define KS_NONE     0
 #define KS_SHIFT    1
@@ -113,8 +111,8 @@ enum class InputType {
 
 struct InputEvent {
   InputType type = InputType::Unknown;
-  uint32_t symbol = 0;
   struct {
+    wchar_t wide_char = 0;
     uint8_t key = KEY_UNKNOWN;
     uint8_t state = KS_NONE;
   } keyboard;
@@ -127,43 +125,75 @@ struct InputEvent {
     dim_t old_size;
     dim_t new_size;
   } window;
+  std::optional<CSISequence> sequence_opt;
 };
 
 class InputPipeline {
   uint8_t priority_;
-  uint32_t timeout_millis_;
-  std::mutex mutex_;
-  std::condition_variable condition_variable_;
-  std::stringbuf buf_;
-  size_t buf_size_ = 0xFFFF;
+  QueuedBuffer<uint8_t>* buf_;
+  std::mutex read_sync_mutex_M;
 
-  void write(const uint8_t* bytes, size_t len);
+  void write(void* bytes, size_t len);
 
   friend class Terminal;
 
  public:
 
-  explicit InputPipeline(uint8_t priority = INPUT_PRIO_LOW, uint32_t timeout_millis = 0xFFFF);
+  explicit InputPipeline(uint8_t priority = INPUT_PRIO_LOW, size_t capacity = 1024);
 
   ~InputPipeline();
-
-  void setBufferSize(size_t size);
 
   size_t available();
 
   [[nodiscard]] uint8_t priority() const;
 
-  size_t read(uint8_t* bytes, size_t len);
+  size_t peek(void* bytes, size_t len);
+
+  size_t read(void* bytes, size_t len);
+
+  void readInput(InputEvent* input_event);
+
+  size_t peekInput(InputEvent* input_event);
+
+  template<typename Rep, typename Period>
+  size_t read(void* bytes, size_t len, std::chrono::duration<Rep, Period> duration) {
+    if(duration.count() == 0) {
+      return buf_->readNB(bytes, len);
+    }
+    return buf_->read(bytes, len, duration);
+  }
+
+  template<typename Rep, typename Period>
+  bool readInput(InputEvent* input_event, std::chrono::duration<Rep, Period> duration);
 
   void detach();
 
 };
 
-bool translateInput(InputEvent* event, StringBuffer* buffer);
+void translateInput(InputEvent* event, uint8_t* bytes, size_t len);
 
 bool translateInput(InputEvent* event, const uint64_t& hash);
 
 uint64_t hashInput(const uint8_t* bytes, size_t len);
+
+size_t scanInputLength(uint8_t* buf, size_t len);
+
+template<typename Rep, typename Period>
+bool InputPipeline::readInput(InputEvent *input_event, std::chrono::duration<Rep, Period> duration) {
+  std::unique_lock<std::mutex> lock(read_sync_mutex_M);
+  buf_->read(nullptr, 0, duration);
+
+  uint8_t bytes[32];
+  size_t peek_len = peek(bytes, 32);
+  if(peek_len == 0) {
+    return false;
+  }
+  size_t input_length = scanInputLength(bytes, peek_len);
+  input_length = buf_->read(bytes, input_length);
+
+  translateInput(input_event, bytes, input_length);
+  return true;
+}
 
 }
 
