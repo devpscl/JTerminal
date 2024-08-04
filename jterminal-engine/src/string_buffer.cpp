@@ -82,6 +82,19 @@ int StringBuffer::readNumberFormat32() {
   return value;
 }
 
+int StringBuffer::peekNumberFormat32(size_t offset, size_t* len) {
+  int value = 0;
+  size_t count = offset;
+  while(std::isdigit(peek(count))) {
+    uint8_t digit_byte = peek(count++) - 0x30;
+    value = value * 10 + digit_byte;
+  }
+  if(len != nullptr) {
+    *len = count - offset;
+  }
+  return value;
+}
+
 short StringBuffer::readNumberFormat16() {
   short value = 0;
   while(std::isdigit(peek())) {
@@ -91,7 +104,7 @@ short StringBuffer::readNumberFormat16() {
   return value;
 }
 
-size_t StringBuffer::peekWideCharLength() {
+size_t StringBuffer::scanWideCharLength() {
   size_t avail = available();
   if(avail == 0) {
     return 0;
@@ -112,7 +125,7 @@ size_t StringBuffer::peekWideCharLength() {
 }
 
 wchar_t StringBuffer::readWideChar() {
-  size_t len = peekWideCharLength();
+  size_t len = scanWideCharLength();
   if(len <= 1) {
     return read();
   }
@@ -121,13 +134,18 @@ wchar_t StringBuffer::readWideChar() {
   read(bytes, len);
   std::string utf_bytes(bytes, len);
   std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-  std::wstring wstr = converter.from_bytes(utf_bytes);
-  free(bytes);
-  return wstr[0];
+  try {
+    std::wstring wstr = converter.from_bytes(utf_bytes);
+    free(bytes);
+    return wstr[0];
+  } catch(std::exception _) {
+    free(bytes);
+    return bytes[0];
+  }
 }
 
 wchar_t StringBuffer::peekWideChar() {
-  size_t len = peekWideCharLength();
+  size_t len = scanWideCharLength();
   if(len <= 1) {
     return peek();
   }
