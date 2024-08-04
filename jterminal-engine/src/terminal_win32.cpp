@@ -81,7 +81,7 @@ void Terminal::threadWindowEvent() {
 }
 
 void Terminal::create(Settings settings) {
-  main_pipeline_ = new InputPipeline(INPUT_PRIO_HIGH);
+  main_pipeline_ = new InputPipeline(INPUT_PRIO_HIGH, settings.input_buffer_size);
   pipelines_.push_back(main_pipeline_);
   settings_ = settings;
   flags_ = FLAG_DEFAULT;
@@ -258,15 +258,18 @@ bool Terminal::Window::requestCursorPosition(pos_t *pos_ptr) {
   uint8_t buf[8];
   attachInputPipeline(&pipeline);
   write(ESC_CURSOR_REQUEST);
-  size_t len = pipeline.read(buf, 8, std::chrono::milliseconds(10));
-  if(len == -1) {
+  size_t len = pipeline.read(buf, 8, std::chrono::milliseconds(
+      settings_.mode == TERMINAL_MODE_PERFORMANCE ? 10 : 500));
+  if(len == -1 || len == 0) {
     detachInputPipeline(&pipeline);
     return false;
   }
   ESCBuffer buffer(buf, len);
-  while(buffer.hasNext() && !buffer.isESCByte());
+  if(!buffer.skipToNextSequence()) {
+    detachInputPipeline(&pipeline);
+    return false;
+  }
   CSISequenceString sequence_string;
-
   if(!buffer.readSequence(&sequence_string)) {
     detachInputPipeline(&pipeline);
     return false;

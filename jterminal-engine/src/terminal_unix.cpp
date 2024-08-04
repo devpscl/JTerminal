@@ -237,7 +237,8 @@ bool Terminal::Window::requestCursorPosition(pos_t *pos_ptr) {
   uint8_t buf[8];
   attachInputPipeline(&pipeline);
   write(ESC_CURSOR_REQUEST);
-  size_t len = pipeline.read(buf, 8, std::chrono::milliseconds(10));
+  size_t len = pipeline.read(buf, 8, std::chrono::milliseconds(
+      settings_.mode == TERMINAL_MODE_PERFORMANCE ? 10 : 500));
   if(len == -1 || len == 0) {
     detachInputPipeline(&pipeline);
     return false;
