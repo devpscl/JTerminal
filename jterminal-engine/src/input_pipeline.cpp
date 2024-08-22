@@ -2,7 +2,6 @@
 #include <chrono>
 #include <mutex>
 #include "../include/terminal.h"
-#include <iostream> //todo remove
 
 namespace jterminal {
 
