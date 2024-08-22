@@ -60,4 +60,8 @@ void InputPipeline::detach() {
   Terminal::detachInputPipeline(this);
 }
 
+void InputPipeline::reset() {
+  buf_->clear();
+}
+
 }

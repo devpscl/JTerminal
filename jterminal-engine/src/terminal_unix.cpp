@@ -94,6 +94,7 @@ bool Terminal::isDisposed() {
 }
 
 void Terminal::attachInputPipeline(InputPipeline *input_pipeline) {
+  input_pipeline->reset();
   if(pipelines_.size() >= MAXIMUM_PIPELINE_COUNT) {
     return;
   }
@@ -111,6 +112,7 @@ void Terminal::detachInputPipeline(InputPipeline *input_pipeline) {
   for(uint8_t idx = 0; idx < pipelines_.size(); idx++) {
     if(pipelines_[idx] == input_pipeline) {
       pipelines_.erase(pipelines_.begin() + idx);
+      input_pipeline->reset();
       return;
     }
   }

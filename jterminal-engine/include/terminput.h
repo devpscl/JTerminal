@@ -168,6 +168,8 @@ class InputPipeline {
 
   void detach();
 
+  void reset();
+
 };
 
 void translateInput(InputEvent* event, uint8_t* bytes, size_t len);
