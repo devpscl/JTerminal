@@ -82,16 +82,11 @@ namespace jterminal {
 #define KEY_F11             (uint8_t)122
 #define KEY_F12             (uint8_t)123
 
-#define INPUT_PRIO_LOW                0
-#define INPUT_PRIO_NORMAL             1
-#define INPUT_PRIO_HIGH               2
-#define INPUT_PRIO_HIGHEST_SINGLETON  0xFF
-
-#define MOUSE_ACTION_PRESS      1
-#define MOUSE_ACTION_RELEASE    2
-#define MOUSE_ACTION_MOVE       3
-#define MOUSE_ACTION_WHEEL_UP   4
-#define MOUSE_ACTION_WHEEL_DOWN 5
+#define MOUSE_ACTION_PRESS      0
+#define MOUSE_ACTION_RELEASE    1
+#define MOUSE_ACTION_MOVE       2
+#define MOUSE_ACTION_WHEEL_UP   3
+#define MOUSE_ACTION_WHEEL_DOWN 4
 
 #define MOUSE_NONE              0
 #define MOUSE_LEFT_BUTTON       1
