@@ -141,7 +141,6 @@ class ESCBuffer : public StringBuffer {
 
 template <typename T>
 class QueuedBuffer {
- private:
   T* array_;
   size_t len_;
   size_t head_index_ = 0;
@@ -222,6 +221,10 @@ class QueuedBuffer {
   size_t size();
 
   void clear();
+
+  void close();
+
+  bool isClosed();
 
 };
 

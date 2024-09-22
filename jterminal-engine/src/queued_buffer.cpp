@@ -1,5 +1,6 @@
 #include "../include/bufnio.h"
 #include <mutex>
+#include <stdexcept>
 
 namespace jterminal {
 
@@ -11,12 +12,17 @@ QueuedBuffer<T>::QueuedBuffer(size_t capacity) {
 
 template<typename T>
 QueuedBuffer<T>::~QueuedBuffer() {
-  delete[] array_;
+  if(array_ != nullptr) {
+    delete[] array_;
+  }
 }
 
 template<typename T>
 size_t QueuedBuffer<T>::writeNB(void *ptr, size_t len) {
-  std::unique_lock<std::mutex> lock(global_sync_mutex_);
+  std::unique_lock lock(global_sync_mutex_);
+  if(array_ == nullptr) {
+    throw std::runtime_error("queued buffer is closed");
+  }
   T* arr = reinterpret_cast<T*>(ptr);
   size_t free_ = free();
   len = free_ > len ? len : free_;
@@ -35,7 +41,10 @@ size_t QueuedBuffer<T>::readNB(void *ptr, size_t len) {
   if(ptr == nullptr && len == 0) {
     return 0;
   }
-  std::unique_lock<std::mutex> lock(global_sync_mutex_);
+  std::unique_lock lock(global_sync_mutex_);
+  if(array_ == nullptr) {
+    throw std::runtime_error("queued buffer is closed");
+  }
   T* arr = reinterpret_cast<T*>(ptr);
   size_t avail = available();
   len = avail > len ? len : avail;
@@ -51,7 +60,10 @@ size_t QueuedBuffer<T>::readNB(void *ptr, size_t len) {
 
 template<typename T>
 size_t QueuedBuffer<T>::peek(void *ptr, size_t len) {
-  std::unique_lock<std::mutex> lock(global_sync_mutex_);
+  std::unique_lock lock(global_sync_mutex_);
+  if(array_ == nullptr) {
+    throw std::runtime_error("queued buffer is closed");
+  }
   T* arr = reinterpret_cast<T*>(ptr);
   size_t avail = available();
   len = avail > len ? len : avail;
@@ -98,6 +110,19 @@ template<typename T>
 void QueuedBuffer<T>::clear() {
   head_index_ = 0;
   tail_index_ = 0;
+}
+
+template <typename T>
+bool QueuedBuffer<T>::isClosed() {
+  return array_ == nullptr;
+}
+
+template <typename T>
+void QueuedBuffer<T>::close() {
+  std::unique_lock lock(global_sync_mutex_);
+  delete[] array_;
+  array_ = nullptr;
+  clear();
 }
 
 }
