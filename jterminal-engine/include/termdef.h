@@ -23,9 +23,8 @@ class Terminal;
 #define CURSOR_FLAG_VISIBLE       0x01
 #define CURSOR_FLAG_BLINKING      0x02
 
-#ifdef TERMINAL_UNIX
-#define FLAG_ALTERNATIVE_BUFFER 0x80
-#endif
+#define MATH_MAX(a,b) (((a) > (b)) ? (a) : (b))
+#define MATH_MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 #define FLAG_DEFAULT (FLAG_ECHO | FLAG_LINE_INPUT | FLAG_SIGNAL_INPUT)
 
@@ -36,6 +35,8 @@ class Terminal;
 
 #define TERMINAL_DEFAULT_TITLE "Terminal"
 
+#define BUFFER_MAIN         0
+#define BUFFER_SECONDARY    1
 
 struct Pos;
 struct Dim;
