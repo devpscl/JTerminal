@@ -52,11 +52,8 @@ struct Pos {
   uint16_t x;
   uint16_t y;
 
-  Pos(uint16_t x, uint16_t y) : x(x), y(y) {}
-
-  Pos(int16_t x, int16_t y) : x(x), y(y) {}
-
-  Pos(uint32_t x, uint32_t y) : x(x), y(y) {}
+  template <typename T>
+  Pos(T x, T y) : x(x), y(y) {}
 
   Pos() : x(1), y(1) {}
 };
@@ -65,9 +62,10 @@ struct Dim {
   uint16_t width;
   uint16_t height;
 
-  Dim(uint16_t width, uint16_t height) : width(width), height(height) {}
+  template <typename T>
+  Dim(T width, T height) : width(width), height(height) {}
 
-  Dim() : Dim(1, 1) {}
+  Dim() : width(0), height(0) {}
 };
 
 inline bool operator==(const Pos& a, const Pos& b) {
