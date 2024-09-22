@@ -6,12 +6,6 @@ namespace jterminal {
 
 class Terminal;
 
-#if defined(WIN32) || defined(WIN64)
-#define TERMINAL_WIN
-#elif defined(__linux__) || defined(__APPLE__) || defined(__unix__)
-#define TERMINAL_UNIX
-#endif
-
 #define FLAG_LINE_INPUT           0x01
 #define FLAG_ECHO                 0x02
 #define FLAG_MOUSE_INPUT          0x04
