@@ -5,112 +5,196 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <sstream>
 
 namespace jterminal {
 
-class Terminal {
-  inline static volatile bool               disposed_ = false;
-  inline static volatile uint8_t            flags_ = 0;
-  inline static volatile bool               enabled_ = false;
-  inline static Settings                    settings_;
-  inline static std::vector<InputPipeline*> pipelines_;
-  inline static uint8_t                     cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
+using strstream = std::stringstream;
 
-  inline static InputPipeline*              main_pipeline_;
+#if TERMINAL_WIN
+#define STDOUT_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
+#define STDIN_HANDLE GetStdHandle(STD_INPUT_HANDLE)
+#endif
+
+
+class Window;
+class Terminal;
+
+using InputStreamPtr  = InputStream*;
+using WindowPtr       = Window*;
+using TerminalPtr     = Terminal*;
+
+class TermEngine {
+
+  inline static TerminalPtr                 instance_;
+  inline static Settings                    settings_;
   inline static std::condition_variable     input_thread_cv_;
   inline static std::mutex                  input_thread_mutex_;
   inline static std::thread*                input_thread_;
+  inline static uint8_t                     buffer_channel_ = BUFFER_MAIN;
+  inline static bool                        enabled_ = false;
+  inline static bool                        closed_ = false;
+  inline static uint8_t                     flags_memory_ = FLAG_DEFAULT;
+
+  static void threadInputLoop();
+
+#if defined(TERMINAL_WIN)
+
   inline static std::condition_variable     window_thread_cv_;
   inline static std::mutex                  window_thread_mutex_;
   inline static std::thread*                window_thread_;
 
-  static void sendInput(uint8_t* bytes, size_t len);
+  static void threadWindowInput();
 
-  static void threadRead();
-
-#if defined(TERMINAL_WIN)
-
-  static void threadWindowEvent();
+  static void signalSigAbrt(int);
 
 #elif defined(TERMINAL_UNIX)
 
-  static void signalWindowEvent(int);
+  static void signalWindowInput(int);
+
+
+
+  static void signalSigQuit(int);
+
+  static void signalSigTstp(int);
 
 #endif
+
+  static void signalSigInt(int);
 
  public:
 
   static void create(Settings settings = {});
 
-  static void dispose();
+  static void set(TerminalPtr instance);
 
-  static bool isValid();
-
-  static bool isDisposed();
-
-  static void attachInputPipeline(InputPipeline* input_pipeline);
-
-  static void detachInputPipeline(InputPipeline* input_pipeline);
-
-  static void setFlags(uint8_t flags);
-
-  static void getFlags(uint8_t* flags_ptr);
-
-  static void clear();
-
-  static void update();
-
-  static void reset(bool clear_screen);
-
-  static void write(uint8_t* bytes, size_t len);
+  static void get(TerminalPtr instance);
 
   static void write(const char* cstr);
 
-  static void beep();
+  static void write(void *bytes, size_t len);
 
-  static size_t read(uint8_t* bytes, size_t size);
+  static void shutdown();
 
-  static void readInput(InputEvent* input_event);
+  static void resetAll();
 
-  union Window {
+  static void writeFlags(uint8_t flags, uint8_t cursor_flags);
 
-    static void setTitle(const char* cstr);
+  static void setBufferChannel(uint8_t buf_ch);
 
-    static std::string getTitle();
+  static bool isEnabled();
 
-    static void setDimension(const dim_t& dim);
+  static bool isClosed();
 
-    static void setCursor(const pos_t& pos);
+  static bool isActive(Terminal* instance);
 
-    static void getDimension(dim_t* dim_ptr);
+  static void readConsoleDim(dim_t* dim);
 
-    static bool requestCursorPosition(pos_t* pos_ptr);
+  static Settings getSettings();
 
-    static void setCursorFlags(uint8_t flags);
+  static void waitForClose();
 
-    static uint8_t getCursorFlags();
+};
+
+class Terminal {
+  volatile uint8_t            flags_ = FLAG_DEFAULT;
+  uint8_t                     buffer_ = BUFFER_MAIN;
+
+  std::vector<InputStreamPtr> input_stream_vector_;
+  WindowPtr                   window_;
+
+  InputStreamPtr newSingletonInputStream(size_t capacity = 1024);
+
+  void sortInputStreamVector();
+
+  void writeInput(uint8_t *bytes, size_t len);
+
+  friend class Window;
+  friend class TermEngine;
+  friend class InputStream;
+
+ public:
+
+  Terminal();
+
+  ~Terminal();
+
+  void setFlags(uint8_t flags);
+
+  void getFlags(uint8_t* flags_ptr);
+
+  void clear();
+
+  void update();
+
+  void reset(bool clear_screen);
+
+  void beep();
+
+  [[nodiscard]] uint8_t getBuffer() const;
+
+  bool isActive();
+
+  InputStreamPtr newInputStream(InputStreamPriority prio, size_t capacity = 1024);
+
+  void disposeInputStream(InputStreamPtr input_stream);
+
+  WindowPtr getWindow();
+
+};
+
+class Window {
+
+  uint8_t                     cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
+  std::string                 title_ = TERMINAL_DEFAULT_TITLE;
+  TerminalPtr                 instance_;
+
+  explicit Window(TerminalPtr instance);
+
+  void setup();
+
+  friend class TermEngine;
+  friend class Terminal;
+
+public:
+
+  [[nodiscard]] bool isActive() const;
+
+  void setTitle(const char* cstr);
+
+  std::string getTitle();
+
+  void setDimension(const dim_t& dim);
+
+  void setCursor(const pos_t& pos);
+
+  void getDimension(dim_t* dim_ptr);
+
+  bool requestCursorPosition(pos_t* pos_ptr);
+
+  void setCursorFlags(uint8_t flags);
+
+  uint8_t getCursorFlags();
 
 #ifdef TERMINAL_WIN
 
-    static void setVisible(bool state);
+  void setVisible(bool state);
 
-    static bool isVisible();
+  bool isVisible();
 
-    static void setGraphicUpdate(bool state);
+  void setGraphicUpdate(bool state);
 
-    static void setRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+  void setRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
-    static void setRectSize(uint8_t width, uint8_t height);
+  void setRectSize(uint8_t width, uint8_t height);
 
-    static void setRectPos(uint8_t x, uint8_t y);
+  void setRectPos(uint8_t x, uint8_t y);
 
-    static void getRect(uint8_t* x, uint8_t* y, uint8_t* width, uint8_t* height);
+  void getRect(uint8_t* x, uint8_t* y, uint8_t* width, uint8_t* height);
 
-    static bool isOnFocus();
+  bool isOnFocus();
 
 #endif
-
-  };
 
 };
 
