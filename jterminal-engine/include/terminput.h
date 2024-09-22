@@ -125,7 +125,7 @@ struct InputEvent {
     dim_t old_size;
     dim_t new_size;
   } window;
-  std::optional<CSISequence> sequence_opt;
+  std::string raw;
 };
 
 class InputStream {
