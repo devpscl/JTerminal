@@ -21,10 +21,11 @@ subprojects {
     compileJava.options.encoding = "UTF-8"
     compileTestJava.options.encoding = "UTF-8"
 
-    tasks.register('buildDebug', ShadowJar) {
+    tasks.register('buildTest', ShadowJar) {
         group = "jterminal"
         manifest {
             attributes["Main-Class"] = "net.jterminal.test.Main"
+            attributes 'Multi-Release': 'true'
         }
         from sourceSets.main.output
         from sourceSets.test.output
@@ -34,6 +35,9 @@ subprojects {
 
     tasks.register('buildRelease', ShadowJar) {
         group = "jterminal"
+        manifest {
+            attributes 'Multi-Release': 'true'
+        }
         from sourceSets.main.output
         configurations = [project.configurations.testRuntimeClasspath]
         setArchiveClassifier "RELEASE"
