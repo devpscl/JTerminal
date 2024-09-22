@@ -3,7 +3,8 @@
 namespace jterminal {
 
 void translateInput(InputEvent* event, uint8_t* bytes, size_t len) {
-  event->sequence_opt = std::nullopt;
+  event->raw = std::string(bytes, bytes + len);
+  event->keyboard.wide_char = 0;
   event->type = InputType::Unknown;
   ESCBuffer buffer(bytes, len);
   if(!buffer.hasNext()) {
@@ -28,7 +29,6 @@ void translateInput(InputEvent* event, uint8_t* bytes, size_t len) {
     event->type = InputType::Keyboard;
     return;
   }
-  event->sequence_opt = sequence;
   if(sequence.endSymbol() == 'M' && sequence.paramCount() == 3 && sequence.privateChar() == '<') {
     event->mouse.position = pos_t{sequence[1], sequence[2]};
     switch (sequence[0]) {
@@ -95,11 +95,11 @@ void translateInput(InputEvent* event, uint8_t* bytes, size_t len) {
     event->type = InputType::Mouse;
     return;
   }
-  if(sequence.endSymbol() == 'W' && sequence.paramCount() == 4 && sequence.privateChar() == ':') {
+  if(sequence.endSymbol() == 'W' && sequence.paramCount() == 4 && sequence.privateChar() == '=') {
     event->window.new_size.width = sequence[0];
     event->window.new_size.height = sequence[1];
     event->window.old_size.width = sequence[2];
-    event->window.old_size.width = sequence[3];
+    event->window.old_size.height = sequence[3];
     event->type = InputType::Window;
     return;
   }
