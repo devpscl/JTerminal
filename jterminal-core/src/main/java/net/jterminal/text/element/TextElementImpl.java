@@ -1,63 +1,59 @@
 package net.jterminal.text.element;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.style.TextFont;
+import net.jterminal.text.style.TextStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class TextElementImpl implements TextElement {
 
   private String value;
-  private ForegroundColor foregroundColor = null;
-  private BackgroundColor backgroundColor = null;
-  private final EnumSet<TextFont> fontSet;
-  private final Set<TextElement> elementSet = new HashSet<>();
+  private final TextStyle textStyle;
+  private List<TextElement> childList = null;
 
-  public TextElementImpl(@NotNull String value, @Nullable ForegroundColor fgc,
-      @Nullable BackgroundColor bgc, @Nullable EnumSet<TextFont> fontSet) {
+  public TextElementImpl(@NotNull String value, @NotNull TextStyle textStyle) {
     this.value = value;
-    this.foregroundColor = fgc;
-    this.backgroundColor = bgc;
-    this.fontSet = fontSet == null ? EnumSet.noneOf(TextFont.class) : fontSet;
-
+    this.textStyle = textStyle.clone();
   }
 
   @Override
   public @NotNull TextElement foregroundColor(@Nullable ForegroundColor foregroundColor) {
-    this.foregroundColor = foregroundColor;
+    this.textStyle.foregroundColor(foregroundColor);
     return this;
   }
 
   @Override
   public @Nullable ForegroundColor foregroundColor() {
-    return foregroundColor;
+    return this.textStyle.foregroundColor();
   }
 
   @Override
   public @NotNull TextElement backgroundColor(@Nullable BackgroundColor backgroundColor) {
-    this.backgroundColor = backgroundColor;
+    this.textStyle.backgroundColor(backgroundColor);
     return this;
   }
 
   @Override
   public @Nullable BackgroundColor backgroundColor() {
-    return backgroundColor;
+    return this.textStyle.backgroundColor();
   }
 
   @Override
   public @NotNull Set<TextFont> fonts() {
-    return Collections.unmodifiableSet(fontSet);
+    return this.textStyle.fonts();
   }
 
   @Override
   public @NotNull TextElement fonts(TextFont... fonts) {
-    fontSet.clear();
-    Collections.addAll(fontSet, fonts);
+    textStyle.font(fonts);
     return this;
   }
 
@@ -68,19 +64,26 @@ class TextElementImpl implements TextElement {
   }
 
   @Override
-  public @Nullable String value() {
+  public @NotNull String value() {
     return value;
   }
 
   @Override
+  public @NotNull TextStyle style() {
+    return textStyle;
+  }
+
+  @Override
   public @NotNull TextElement child(TextElement... elements) {
-    elementSet.clear();
-    Collections.addAll(elementSet, elements);
+    childList = Arrays.asList(elements);
     return this;
   }
 
   @Override
-  public @NotNull Set<TextElement> child() {
-    return Collections.unmodifiableSet(elementSet);
+  public @NotNull List<TextElement> child() {
+    if(childList == null) {
+      return new ArrayList<>();
+    }
+    return Collections.unmodifiableList(childList);
   }
 }

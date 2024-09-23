@@ -1,9 +1,11 @@
 package net.jterminal.text.element;
 
+import java.util.List;
 import java.util.Set;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.style.TextFont;
+import net.jterminal.text.style.TextStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,16 +25,16 @@ public interface TextElement {
 
   @NotNull TextElement value(@NotNull String value);
 
-  @Nullable String value();
+  @NotNull String value();
 
   @NotNull TextElement child(TextElement...elements);
 
-  @NotNull Set<TextElement> child();
+  @NotNull List<TextElement> child();
+
+  @NotNull TextStyle style();
 
   static @NotNull TextElement create(@NotNull String value) {
-    return new TextElementImpl(value, null, null, null);
+    return new TextElementImpl(value, TextStyle.create());
   }
-
-
 
 }

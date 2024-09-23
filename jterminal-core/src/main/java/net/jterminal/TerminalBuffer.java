@@ -7,6 +7,7 @@ import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.command.AnsiCommand;
 import net.jterminal.text.command.CursorCommand;
 import net.jterminal.text.command.ScreenCommand;
+import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.util.TerminalPosition;
@@ -15,16 +16,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class TerminalBuffer {
 
-  private final StringBuffer stringBuffer;
+  private final StringBuilder stringBuffer;
   private TextStyle textStyle;
 
   public TerminalBuffer() {
-    stringBuffer = new StringBuffer();
+    stringBuffer = new StringBuilder();
     textStyle = TextStyle.create();
   }
 
   public TerminalBuffer(@NotNull TerminalBuffer buffer) {
-    stringBuffer = new StringBuffer(buffer.stringBuffer);
+    stringBuffer = new StringBuilder(buffer.stringBuffer);
     textStyle = buffer.textStyle.clone();
   }
 
@@ -71,6 +72,14 @@ public class TerminalBuffer {
   public TerminalBuffer append(String x) {
     stringBuffer.append(x);
     return this;
+  }
+
+  public TerminalBuffer append(@Nullable TextElement textElement) {
+    if(textElement == null) {
+      return append("null");
+    }
+    String ansiCode = AnsiCodeSerializer.DEFAULT.serialize(textElement, textStyle);
+    return append(ansiCode).appendStyle();
   }
 
   public TerminalBuffer newLine() {
