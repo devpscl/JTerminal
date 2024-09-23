@@ -112,6 +112,11 @@ class TermStringImpl implements TermString {
   }
 
   @Override
+  public @NotNull StyleIndexedData data() {
+    return null;
+  }
+
+  @Override
   public byte[] bytes() {
     return new byte[0];
   }
