@@ -1,10 +1,13 @@
 package net.jterminal.ansi;
 
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import net.jterminal.text.BackgroundColor;
+import net.jterminal.text.Combiner;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.FontMap;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
@@ -25,7 +28,7 @@ public class AnsiCodeSerializer {
         .getBackgroundAnsiCode();
   }
 
-  public String serialize(@NotNull FontMap fontMap) {
+  public @NotNull String serialize(@NotNull FontMap fontMap) {
     StringBuilder buffer = new StringBuilder();
     for (Entry<TextFont, Boolean> entry : fontMap.entrySet()) {
       TextFont font = entry.getKey();
@@ -39,13 +42,36 @@ public class AnsiCodeSerializer {
     return buffer.toString();
   }
 
-  public String serialize(@Nullable TextStyle textStyle) {
+  public @NotNull String serialize(@Nullable TextStyle textStyle) {
+    StringBuilder buffer = new StringBuilder("\u001b[0m");
     if(textStyle == null) {
-      return "\u001b[0m";
+      return buffer.toString();
     }
-    return "\u001b[0m" + serialize(textStyle.foregroundColor())
-        + serialize(textStyle.backgroundColor())
-        + serialize(textStyle.fontMap());
+    buffer.append(serialize(textStyle.foregroundColor()))
+        .append(serialize(textStyle.backgroundColor()));
+    for (Entry<TextFont, Boolean> entry : textStyle.fontMap().entrySet()) {
+      if(entry.getValue()) {
+        buffer.append(entry.getKey().getAnsiCode());
+      }
+    }
+    return buffer.toString();
+  }
+
+  public @NotNull String serialize(@NotNull TextElement textElement) {
+    return serialize(textElement, TextStyle.create());
+  }
+
+  public @NotNull String serialize(@NotNull TextElement textElement,
+      @NotNull TextStyle textStyle) {
+    TextStyle currentStyle = Combiner.combine(textElement.style(), textStyle);
+    StringBuilder buffer = new StringBuilder();
+    buffer.append(serialize(currentStyle))
+        .append(textElement.value());
+    List<TextElement> child = textElement.child();
+    for (TextElement element : child) {
+      buffer.append(serialize(element, currentStyle));
+    }
+    return buffer.toString();
   }
 
 }
