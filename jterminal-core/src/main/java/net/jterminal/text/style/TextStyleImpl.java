@@ -32,7 +32,7 @@ class TextStyleImpl implements TextStyle {
 
   @Override
   public @NotNull Set<TextFont> fonts() {
-    return fontMap.fonts();
+    return fontMap.fonts(FontOption.SET);
   }
 
   @Override
