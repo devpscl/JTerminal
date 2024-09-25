@@ -49,7 +49,7 @@ public interface TermString {
 
   boolean endsWith(@NotNull String str);
 
-  @NotNull StyleIndexedData data();
+  @NotNull IndexedStyleData data();
 
   byte[] bytes();
 

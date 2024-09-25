@@ -112,7 +112,7 @@ class TermStringImpl implements TermString {
   }
 
   @Override
-  public @NotNull StyleIndexedData data() {
+  public @NotNull IndexedStyleData data() {
     return null;
   }
 
