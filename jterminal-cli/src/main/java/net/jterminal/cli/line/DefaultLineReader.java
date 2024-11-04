@@ -127,6 +127,13 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     }
   }
 
+  @Override
+  public void updateDisplay() {
+    if(terminalSetLock.isSet()) {
+      terminalSetLock.get().updateLine();
+    }
+  }
+
   protected void setEditingInput(@NotNull String str) {
     input.setLength(0);
     input.append(str);
