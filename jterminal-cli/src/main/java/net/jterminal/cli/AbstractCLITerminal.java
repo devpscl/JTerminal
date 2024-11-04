@@ -5,6 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.jterminal.Terminal;
 import net.jterminal.TerminalBuffer;
 import net.jterminal.annotation.SubscribeEvent;
+import net.jterminal.cli.event.LineReleaseEvent;
 import net.jterminal.cli.line.DefaultLineReader;
 import net.jterminal.cli.line.InternalLineReader;
 import net.jterminal.cli.line.LineReader;
@@ -62,7 +63,9 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
     InternalLineReader internalLineReader = (InternalLineReader) lineReader;
     SetLock<CLITerminal> lock = internalLineReader.getSetLock();
     lock.set(this);
+    removeLine();
     this.lineReader = lineReader;
+    printLine();
   }
 
   @Override
@@ -109,7 +112,7 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
   protected void printLine() {
     lock.lock();
     try {
-      if(lineView != null) {
+      if(lineView != null || !lineReading) {
         return;
       }
       TerminalBuffer buffer = new TerminalBuffer();
