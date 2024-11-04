@@ -30,20 +30,21 @@ set(NATIVE_SOURCE_FILES_GLOBAL
 )
 set(NATIVE_SOURCE_FILES_WIN
         src/win32/terminal_win32.cpp
-        src/win32/termengine_win32.cpp
         src/win32/window_win32.cpp
 )
 set(NATIVE_SOURCE_FILES_UNIX
         src/unix/terminal_unix.cpp
-        src/unix/termengine_unix.cpp
         src/unix/window_unix.cpp
 )
 set(JNI_FILES
         jni/include/AbstractNativeTerminal.h
-        jni/include/NativeTerminalInputStream.h
         jni/src/AbstractNativeTerminal.cpp
-        jni/src/NativeTerminalInputStream.cpp
-        jni/include/jni_helper.h)
+        jni/src/NativeTerminalInput.cpp
+        jni/include/jni_helper.h
+        jni/include/WindowsTerminalImpl.h
+        jni/src/WindowsTerminalImpl.cpp
+        jni/src/AbstractNativeTerminal.cpp
+        jni/include/NativeTerminalInput.h)
 set(TEST_FILES test/main.cpp)
 
 #####################################
@@ -65,7 +66,7 @@ ENDIF()
 
 IF(DEBUG_MODE)
     message("Debug mode is enabled!")
-    add_executable(jterminal_engine ${TEST_FILES} ${HEADER_FILES} ${SOURCE_FILES} ${JNI_FILES})
+    add_executable(jterminal_engine ${TEST_FILES} ${HEADER_FILES} ${SOURCE_FILES})
 ELSE()
     add_library(jterminal_engine SHARED ${HEADER_FILES} ${SOURCE_FILES} ${JNI_FILES})
 ENDIF ()
