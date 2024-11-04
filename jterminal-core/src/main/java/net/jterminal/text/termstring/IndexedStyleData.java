@@ -17,18 +17,30 @@ public interface IndexedStyleData {
 
   int lastIndex();
 
-  void put(int index, @NotNull TextStyle textStyle);
+  void add(int index, @NotNull TextStyle textStyle);
 
   void set(int index, @Nullable TextStyle textStyle);
 
+  void set(int index, @Nullable TextStyle textStyle, boolean explicitStyle);
+
   void unset(int index);
 
-  void shift(int offset);
+  @NotNull IndexedStyleData shift(int offset);
 
-  void insert(int index, @NotNull IndexedStyleData indexedStyleData);
+  @NotNull IndexedStyleData sub(int start, int end);
+
+  void mix(@NotNull IndexedStyleData indexedStyleData);
+
+  void clear();
+
+  void assign(@NotNull IndexedStyleData indexedStyleData, boolean copy);
 
   @NotNull IndexedStyleData clone();
 
   record IndexEntry(int index, @NotNull TextStyle textStyle) {}
+
+  static IndexedStyleData create() {
+    return new IndexedStyleDataImpl();
+  }
 
 }
