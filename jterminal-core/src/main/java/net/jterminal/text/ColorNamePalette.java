@@ -65,6 +65,11 @@ public enum ColorNamePalette implements TerminalColor {
   }
 
   @Override
+  public boolean isDefault() {
+    return false;
+  }
+
+  @Override
   public @NotNull XtermColor asXtermColor() {
     return color;
   }

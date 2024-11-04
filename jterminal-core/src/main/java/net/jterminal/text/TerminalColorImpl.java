@@ -1,7 +1,6 @@
 package net.jterminal.text;
 
 import java.awt.Color;
-import net.jterminal.TerminalBuffer;
 
 class TerminalColorImpl implements TerminalColor {
 
@@ -9,11 +8,13 @@ class TerminalColorImpl implements TerminalColor {
   private final String backgroundColor;
 
   private final Color color;
+  private final boolean defaultColor;
 
   public TerminalColorImpl() {
     this.foregroundColor = "\u001b[39m";
     this.backgroundColor = "\u001b[49m";
     this.color = Color.BLACK;
+    defaultColor = true;
   }
 
   public TerminalColorImpl(int red, int green, int blue) {
@@ -26,6 +27,7 @@ class TerminalColorImpl implements TerminalColor {
         + red + ";"
         + green + ";"
         + blue + "m";
+    defaultColor = false;
   }
 
   public TerminalColorImpl(Color color) {
@@ -41,6 +43,7 @@ class TerminalColorImpl implements TerminalColor {
         + red + ";"
         + green + ";"
         + blue + "m";
+    defaultColor = false;
   }
 
   @Override
@@ -56,5 +59,18 @@ class TerminalColorImpl implements TerminalColor {
   @Override
   public Color toColor() {
     return color;
+  }
+
+  @Override
+  public boolean isDefault() {
+    return defaultColor;
+  }
+
+  @Override
+  public String toString() {
+    if(defaultColor) {
+      return "DEFAULT";
+    }
+    return color.toString();
   }
 }

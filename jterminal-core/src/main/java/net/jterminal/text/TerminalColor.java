@@ -25,6 +25,8 @@ public interface TerminalColor extends ForegroundColor, BackgroundColor {
 
   Color toColor();
 
+  boolean isDefault();
+
   default @NotNull XtermColor asXtermColor() {
     return XtermColor.getNearestTo(toColor());
   }

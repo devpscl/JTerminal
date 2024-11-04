@@ -321,6 +321,11 @@ public enum XtermColor implements TerminalColor {
   }
 
   @Override
+  public boolean isDefault() {
+    return false;
+  }
+
+  @Override
   public @NotNull String toString() {
     return color.toString();
   }
