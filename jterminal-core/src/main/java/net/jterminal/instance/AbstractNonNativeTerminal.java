@@ -5,10 +5,6 @@ import java.io.PrintStream;
 import net.jterminal.Terminal;
 import net.jterminal.exception.TerminalProviderException;
 import net.jterminal.exception.TerminalRuntimeException;
-import net.jterminal.io.DefaultTerminalInputStream;
-import net.jterminal.io.TerminalInputStream;
-import net.jterminal.queue.AsyncQueueIOProcessor;
-import net.jterminal.queue.QueuedByteBuf;
 import net.jterminal.system.SystemInfo;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
@@ -18,8 +14,6 @@ import org.jetbrains.annotations.Nullable;
 public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTerminal<T> {
 
   private String title = "Terminal";
-  protected static final AsyncQueueIOProcessor queueIoProcessor
-      = new AsyncQueueIOProcessor(FD_IN);
 
   public AbstractNonNativeTerminal(@NotNull Class<T> interfaceType) {
     super(interfaceType);
@@ -31,28 +25,22 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
   }
 
   @Override
+  public void initialize() {
+
+  }
+
+  @Override
   public void enable() throws TerminalProviderException {
     super.enable();
-    queueIoProcessor.enabled(true);
   }
 
   @Override
   public void disable() {
-    queueIoProcessor.enabled(false);
   }
 
   @Override
   public void cursorPosition(@NotNull TerminalPosition pos) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public TerminalInputStream newInputStream(int capacity) {
-    QueuedByteBuf buf = QueuedByteBuf.create(capacity);
-    DefaultTerminalInputStream inputStream
-        = new DefaultTerminalInputStream(buf, queueIoProcessor);
-    queueIoProcessor.add(buf);
-    return inputStream;
   }
 
   @Override
@@ -62,6 +50,9 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
 
   @Override
   public void clear() {
+    if(!isEnabled()) {
+      return;
+    }
     SystemInfo current = SystemInfo.current();
     try {
       switch (current.os()) {
@@ -100,6 +91,10 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
 
   @Override
   public void reset(boolean clearScreen) {
+    title = "Terminal";
+    if(!isEnabled()) {
+      return;
+    }
     write("\u001B[0m");
     if(clearScreen) {
       clear();
@@ -109,6 +104,9 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
   @Override
   public void title(@NotNull String title) {
     this.title = title;
+    if(!isEnabled()) {
+      return;
+    }
     update();
   }
 
@@ -129,11 +127,17 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
 
   @Override
   public void update() {
+    if(!isEnabled()) {
+      return;
+    }
     write("\u001B]0;" + title + "\007");
   }
 
   @Override
   public void beep() {
+    if(!isEnabled()) {
+      return;
+    }
     write('\007');
   }
 

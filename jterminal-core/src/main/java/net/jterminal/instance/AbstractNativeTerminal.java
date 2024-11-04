@@ -5,24 +5,29 @@ import net.jterminal.NativeTerminal;
 import net.jterminal.Terminal;
 import net.jterminal.annotation.NativeType;
 import net.jterminal.exception.TerminalProviderException;
-import net.jterminal.io.NativeTerminalInputStream;
-import net.jterminal.io.TerminalInputStream;
 import net.jterminal.natv.NativeException;
 import net.jterminal.natv.NativeLoader;
+import net.jterminal.system.OperationSystem;
+import net.jterminal.system.SystemInfo;
 import net.jterminal.system.UnsupportedSystemException;
-import net.jterminal.util.PointerRef;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
+import net.jterminal.windows.WindowsTerminal;
+import net.jterminal.windows.WindowsTerminalImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@NativeType(name = "termengine", version = 1)
+@NativeType(name = "termengine", version = NativeTerminal.VERSION)
 public abstract class AbstractNativeTerminal<T extends Terminal>
     extends AbstractTerminal<T>
     implements NativeTerminal {
 
-  private final PointerRef instancePtr = new PointerRef();
-  private final PointerRef windowPtr = new PointerRef();
+  private static InputEventListener inputEventListener = null;
+
+  private int flags = Terminal.FLAG_LINE_INPUT | Terminal.FLAG_ECHO;
+  private int cursorFlags = Terminal.CURSOR_BLINKING | Terminal.CURSOR_VISIBLE;
+  private String title = "Terminal";
+  private BufferId buffer = BufferId.MAIN;
 
   public AbstractNativeTerminal(@NotNull Class<T> interfaceType) {
     super(interfaceType);
@@ -39,8 +44,7 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   }
 
   @Override
-  public void enable() throws TerminalProviderException {
-    super.enable();
+  public void initialize() throws TerminalProviderException {
     try {
       if(!NativeLoader.isLoaded(AbstractNativeTerminal.class)) {
         NativeLoader.load(AbstractNativeTerminal.class);
@@ -51,49 +55,60 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
     } catch (NativeException | UnsupportedSystemException e) {
       throw new TerminalProviderException(e);
     }
-    if(instancePtr.isNull()) {
-      long instance = _construct();
-      instancePtr.set(instance);
-      long window = _getWindowPointer(instance);
-      windowPtr.set(window);
-    }
-    _set(instancePtr.get());
+  }
+
+  @Override
+  public void enable() throws TerminalProviderException {
+    super.enable();
+
+    _setTitle(title.getBytes());
+    _setFlags((byte) flags);
+    _setCursorFlags((byte) cursorFlags);
+    _setBuffer((byte) buffer.ordinal());
+    updateInputEventListener();
   }
 
   @Override
   public void disable() {
-
+    updateInputEventListener();
   }
 
   @Override
   public void title(@NotNull String title) {
-    _setTitle(windowPtr.get(), title.getBytes());
+    _setTitle(title.getBytes());
+    this.title = title;
   }
 
   @Override
   public @NotNull String title() {
-    return new String(_getTitle(windowPtr.get()));
+    return title;
   }
 
   @Override
   public void windowSize(@NotNull TerminalDimension size) {
-    _setDim(windowPtr.get(), size.width(), size.height());
+    if(!isEnabled()) {
+      return;
+    }
+    _setDim(size.width(), size.height());
   }
 
   @Override
   public @NotNull TerminalDimension windowSize() {
-    int dim = _getDim(windowPtr.get());
+    int dim = _getDim();
     return new TerminalDimension(dim & 0xFF, (dim >> 16) & 0xFF);
   }
 
   @Override
   public void update() {
-    _update(instancePtr.get());
+    if(!isEnabled()) {
+      return;
+    }
+    _update();
   }
 
   @Override
   public void beep() {
-    _beep(instancePtr.get());
+    _beep();
   }
 
   @Override
@@ -104,55 +119,127 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   @Override
   public void shutdown(int status) {
     _shutdown();
+    if(inputEventListener != null) {
+      inputEventListener.stop();
+    }
     System.exit(status);
   }
 
   @Override
   public void cursorPosition(@NotNull TerminalPosition pos) {
-    _setCursor(windowPtr.get(), pos.x(), pos.y());
-  }
-
-  @Override
-  public TerminalInputStream newInputStream(int capacity) {
-    long ptr = _createInputStream(instancePtr.get(), capacity);
-    PointerRef pointerRef = new PointerRef(ptr);
-    return new NativeTerminalInputStream(pointerRef);
+    if(!isEnabled()) {
+      return;
+    }
+    _setCursor(pos.x(), pos.y());
   }
 
   @Override
   public @NotNull TerminalPosition cursorPosition() {
-    int pos = _requestCursor(windowPtr.get());
+    int pos = _requestCursor();
     return new TerminalPosition(pos & 0xFF, (pos >> 16) & 0xFF);
   }
 
   @Override
   public void clear() {
-    _clear(instancePtr.get());
+    if(!isEnabled()) {
+      return;
+    }
+    _clear();
   }
 
   @Override
   public void flags(int flags) {
-    _setFlags(instancePtr.get(), (byte) flags);
+    if(!isEnabled()) {
+      return;
+    }
+    _setFlags((byte) flags);
+    this.flags = flags;
   }
 
   @Override
   public int flags() {
-    return _getFlags(instancePtr.get());
+    return flags;
   }
 
   @Override
   public void cursorFlags(int flags) {
-    _setCursorFlags(windowPtr.get(), (byte) flags);
+    this.cursorFlags = flags;
+    if(!isEnabled()) {
+      return;
+    }
+    _setCursorFlags((byte) flags);
   }
 
   @Override
   public int cursorFlags() {
-    return _getCursorFlags(windowPtr.get());
+    return cursorFlags;
   }
 
   @Override
   public void reset(boolean clearScreen) {
-    _reset(instancePtr.get(), clearScreen);
+    flags = Terminal.FLAG_LINE_INPUT | Terminal.FLAG_ECHO;
+    cursorFlags = Terminal.CURSOR_BLINKING | Terminal.CURSOR_VISIBLE;
+    title = "Terminal";
+    if(!isEnabled()) {
+      return;
+    }
+    _reset(clearScreen);
+  }
+
+  @Override
+  public void setBuffer(@NotNull BufferId buffer) {
+    this.buffer = buffer;
+    if(!isEnabled()) {
+      return;
+    }
+    _setBuffer((byte) buffer.ordinal());
+  }
+
+  @Override
+  public @NotNull BufferId getBuffer() {
+    return buffer;
+  }
+
+  @Override
+  public void inputEventListenerEnabled(boolean state) {
+    super.inputEventListenerEnabled(state);
+    if(!isEnabled()) {
+      return;
+    }
+    updateInputEventListener();
+  }
+
+  @Override
+  public void waitFutureShutdown() {
+    super.waitFutureShutdown();
+    _joinFutureClose();
+  }
+
+  @Override
+  public @NotNull WindowsTerminal windowsTerminal()
+      throws UnsupportedSystemException, NativeException {
+    if(SystemInfo.current().os() != OperationSystem.WINDOWS) {
+      throw new UnsupportedSystemException("Windows is required");
+    }
+    if(!NativeLoader.isLoaded(WindowsTerminalImpl.class)) {
+      NativeLoader.load(WindowsTerminalImpl.class);
+    }
+    return new WindowsTerminalImpl();
+  }
+
+  public void updateInputEventListener() {
+    if(inputEventListener == null) {
+      if(!inputEventListening) {
+        return;
+      }
+      inputEventListener = new InputEventListener(128);
+      inputEventListener.start();
+    }
+    if(inputEventListening) {
+      inputEventListener.resume();
+    } else {
+      inputEventListener.pause();
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -161,60 +248,42 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
 
   protected native void _create(byte mode, int buffer_size);
 
-  protected native void _set(long instancePtr);
-
-  protected native boolean _isActive(long instancePtr);
-
   protected native void _shutdown();
 
-  protected native void _resetAll();
-
-  protected native void _setBuffer(byte channel);
+  protected native void _joinFutureClose();
 
   protected native boolean _isEnabled();
 
-  protected native boolean isAlive();
+  protected native void _setFlags(byte flags);
 
-  ///////////////////////////////////////////////////////////////////////////
-  // Terminal instance methods
-  ///////////////////////////////////////////////////////////////////////////
+  protected native byte _getFlags();
 
-  protected native long _construct();
+  protected native void _clear();
 
-  protected native void _destruct(long instancePtr);
+  protected native void _update();
 
-  protected native void _setFlags(long instancePtr, byte flags);
+  protected native void _reset(boolean clearScreen);
 
-  protected native byte _getFlags(long instancePtr);
+  protected native void _beep();
 
-  protected native void _clear(long instancePtr);
+  protected native void _setBuffer(byte buf);
 
-  protected native void _update(long instancePtr);
+  protected native byte _getBuffer();
 
-  protected native void _reset(long instancePtr, boolean clearScreen);
+  protected native void _setTitle(byte[] data);
 
-  protected native void _beep(long instancePtr);
+  protected native byte[] _getTitle();
 
-  protected native long _createInputStream(long instancePtr, int capacity);
+  protected native void _setDim(int x, int y);
 
-  protected native void _disposeInputStream(long instancePtr, long inputStreamPtr);
+  protected native int _getDim();
 
-  protected native long _getWindowPointer(long instancePtr);
+  protected native void _setCursor(int x, int y);
 
-  protected native void _setTitle(long windowPtr, byte[] data);
+  protected native int _requestCursor();
 
-  protected native byte[] _getTitle(long windowPtr);
+  protected native void _setCursorFlags(byte flags);
 
-  protected native void _setDim(long windowPtr, int x, int y);
-
-  protected native int _getDim(long windowPtr);
-
-  protected native void _setCursor(long windowPtr, int x, int y);
-
-  protected native int _requestCursor(long windowPtr);
-
-  protected native void _setCursorFlags(long windowPtr, byte flags);
-
-  protected native byte _getCursorFlags(long windowPtr);
+  protected native byte _getCursorFlags();
 
 }
