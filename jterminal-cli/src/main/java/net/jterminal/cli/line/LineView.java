@@ -13,6 +13,8 @@ public interface LineView {
 
   int cursor();
 
+  int length();
+
   @NotNull TerminalPosition cursorPos(@NotNull TerminalPosition origin);
 
   @NotNull TerminalDimension preferredWindowSize();
@@ -20,11 +22,10 @@ public interface LineView {
   @NotNull LineView convert(@NotNull TerminalDimension windowSize);
 
   static @NotNull LineView create(@NotNull TermString termString, int consoleCursor,
-      @NotNull TerminalDimension windowSize) {
+      @NotNull TerminalDimension windowSize, int length) {
     int width = windowSize.width();
-    int length = termString.length();
     int lines = Math.max(0, (length - 1) / width + 1);
-    return new DefaultLineView(lines, termString, consoleCursor, windowSize);
+    return new DefaultLineView(lines, termString, consoleCursor, windowSize, length);
   }
 
 }

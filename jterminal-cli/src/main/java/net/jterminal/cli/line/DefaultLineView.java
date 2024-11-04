@@ -11,13 +11,20 @@ class DefaultLineView implements LineView {
   private final TermString view;
   private final int cursor;
   private final TerminalDimension preferredWindowSize;
+  private final int length;
 
   public DefaultLineView(int lines, TermString view, int cursor,
-      TerminalDimension preferredWindowSize) {
+      TerminalDimension preferredWindowSize, int length) {
     this.lines = lines;
     this.view = view;
     this.cursor = cursor;
     this.preferredWindowSize = preferredWindowSize;
+    this.length = length;
+  }
+
+  @Override
+  public int length() {
+    return length;
   }
 
   @Override
@@ -49,6 +56,6 @@ class DefaultLineView implements LineView {
 
   @Override
   public @NotNull LineView convert(@NotNull TerminalDimension windowSize) {
-    return LineView.create(view, cursor, windowSize);
+    return LineView.create(view, cursor, windowSize, length);
   }
 }
