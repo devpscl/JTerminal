@@ -1,5 +1,6 @@
 package net.jterminal;
 
+import java.nio.charset.Charset;
 import net.jterminal.ansi.AnsiCodeSerializer;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.Combiner;
@@ -10,6 +11,7 @@ import net.jterminal.text.command.ScreenCommand;
 import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
+import net.jterminal.text.termstring.TermString;
 import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +33,14 @@ public class TerminalBuffer {
 
   public TerminalBuffer append(Object x) {
     stringBuffer.append(x);
+    return this;
+  }
+
+  public TerminalBuffer append(TermString termString) {
+    if(termString == null) {
+      return append("null");
+    }
+    stringBuffer.append(AnsiCodeSerializer.DEFAULT.serialize(termString));
     return this;
   }
 
@@ -139,18 +149,30 @@ public class TerminalBuffer {
   }
 
   public TerminalBuffer cursorUp(int count) {
+    if(count == 0) {
+      return this;
+    }
     return command(CursorCommand.moveUp(count));
   }
 
   public TerminalBuffer cursorDown(int count) {
+    if(count == 0) {
+      return this;
+    }
     return command(CursorCommand.moveDown(count));
   }
 
   public TerminalBuffer cursorLeft(int count) {
+    if(count == 0) {
+      return this;
+    }
     return command(CursorCommand.moveLeft(count));
   }
 
   public TerminalBuffer cursorRight(int count) {
+    if(count == 0) {
+      return this;
+    }
     return command(CursorCommand.moveRight(count));
   }
 
@@ -231,4 +253,13 @@ public class TerminalBuffer {
   public String toString() {
     return stringBuffer.toString();
   }
+
+  public byte[] toBytes() {
+    return toString().getBytes();
+  }
+
+  public byte[] toBytes(@NotNull Charset charset) {
+    return toString().getBytes(charset);
+  }
+
 }
