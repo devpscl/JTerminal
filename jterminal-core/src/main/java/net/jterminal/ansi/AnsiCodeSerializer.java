@@ -11,20 +11,47 @@ import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.FontMap;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
+import net.jterminal.text.termstring.IndexedStyleData;
+import net.jterminal.text.termstring.IndexedStyleData.IndexEntry;
+import net.jterminal.text.termstring.TermString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AnsiCodeSerializer {
 
-  public static final AnsiCodeSerializer DEFAULT = new AnsiCodeSerializer();
+  public static final AnsiCodeSerializer DEFAULT = new AnsiCodeSerializer(
+      null, null);
+
+  private final ForegroundColor defaultForegroundColor;
+  private final BackgroundColor defaultBackgroundColor;
+
+  public AnsiCodeSerializer(@Nullable ForegroundColor defaultForegroundColor,
+      @Nullable BackgroundColor defaultBackgroundColor) {
+    this.defaultForegroundColor = defaultForegroundColor;
+    this.defaultBackgroundColor = defaultBackgroundColor;
+  }
+
+  public @NotNull ForegroundColor getDefaultForegroundColor() {
+    return defaultForegroundColor == null ? TerminalColor.DEFAULT : defaultForegroundColor;
+  }
+
+  public @NotNull BackgroundColor getDefaultBackgroundColor() {
+    return defaultBackgroundColor == null ? TerminalColor.DEFAULT : defaultBackgroundColor;
+  }
 
   public @NotNull String serialize(@Nullable ForegroundColor foregroundColor) {
-    return Objects.requireNonNullElse(foregroundColor, TerminalColor.DEFAULT)
+    if(foregroundColor == TerminalColor.DEFAULT) {
+      foregroundColor = null;
+    }
+    return Objects.requireNonNullElse(foregroundColor, getDefaultForegroundColor())
         .getForegroundAnsiCode();
   }
 
   public @NotNull String serialize(@Nullable BackgroundColor backgroundColor) {
-    return Objects.requireNonNullElse(backgroundColor, TerminalColor.DEFAULT)
+    if(backgroundColor == TerminalColor.DEFAULT) {
+      backgroundColor = null;
+    }
+    return Objects.requireNonNullElse(backgroundColor, getDefaultBackgroundColor())
         .getBackgroundAnsiCode();
   }
 
@@ -72,6 +99,26 @@ public class AnsiCodeSerializer {
       buffer.append(serialize(element, currentStyle));
     }
     return buffer.toString();
+  }
+
+  public @NotNull String serialize(@NotNull TermString termString) {
+    String value = termString.raw();
+    IndexedStyleData data = termString.data();
+    int offset = 0;
+    TextStyle prevStyle = TextStyle.create();
+    StringBuilder stringBuilder = new StringBuilder(value);
+    for (IndexEntry entry : data.indexes()) {
+      prevStyle = Combiner.combine(entry.textStyle(), prevStyle);
+      String ansi = serialize(prevStyle);
+      int index = entry.index() + offset;
+      if(index < stringBuilder.length()) {
+        stringBuilder.insert(index, ansi);
+      } else {
+        stringBuilder.append(ansi);
+      }
+      offset += ansi.length();
+    }
+    return stringBuilder.toString();
   }
 
 }
