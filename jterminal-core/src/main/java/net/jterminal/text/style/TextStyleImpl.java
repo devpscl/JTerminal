@@ -1,7 +1,9 @@
 package net.jterminal.text.style;
 
+import java.util.Collection;
 import java.util.Set;
 import net.jterminal.text.BackgroundColor;
+import net.jterminal.text.Combiner;
 import net.jterminal.text.ForegroundColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +57,7 @@ class TextStyleImpl implements TextStyle {
   }
 
   @Override
-  public @NotNull TextStyle font(@Nullable Set<TextFont> textFontSet) {
+  public @NotNull TextStyle font(@Nullable Collection<TextFont> textFontSet) {
     fontMap.unset(TextFont.values());
     if(textFontSet == null) {
       return this;
@@ -74,7 +76,7 @@ class TextStyleImpl implements TextStyle {
 
   @Override
   public @NotNull TextStyle font(@NotNull FontOption fontOption,
-      @Nullable Set<TextFont> textFontSet) {
+      @Nullable Collection<TextFont> textFontSet) {
     if(textFontSet == null) {
       return this;
     }
@@ -101,6 +103,15 @@ class TextStyleImpl implements TextStyle {
   }
 
   @Override
+  public @NotNull TextStyle assignFrom(@NotNull TextStyle textStyle) {
+    foregroundColor = textStyle.foregroundColor();
+    backgroundColor = textStyle.backgroundColor();
+    fontMap.clear();
+    fontMap.putAll(textStyle.fontMap());
+    return this;
+  }
+
+  @Override
   public @NotNull FontMap fontMap() {
     return fontMap;
   }
@@ -111,12 +122,26 @@ class TextStyleImpl implements TextStyle {
   }
 
   @Override
-  public boolean equals(@NotNull TextStyle other) {
-    if(!(other instanceof TextStyleImpl impl)) {
+  public TextStyle asExplicitStyle() {
+    return Combiner.combine(this, TextStyle.getDefault());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof TextStyleImpl impl)) {
       return false;
     }
     return foregroundColor == impl.foregroundColor &&
         backgroundColor == impl.backgroundColor &&
-        fontMap.equals(((TextStyleImpl) other).fontMap);
+        fontMap.equals(((TextStyleImpl) obj).fontMap);
+  }
+
+  @Override
+  public String toString() {
+    return "TextStyleImpl{" +
+        "foregroundColor=" + foregroundColor +
+        ", backgroundColor=" + backgroundColor +
+        ", fontMap=" + fontMap +
+        '}';
   }
 }

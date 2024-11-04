@@ -1,8 +1,10 @@
 package net.jterminal.text.style;
 
+import java.util.Collection;
 import java.util.Set;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
+import net.jterminal.text.TerminalColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,13 +35,13 @@ public interface TextStyle {
   TextStyle font(@NotNull TextFont... textFonts);
 
   @NotNull
-  TextStyle font(@Nullable Set<TextFont> textFontSet);
+  TextStyle font(@Nullable Collection<TextFont> textFontSet);
 
   @NotNull
   TextStyle font(@NotNull FontOption fontOption, @NotNull TextFont... textFonts);
 
   @NotNull
-  TextStyle font(@NotNull FontOption fontOption, @Nullable Set<TextFont> textFontSet);
+  TextStyle font(@NotNull FontOption fontOption, @Nullable Collection<TextFont> textFontSet);
 
   @NotNull
   TextStyle setFont(@NotNull TextFont... textFonts);
@@ -50,13 +52,21 @@ public interface TextStyle {
   @NotNull
   TextStyle ignoreFont(@NotNull TextFont... textFonts);
 
+  @NotNull TextStyle assignFrom(@NotNull TextStyle textStyle);
+
   @NotNull
   FontMap fontMap();
 
   @NotNull
   TextStyle clone();
 
-  boolean equals(@NotNull TextStyle other);
+  TextStyle asExplicitStyle();
+
+  static @NotNull TextStyle getDefault() {
+    FontMap fontMap = new FontMap();
+    fontMap.unset(TextFont.values());
+    return create(TerminalColor.DEFAULT, TerminalColor.DEFAULT, fontMap);
+  }
 
   static @NotNull TextStyle create(@Nullable ForegroundColor foregroundColor,
       @Nullable BackgroundColor backgroundColor,

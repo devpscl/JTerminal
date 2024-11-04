@@ -93,6 +93,17 @@ public class FontMap extends EnumMap<TextFont, Boolean> {
     return true;
   }
 
-
-
+  @Override
+  public String toString() {
+    int fontSetBit = 0;
+    int fontUnsetBit = 0;
+    for (TextFont font : fonts(FontOption.SET)) {
+      fontSetBit |= font.ordinal();
+    }
+    for (TextFont font : fonts(FontOption.UNSET)) {
+      fontUnsetBit |= font.ordinal();
+    }
+    return "FontMap{" +  fontSetBit + ","
+        + fontUnsetBit + "}";
+  }
 }
