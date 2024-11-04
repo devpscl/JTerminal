@@ -1,4 +1,4 @@
-#include "../include/NativeTerminalInputStream.h"
+#include "../include/NativeTerminalInput.h"
 #include "../../include/terminal.h"
 #include "../include/jni_helper.h"
 
@@ -6,7 +6,17 @@
 
 using namespace jterminal;
 
-jint Java_net_jterminal_io_NativeTerminalInputStream__1read__J(JNIEnv* env, jobject, jlong ptr) {
+jlong Java_net_jterminal_input_NativeTerminalInput__1createInputStream(JNIEnv*, jobject, jint capacity) {
+  InputStreamPtr ptr = Terminal::newInputStream(InputStreamPriority::Normal, capacity);
+  return reinterpret_cast<jlong>(ptr);
+}
+
+void Java_net_jterminal_input_NativeTerminalInput__1disposeInputStream(JNIEnv*, jobject, jlong ptr) {
+  auto input_stream_ptr = TO_INPUT_STREAM(ptr);
+  Terminal::disposeInputStream(input_stream_ptr);
+}
+
+jint Java_net_jterminal_input_NativeTerminalInput__1read__J(JNIEnv* env, jobject, jlong ptr) {
   if(ptr == 0) {
     return 0;
   }
@@ -14,7 +24,7 @@ jint Java_net_jterminal_io_NativeTerminalInputStream__1read__J(JNIEnv* env, jobj
   return input_stream->read();
 }
 
-jint Java_net_jterminal_io_NativeTerminalInputStream__1avail(JNIEnv* env, jobject, jlong ptr) {
+jint Java_net_jterminal_input_NativeTerminalInput__1avail(JNIEnv*, jobject, jlong ptr) {
   if(ptr == 0) {
     return 0;
   }
@@ -22,7 +32,7 @@ jint Java_net_jterminal_io_NativeTerminalInputStream__1avail(JNIEnv* env, jobjec
   return input_stream->available();
 }
 
-jint Java_net_jterminal_io_NativeTerminalInputStream__1peek(JNIEnv* env, jobject, jlong ptr,
+jint Java_net_jterminal_input_NativeTerminalInput__1peek(JNIEnv* env, jobject, jlong ptr,
   jbyteArray b_array, jint off, jint len) {
   if(ptr == 0) {
     return 0;
@@ -41,7 +51,7 @@ jint Java_net_jterminal_io_NativeTerminalInputStream__1peek(JNIEnv* env, jobject
   return ret;
 }
 
-jint Java_net_jterminal_io_NativeTerminalInputStream__1read__J_3BIIJ(JNIEnv* env, jobject, jlong ptr,
+jint Java_net_jterminal_input_NativeTerminalInput__1read__J_3BIIJ(JNIEnv* env, jobject, jlong ptr,
   jbyteArray b_array, jint off, jint len, jlong timeout) {
   if(ptr == 0) {
     return 0;
@@ -65,7 +75,7 @@ jint Java_net_jterminal_io_NativeTerminalInputStream__1read__J_3BIIJ(JNIEnv* env
   return ret;
 }
 
-jint Java_net_jterminal_io_NativeTerminalInputStream__1peekInput(JNIEnv* env, jobject, jlong ptr, jobject ref) {
+jint Java_net_jterminal_input_NativeTerminalInput__1peekInput(JNIEnv* env, jobject, jlong ptr, jobject ref) {
   if(ptr == 0) {
     return 0;
   }
@@ -78,7 +88,7 @@ jint Java_net_jterminal_io_NativeTerminalInputStream__1peekInput(JNIEnv* env, jo
   return ret;
 }
 
-jobject Java_net_jterminal_io_NativeTerminalInputStream__1readInput(JNIEnv* env, jobject, jlong ptr, jlong timeout) {
+jobject Java_net_jterminal_input_NativeTerminalInput__1readInput(JNIEnv* env, jobject, jlong ptr, jlong timeout) {
   if(ptr == 0) {
     return nullptr;
   }
@@ -94,23 +104,13 @@ jobject Java_net_jterminal_io_NativeTerminalInputStream__1readInput(JNIEnv* env,
   return convert(env, input_event);
 }
 
-void Java_net_jterminal_io_NativeTerminalInputStream__1reset(JNIEnv* env, jobject, jlong ptr) {
+void Java_net_jterminal_input_NativeTerminalInput__1reset(JNIEnv* env, jobject, jlong ptr) {
   if(ptr == 0) {
     return;
   }
   auto input_stream = TO_INPUT_STREAM(ptr);
   input_stream->reset();
 }
-
-void Java_net_jterminal_io_NativeTerminalInputStream__1close(JNIEnv* env, jobject, jlong ptr) {
-  if(ptr == 0) {
-    return;
-  }
-  auto input_stream = TO_INPUT_STREAM(ptr);
-  TerminalPtr terminal = input_stream->handle();
-  terminal->disposeInputStream(input_stream);
-}
-
 
 
 
