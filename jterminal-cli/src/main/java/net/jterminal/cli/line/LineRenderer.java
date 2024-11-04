@@ -20,11 +20,8 @@ public interface LineRenderer {
       @NotNull TerminalBuffer terminalBuffer, @NotNull LineView lineView)
       throws IOException;
 
-  @NotNull TermString view(@NotNull Terminal terminal, @NotNull LineReader lineReader);
+  @NotNull LineView view(@NotNull Terminal terminal, @NotNull LineReader lineReader);
 
-  default @NotNull TermString legacyView(@NotNull Terminal terminal,
-      @NotNull LineReader lineReader) {
-    return TermString.value(view(terminal, lineReader).raw());
-  }
+  @NotNull TermString legacyView(@NotNull Terminal terminal, @NotNull LineReader lineReader);
 
 }

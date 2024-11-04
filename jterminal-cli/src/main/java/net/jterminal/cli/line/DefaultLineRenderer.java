@@ -13,9 +13,8 @@ public class DefaultLineRenderer implements LineRenderer {
   @Override
   public @NotNull LineView print(@NotNull Terminal terminal, @NotNull LineReader lineReader,
       @NotNull TerminalBuffer buffer) {
-    TerminalDimension winSize = terminal.windowSize();
-    TermString termString = view(terminal, lineReader);
-    LineView lineView = LineView.create(termString, lineReader.cursor(), winSize);
+    LineView lineView = view(terminal, lineReader);
+    TermString termString = lineView.view();
     TerminalPosition cursorPos = lineView.cursorPos(new TerminalPosition(0, 0));
     buffer.command(CursorCommand.hide())
         .resetStyle()
@@ -57,8 +56,15 @@ public class DefaultLineRenderer implements LineRenderer {
   }
 
   @Override
-  public @NotNull TermString view(@NotNull Terminal terminal, @NotNull LineReader lineReader) {
-    return TermString.value(lineReader.displayingInput());
+  public @NotNull LineView view(@NotNull Terminal terminal, @NotNull LineReader lineReader) {
+    TerminalDimension winSize = terminal.windowSize();
+    TermString termString = TermString.value(lineReader.displayingInput());
+    return LineView.create(termString, lineReader.cursor(), winSize, termString.length());
   }
 
+  @Override
+  public @NotNull TermString legacyView(@NotNull Terminal terminal,
+      @NotNull LineReader lineReader) {
+    return TermString.value(lineReader.displayingInput());
+  }
 }
