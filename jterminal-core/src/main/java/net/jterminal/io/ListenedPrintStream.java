@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ListenedPrintStream extends PrintStream {
 
-  private final Listener listener;
+  private Listener listener;
 
   public ListenedPrintStream(@NotNull Listener listener, @NotNull OutputStream out,
       boolean autoFlush, @NotNull Charset charset) {
@@ -28,11 +28,37 @@ public class ListenedPrintStream extends PrintStream {
     this.listener = listener;
   }
 
+  public ListenedPrintStream(@NotNull OutputStream out,
+      boolean autoFlush, @NotNull Charset charset) {
+    super(out, autoFlush, charset);
+  }
+
+  public ListenedPrintStream(@NotNull OutputStream out,
+      boolean autoFlush) {
+    super(out, autoFlush);
+  }
+
+  public ListenedPrintStream(@NotNull OutputStream out) {
+    super(out);
+  }
+
+  public void setListener(@NotNull Listener listener) {
+    if(this.listener != null) {
+      throw new IllegalStateException("Listener is already set");
+    }
+    this.listener = listener;
+  }
+
   @Override
   public void print(@Nullable String x) {
+    if(listener == null) {
+      super.print(x);
+      return;
+    }
     String str = listener.accept(x == null ? "null" : x);
     if(str != null) {
       super.print(str);
+      listener.afterPrint(str);
     }
   }
 
@@ -169,6 +195,8 @@ public class ListenedPrintStream extends PrintStream {
   public interface Listener {
 
     @Nullable String accept(@NotNull final String out);
+
+    default void afterPrint(@NotNull String value) {}
 
   }
 
