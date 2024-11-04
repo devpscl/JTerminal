@@ -2,6 +2,7 @@ package net.jterminal.text.element;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -73,8 +74,20 @@ class TextElementImpl implements TextElement {
   }
 
   @Override
+  public @NotNull TextElement style(@NotNull TextStyle style) {
+    textStyle.assignFrom(style);
+    return this;
+  }
+
+  @Override
   public @NotNull TextElement child(TextElement... elements) {
     childList = Arrays.asList(elements);
+    return this;
+  }
+
+  @Override
+  public @NotNull TextElement child(Collection<TextElement> collection) {
+    childList = new ArrayList<>(collection);
     return this;
   }
 

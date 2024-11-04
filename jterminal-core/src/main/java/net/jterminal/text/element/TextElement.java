@@ -1,5 +1,6 @@
 package net.jterminal.text.element;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import net.jterminal.text.BackgroundColor;
@@ -30,9 +31,13 @@ public interface TextElement {
 
   @NotNull TextElement child(TextElement...elements);
 
+  @NotNull TextElement child(Collection<TextElement> collection);
+
   @NotNull List<TextElement> child();
 
   @NotNull TextStyle style();
+
+  @NotNull TextElement style(@NotNull TextStyle style);
 
   static @NotNull TextElement create(@NotNull String value) {
     return new TextElementImpl(value, TextStyle.create());
