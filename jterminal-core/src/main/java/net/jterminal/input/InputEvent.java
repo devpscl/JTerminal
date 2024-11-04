@@ -1,8 +1,9 @@
 package net.jterminal.input;
 
+import net.jterminal.event.Event;
 import org.jetbrains.annotations.NotNull;
 
-public class InputEvent {
+public class InputEvent implements Event {
 
   public enum Type {
     KEYBOARD,
