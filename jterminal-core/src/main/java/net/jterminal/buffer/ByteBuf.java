@@ -6,6 +6,12 @@ import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import net.jterminal.text.TerminalColor;
+import net.jterminal.text.element.TextElement;
+import net.jterminal.text.style.FontMap;
+import net.jterminal.text.style.TextStyle;
+import net.jterminal.text.termstring.IndexedStyleData;
+import net.jterminal.text.termstring.TermString;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
@@ -45,10 +51,27 @@ public interface ByteBuf {
   @NotNull ByteBuf writePosition(@NotNull TerminalPosition position);
 
   @NotNull ByteBuf writeDimension(@NotNull TerminalDimension dimension);
+
   <T extends Enum<T>> @NotNull ByteBuf writeEnum(T enumElement);
 
   <T> @NotNull ByteBuf writeOpt(@NotNull Optional<T> opt,
       BiConsumer<T, ByteBuf> byteBufBiConsumer);
+
+  @NotNull ByteBuf writeColor(@NotNull TerminalColor terminalColor);
+
+  @NotNull ByteBuf writeFontMap(@NotNull FontMap fontMap);
+
+  @NotNull ByteBuf writeTextStyle(@NotNull TextStyle textStyle);
+
+  @NotNull ByteBuf writeTextElement(@NotNull TextElement textElement);
+
+  @NotNull ByteBuf writeTextElement(@NotNull TextElement textElement, @NotNull Charset charset);
+
+  @NotNull ByteBuf writeIndexedStyleData(@NotNull IndexedStyleData data);
+
+  @NotNull ByteBuf writeTermString(@NotNull TermString termString);
+
+  @NotNull ByteBuf writeTermString(@NotNull TermString termString, @NotNull Charset charset);
 
   int read(byte[] arr, int off, int len);
 
@@ -57,6 +80,8 @@ public interface ByteBuf {
   byte peek();
 
   byte readByte();
+
+  int readUnsignedByte();
 
   boolean readBoolean();
 
@@ -88,6 +113,22 @@ public interface ByteBuf {
 
   <T> @NotNull Optional<T> readOpt(@NotNull Function<ByteBuf, T> func);
 
+  @NotNull TerminalColor readColor();
+
+  @NotNull FontMap readFontMap();
+
+  @NotNull TextStyle readTextStyle();
+
+  @NotNull TextElement readTextElement();
+
+  @NotNull TextElement readTextElement(@NotNull Charset charset);
+
+  @NotNull IndexedStyleData readIndexedStyleData();
+
+  @NotNull TermString readTermString();
+
+  @NotNull TermString readTermString(@NotNull Charset charset);
+
   int capacity();
 
   int size();
@@ -95,6 +136,8 @@ public interface ByteBuf {
   int remaining();
 
   int cursor();
+
+  @NotNull ByteBuf ensureRemaining(int remaining);
 
   @NotNull ByteBuf cursor(int cursor);
 

@@ -1,12 +1,26 @@
 package net.jterminal.buffer;
 
+import java.awt.Color;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import net.jterminal.text.ColorNamePalette;
+import net.jterminal.text.TerminalColor;
+import net.jterminal.text.XtermColor;
+import net.jterminal.text.element.TextElement;
+import net.jterminal.text.style.FontMap;
+import net.jterminal.text.style.TextFont;
+import net.jterminal.text.style.TextStyle;
+import net.jterminal.text.termstring.IndexedStyleData;
+import net.jterminal.text.termstring.IndexedStyleData.IndexEntry;
+import net.jterminal.text.termstring.TermString;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
@@ -177,6 +191,99 @@ class ByteBufImpl implements ByteBuf {
   }
 
   @Override
+  public @NotNull ByteBuf writeColor(@NotNull TerminalColor terminalColor) {
+    if(terminalColor.isDefault()) {
+      writeByte(0);
+      return this;
+    }
+    if(terminalColor instanceof XtermColor xtermColor) {
+      writeByte(1);
+      writeByte(xtermColor.ordinal());
+      return this;
+    }
+    if(terminalColor instanceof ColorNamePalette colorNamePalette) {
+      writeByte(1);
+      writeByte(colorNamePalette.asXtermColor().ordinal());
+      return this;
+    }
+    Color color = terminalColor.toColor();
+    writeByte(2);
+    writeInt(color.getRGB());
+    return this;
+  }
+
+  @Override
+  public @NotNull ByteBuf writeFontMap(@NotNull FontMap fontMap) {
+    byte trueBits = 0;
+    byte falseBits = 0;
+    for (Entry<TextFont, Boolean> entry : fontMap.entrySet()) {
+      byte bitFlag = (byte) (1 << entry.getKey().ordinal());
+      if(entry.getValue()) {
+        trueBits |= bitFlag;
+      } else {
+        falseBits |= bitFlag;
+      }
+    }
+    writeByte(trueBits);
+    writeByte(falseBits);
+    return this;
+  }
+
+  @Override
+  public @NotNull ByteBuf writeTextStyle(@NotNull TextStyle textStyle) {
+    writeOpt(Optional.ofNullable(textStyle.foregroundColor()), (val, buf) -> {
+      buf.writeColor((TerminalColor) val);
+    });
+    writeOpt(Optional.ofNullable(textStyle.backgroundColor()), (val, buf) -> {
+      buf.writeColor((TerminalColor) val);
+    });
+    writeFontMap(textStyle.fontMap());
+    return this;
+  }
+
+  @Override
+  public @NotNull ByteBuf writeTextElement(@NotNull TextElement textElement) {
+    return writeTextElement(textElement, Charset.defaultCharset());
+  }
+
+  @Override
+  public @NotNull ByteBuf writeTextElement(@NotNull TextElement textElement,
+      @NotNull Charset charset) {
+    writeString(textElement.value(), charset);
+    writeTextStyle(textElement.style());
+    List<TextElement> elementList = textElement.child();
+    writeVarInt(elementList.size());
+    for (TextElement element : elementList) {
+      writeTextElement(element, charset);
+    }
+    return this;
+  }
+
+  @Override
+  public @NotNull ByteBuf writeIndexedStyleData(@NotNull IndexedStyleData data) {
+    List<IndexEntry> indexes = data.indexes();
+    writeVarInt(indexes.size());
+    for (IndexEntry index : indexes) {
+      writeInt(index.index());
+      writeTextStyle(index.textStyle());
+    }
+    return this;
+  }
+
+  @Override
+  public @NotNull ByteBuf writeTermString(@NotNull TermString termString) {
+    return writeTermString(termString, Charset.defaultCharset());
+  }
+
+  @Override
+  public @NotNull ByteBuf writeTermString(@NotNull TermString termString,
+      @NotNull Charset charset) {
+    writeString(termString.raw(), charset);
+    writeIndexedStyleData(termString.data());
+    return this;
+  }
+
+  @Override
   public int read(byte[] arr, int off, int len) {
     int remaining = remaining();
     len = Math.min(remaining, len);
@@ -197,6 +304,11 @@ class ByteBufImpl implements ByteBuf {
   @Override
   public byte readByte() {
     return buffer.get();
+  }
+
+  @Override
+  public int readUnsignedByte() {
+    return readByte() & 0xFF;
   }
 
   @Override
@@ -306,6 +418,92 @@ class ByteBufImpl implements ByteBuf {
   }
 
   @Override
+  public @NotNull TerminalColor readColor() {
+    byte mode = readByte();
+    return switch (mode) {
+      case 0 -> TerminalColor.DEFAULT;
+      case 1 -> {
+        int ordinal = readUnsignedByte();
+        yield XtermColor.getColor(ordinal);
+      }
+      case 2 -> {
+        int rgb = readInt();
+        yield TerminalColor.from(new Color(rgb));
+      }
+      default -> throw new IllegalStateException("Invalid color mode byte: " + mode);
+    };
+  }
+
+  @Override
+  public @NotNull FontMap readFontMap() {
+    byte trueBits = readByte();
+    byte falseBits = readByte();
+    FontMap fontMap = new FontMap();
+    for (TextFont value : TextFont.values()) {
+      byte bitFlag = (byte) (1 << value.ordinal());
+      if((trueBits & bitFlag) == bitFlag) {
+        fontMap.set(value);
+      }
+      if((falseBits & bitFlag) == bitFlag) {
+        fontMap.unset(value);
+      }
+    }
+    return fontMap;
+  }
+
+  @Override
+  public @NotNull TextStyle readTextStyle() {
+    Optional<TerminalColor> opt1 = readOpt(ByteBuf::readColor);
+    Optional<TerminalColor> opt2 = readOpt(ByteBuf::readColor);
+    FontMap fontMap = readFontMap();
+    return TextStyle.create(opt1.orElse(null), opt2.orElse(null), fontMap);
+  }
+
+  @Override
+  public @NotNull TextElement readTextElement() {
+    return readTextElement(Charset.defaultCharset());
+  }
+
+  @Override
+  public @NotNull TextElement readTextElement(@NotNull Charset charset) {
+    String value = readString(charset);
+    TextStyle textStyle = readTextStyle();
+    int childCount = readVarInt();
+    List<TextElement> textElements = new ArrayList<>();
+    for (int idx = 0; idx < childCount; idx++) {
+      TextElement element = readTextElement(charset);
+      textElements.add(element);
+    }
+    return TextElement.create(value)
+        .style(textStyle)
+        .child(textElements);
+  }
+
+  @Override
+  public @NotNull IndexedStyleData readIndexedStyleData() {
+    int count = readVarInt();
+    IndexedStyleData data = IndexedStyleData.create();
+    for (int idx = 0; idx < count; idx++) {
+      int index = readInt();
+      TextStyle textStyle = readTextStyle();
+      data.set(index, textStyle);
+    }
+    return data;
+  }
+
+  @Override
+  public @NotNull TermString readTermString() {
+    return readTermString(Charset.defaultCharset());
+  }
+
+  @Override
+  public @NotNull TermString readTermString(@NotNull Charset charset) {
+    String value = readString(charset);
+    IndexedStyleData data = readIndexedStyleData();
+    return TermString.create(value, data);
+  }
+
+  @Override
   public int capacity() {
     return buffer.capacity();
   }
@@ -326,11 +524,33 @@ class ByteBufImpl implements ByteBuf {
   }
 
   @Override
+  public @NotNull ByteBuf ensureRemaining(int remaining) {
+    if(remaining() >= remaining) {
+      return this;
+    }
+    int offset = remaining - remaining();
+    if (offset < 0) {
+      return this;
+    }
+
+    byte[] array = buffer.array();
+    for (int idx = offset; idx < array.length; idx++) {
+      array[idx - offset] = array[idx];
+    }
+    ByteBuffer byteBuffer = ByteBuffer.wrap(array);
+    byteBuffer.position(Math.max(0, cursor() - offset));
+
+    this.buffer = byteBuffer;
+    return this;
+  }
+
+  @Override
   public @NotNull ByteBuf cursor(int cursor) {
-    if(cursor < 0 || buffer.capacity() <= cursor) {
+    if(cursor < 0 || buffer.capacity() < cursor) {
       throw new IndexOutOfBoundsException(
           "Cursor out of buffer(" + buffer.capacity() + ": " + cursor);
     }
+    buffer.position(cursor);
     return this;
   }
 
