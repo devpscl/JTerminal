@@ -132,11 +132,10 @@ class InputStream {
   QueuedBuffer<uint8_t>* buf_;
   std::mutex read_sync_mutex_M;
   uint8_t priority_;
-  Terminal* instance_;
 
   void write(void* bytes, size_t len);
 
-  explicit InputStream(Terminal* instance, uint8_t priority, size_t capacity = 1024);
+  explicit InputStream(uint8_t priority, size_t capacity = 1024);
 
   friend class Terminal;
 
@@ -165,8 +164,6 @@ class InputStream {
   void close() const;
 
   void reset() const;
-
-  Terminal* handle();
 
 };
 
