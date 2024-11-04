@@ -45,4 +45,6 @@ public interface LineReader {
 
   void releaseLine(boolean event);
 
+  void updateDisplay();
+
 }
