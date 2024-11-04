@@ -3,10 +3,9 @@
 #include <mutex>
 
 namespace jterminal {
-InputStream::InputStream(Terminal* instance, uint8_t priority, size_t capacity) {
+InputStream::InputStream(uint8_t priority, size_t capacity) {
   buf_ = new QueuedBuffer<uint8_t>(capacity);
   priority_ = priority;
-  instance_ = instance;
 }
 
 InputStream::~InputStream() {
@@ -68,10 +67,6 @@ void InputStream::close() const {
 
 void InputStream::reset() const {
   buf_->clear();
-}
-
-Terminal* InputStream::handle() {
-  return instance_;
 }
 
 }

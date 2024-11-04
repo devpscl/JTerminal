@@ -8,31 +8,14 @@
 
 namespace jterminal {
 
-Window::Window(Terminal* instance) {
-  instance_ = instance;
-}
-
-void Window::setup() {
-  strstream buf;
-  buf << ESC_TITLE_START << title_ << ESC_TITLE_END;
-  TermEngine::write(buf.str().c_str());
-}
-
-bool Window::isActive() const {
-  return TermEngine::isActive(instance_);
-}
-
 void Window::setTitle(const char* cstr) {
   if(cstr == nullptr) {
     cstr = TERMINAL_DEFAULT_TITLE;
   }
   title_.assign(cstr);
-  if(!isActive()) {
-    return;
-  }
   strstream buf;
   buf << ESC_TITLE_START << title_ << ESC_TITLE_END;
-  TermEngine::write(buf.str().c_str());
+  Terminal::write(buf.str().c_str());
 }
 
 std::string Window::getTitle() {
@@ -40,9 +23,6 @@ std::string Window::getTitle() {
 }
 
 void Window::setDimension(const dim_t& dim) {
-  if(!isActive()) {
-    return;
-  }
   winsize size{};
   size.ws_col = dim.width;
   size.ws_row = dim.height;
@@ -50,34 +30,31 @@ void Window::setDimension(const dim_t& dim) {
   CSISequence sequence = CSI_SEQUENCE('t', 8, dim.height, dim.width);
   ESCBuffer buffer(16);
   buffer.writeSequence(sequence);
-  TermEngine::write(buffer.ptr(), buffer.size());
+  Terminal::write(buffer.ptr(), buffer.size());
 }
 
 void Window::setCursor(const pos_t& pos) {
-  if(!isActive()) {
-    return;
-  }
   CSISequence sequence = CSI_SEQUENCE('f', 8, pos.y, pos.x);
   ESCBuffer buffer(16);
   buffer.writeSequence(sequence);
-  TermEngine::write(buffer.ptr(), buffer.size());
+  Terminal::write(buffer.ptr(), buffer.size());
 }
 
 void Window::getDimension(dim_t* dim_ptr) {
-  TermEngine::readConsoleDim(dim_ptr);
+  winsize size{};
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+  dim_ptr->width = size.ws_col;
+  dim_ptr->height = size.ws_row;
 }
 
 bool Window::requestCursorPosition(pos_t* pos_ptr) {
-  if(!isActive()) {
-    return false;
-  }
   uint8_t buf[8];
-  InputStreamPtr input_stream = instance_->newSingletonInputStream(24);
-  TermEngine::write(ESC_CURSOR_REQUEST);
-  Settings settings = TermEngine::getSettings();
+  InputStreamPtr input_stream = Terminal::newSingletonInputStream(24);
+  Terminal::write(ESC_CURSOR_REQUEST);
+  Settings settings = Terminal::getSettings();
   int ms = settings.mode == TERMINAL_MODE_PERFORMANCE ? 10 : 500;
   size_t len = input_stream->read(buf, 8, std::chrono::milliseconds(ms));
-  instance_->disposeInputStream(input_stream);
+  Terminal::disposeInputStream(input_stream);
 
   if(len == -1 || len == 0) {
     return false;
@@ -100,7 +77,7 @@ bool Window::requestCursorPosition(pos_t* pos_ptr) {
 
 void Window::setCursorFlags(uint8_t flags) {
   cursor_flags_ = flags;
-  instance_->update();
+  Terminal::update();
 }
 
 uint8_t Window::getCursorFlags() {

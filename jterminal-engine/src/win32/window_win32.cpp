@@ -7,28 +7,11 @@
 
 namespace jterminal {
 
-Window::Window(Terminal* instance) {
-  instance_ = instance;
-}
-
-void Window::setup() {
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  std::wstring wstr = converter.from_bytes(title_);
-  SetConsoleTitleW(wstr.c_str());
-}
-
-bool Window::isActive() const {
-  return TermEngine::isActive(instance_);
-}
-
 void Window::setTitle(const char* cstr) {
   if(cstr == nullptr) {
     cstr = TERMINAL_DEFAULT_TITLE;
   }
   title_ = std::string(cstr);
-  if(!isActive()) {
-    return;
-  }
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wstr = converter.from_bytes(title_);
   SetConsoleTitleW(wstr.c_str());
@@ -39,9 +22,6 @@ std::string Window::getTitle() {
 }
 
 void Window::setDimension(const dim_t& dim) {
-  if(!isActive()) {
-    return;
-  }
   auto x = static_cast<SHORT>(dim.width);
   auto y = static_cast<SHORT>(dim.height);
   HANDLE handle = STDOUT_HANDLE;
@@ -63,20 +43,22 @@ void Window::setCursor(const pos_t& pos) {
 }
 
 void Window::getDimension(dim_t* dim_ptr) {
-  TermEngine::readConsoleDim(dim_ptr);
+  CONSOLE_SCREEN_BUFFER_INFO buffer_info;
+  GetConsoleScreenBufferInfo(STDOUT_HANDLE, &buffer_info);
+  uint16_t width = buffer_info.dwSize.X;
+  uint16_t height = buffer_info.dwSize.Y;
+  dim_ptr->width = width;
+  dim_ptr->height = height;
 }
 
 bool Window::requestCursorPosition(pos_t* pos_ptr) {
-  if(!isActive()) {
-    return false;
-  }
   uint8_t buf[8];
-  InputStreamPtr input_stream = instance_->newSingletonInputStream(24);
-  TermEngine::write(ESC_CURSOR_REQUEST);
-  Settings settings = TermEngine::getSettings();
+  InputStreamPtr input_stream = Terminal::newSingletonInputStream(24);
+  Terminal::write(ESC_CURSOR_REQUEST);
+  Settings settings = Terminal::getSettings();
   int ms = settings.mode == TERMINAL_MODE_PERFORMANCE ? 10 : 500;
   size_t len = input_stream->read(buf, 8, std::chrono::milliseconds(ms));
-  instance_->disposeInputStream(input_stream);
+  Terminal::disposeInputStream(input_stream);
 
   if(len == -1 || len == 0) {
     return false;
@@ -99,68 +81,11 @@ bool Window::requestCursorPosition(pos_t* pos_ptr) {
 
 void Window::setCursorFlags(uint8_t flags) {
   cursor_flags_ = flags;
-  instance_->update();
+  Terminal::update();
 }
 
 uint8_t Window::getCursorFlags() {
   return cursor_flags_;
-}
-
-void Window::setVisible(bool state) {
-  HWND console_window = GetConsoleWindow();
-  ShowWindow(console_window, state ? SW_SHOW : SW_HIDE);
-}
-
-bool Window::isVisible() {
-  HWND console_window = GetConsoleWindow();
-  return IsWindowVisible(console_window);
-}
-
-void Window::setGraphicUpdate(bool state) {
-  HWND console_window = GetConsoleWindow();
-  if(state) {
-    LockWindowUpdate(nullptr);
-  } else {
-    LockWindowUpdate(console_window);
-  }
-}
-
-void Window::setRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
-  HWND window = GetConsoleWindow();
-  MoveWindow(window, x, y, width, height, false);
-}
-
-void Window::setRectSize(uint8_t width, uint8_t height) {
-  HWND window = GetConsoleWindow();
-  RECT rect;
-  GetWindowRect(window, &rect);
-  int x = rect.left;
-  int y = rect.top;
-  MoveWindow(window, x, y, width, height, false);
-}
-
-void Window::setRectPos(uint8_t x, uint8_t y) {
-  HWND window = GetConsoleWindow();
-  RECT rect;
-  GetWindowRect(window, &rect);
-  int width = rect.right;
-  int height = rect.bottom;
-  MoveWindow(window, x, y, width, height, false);
-}
-
-void Window::getRect(uint8_t* x, uint8_t* y, uint8_t* width, uint8_t* height) {
-  HWND window = GetConsoleWindow();
-  RECT rect;
-  GetWindowRect(window, &rect);
-  *x = rect.left;
-  *y = rect.top;
-  *width = (rect.right - rect.left);
-  *height = (rect.bottom - rect.top);
-}
-
-bool Window::isOnFocus() {
-  HWND console_window = GetConsoleWindow();
-  return GetForegroundWindow() == console_window;
 }
 
 }

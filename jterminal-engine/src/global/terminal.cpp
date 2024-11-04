@@ -4,7 +4,7 @@
 namespace jterminal {
 
 InputStreamPtr Terminal::newSingletonInputStream(size_t capacity) {
-  const auto ptr = new InputStream(this, 0xFF, capacity);
+  const auto ptr = new InputStream(0xFF, capacity);
   input_stream_vector_.push_back(ptr);
   sortInputStreamVector();
   return ptr;
@@ -35,17 +35,17 @@ void Terminal::writeInput(uint8_t* bytes, size_t len) {
   }
 }
 
-Terminal::Terminal() {
-  window_ = new Window(this);
-}
-
-Terminal::~Terminal() {
-  delete window_;
-}
-
 void Terminal::setFlags(uint8_t flags) {
   flags_ = flags;
   update();
+}
+
+void Terminal::addFlags(uint8_t flags) {
+  setFlags(flags_ | flags);
+}
+
+void Terminal::removeFlags(uint8_t flags) {
+  setFlags(flags_ & ~flags);
 }
 
 void Terminal::getFlags(uint8_t* flags_ptr) {
@@ -53,19 +53,13 @@ void Terminal::getFlags(uint8_t* flags_ptr) {
 }
 
 void Terminal::update() {
-  if(!isActive()) {
-    return;
-  }
-  TermEngine::writeFlags(flags_, window_->cursor_flags_);
+  writeFlags(flags_, Window::cursor_flags_);
 }
 
 void Terminal::reset(bool clear_screen) {
   flags_ = FLAG_DEFAULT;
-  window_->cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
-  if(!isActive()) {
-    return;
-  }
-  TermEngine::write("\033[0m");
+  Window::cursor_flags_ = CURSOR_FLAG_VISIBLE | CURSOR_FLAG_BLINKING;
+  write("\033[0m");
   update();
   if(clear_screen) {
     clear();
@@ -73,22 +67,26 @@ void Terminal::reset(bool clear_screen) {
 }
 
 void Terminal::beep() {
-  if(!isActive()) {
-    return;
-  }
-  TermEngine::write("\a");
+  write("\a");
 }
 
-uint8_t Terminal::getBuffer() const {
+void Terminal::setBuffer(uint8_t buffer) {
+  if(buffer_ != buffer) {
+    buffer_ = buffer;
+    if(buffer_) {
+      write(ESC_ENABLE_ALT_BUFFER);
+    } else {
+      write(ESC_DISABLE_ALT_BUFFER);
+    }
+  }
+}
+
+uint8_t Terminal::getBuffer() {
   return buffer_;
 }
 
-bool Terminal::isActive() {
-  return TermEngine::isActive(this);
-}
-
 InputStreamPtr Terminal::newInputStream(InputStreamPriority prio, size_t capacity) {
-  const auto ptr = new InputStream(this, static_cast<uint8_t>(prio), capacity);
+  const auto ptr = new InputStream(static_cast<uint8_t>(prio), capacity);
   input_stream_vector_.push_back(ptr);
   sortInputStreamVector();
   return ptr;
@@ -104,8 +102,23 @@ void Terminal::disposeInputStream(InputStreamPtr input_stream) {
   delete input_stream;
 }
 
-Window* Terminal::getWindow() {
-  return window_;
+bool Terminal::isEnabled() {
+  return enabled_;
+}
+
+bool Terminal::isClosed() {
+  return closed_;
+}
+
+Settings Terminal::getSettings() {
+  return settings_;
+}
+
+void Terminal::joinFutureClose() {
+  if(closed_) {
+    return;
+  }
+  input_thread_->join();
 }
 
 }
