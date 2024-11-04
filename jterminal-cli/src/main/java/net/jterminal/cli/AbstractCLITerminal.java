@@ -193,7 +193,7 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
     if((lineReader.flags() & LineReader.FLAG_PRINT_LEGACY) == LineReader.FLAG_PRINT_LEGACY) {
       printLegacyLine();
     }
-
+    eventBus.post(new LineReleaseEvent(line));
   }
 
   @Override
