@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class DefaultLineRenderer implements LineRenderer {
 
   @Override
-  public @NotNull LineView print(@NotNull Terminal terminal, @NotNull LineReader lineReader,
+  public @NotNull LineView print(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
       @NotNull TerminalBuffer buffer) {
     LineView lineView = view(terminal, lineReader);
     TermString termString = lineView.view();
@@ -29,7 +29,7 @@ public class DefaultLineRenderer implements LineRenderer {
   }
 
   @Override
-  public void printLegacy(@NotNull Terminal terminal, @NotNull LineReader lineReader,
+  public void printLegacy(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
       @NotNull TerminalBuffer buffer) {
     TermString termString = legacyView(terminal, lineReader);
     buffer.command(CursorCommand.hide())
@@ -41,7 +41,7 @@ public class DefaultLineRenderer implements LineRenderer {
   }
 
   @Override
-  public void remove(@NotNull Terminal terminal, @NotNull LineReader lineReader,
+  public void remove(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
       @NotNull TerminalBuffer buffer, @NotNull LineView lineView) {
     int lines = lineView.usedLines();
     TerminalPosition cursorPos = lineView.cursorPos(new TerminalPosition(0, 0));

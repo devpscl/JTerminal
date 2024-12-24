@@ -8,15 +8,15 @@ import org.jetbrains.annotations.NotNull;
 
 public interface LineRenderer {
 
-  @NotNull LineView print(@NotNull Terminal terminal,
+  @NotNull LineView print(@NotNull CLITerminal terminal,
       @NotNull LineReader lineReader, @NotNull TerminalBuffer terminalBuffer)
       throws IOException;
 
-  void printLegacy(@NotNull Terminal terminal,
+  void printLegacy(@NotNull CLITerminal terminal,
       @NotNull LineReader lineReader, @NotNull TerminalBuffer terminalBuffer)
       throws IOException;
 
-  void remove(@NotNull Terminal terminal, @NotNull LineReader lineReader,
+  void remove(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
       @NotNull TerminalBuffer terminalBuffer, @NotNull LineView lineView)
       throws IOException;
 
