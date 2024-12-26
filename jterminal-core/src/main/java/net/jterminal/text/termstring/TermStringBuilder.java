@@ -56,6 +56,8 @@ public interface TermStringBuilder {
 
   @NotNull TermStringBuilder insert(int index, TermString termString);
 
+  @NotNull TermStringBuilder insertStyle(int index, @NotNull TextStyle textStyle, boolean explicit);
+
   @NotNull TermStringBuilder region(int start, int end);
 
   @NotNull TermStringBuilder erase(int start, int end);
@@ -63,6 +65,8 @@ public interface TermStringBuilder {
   @NotNull TermStringBuilder replace(int start, int end, String str);
 
   @NotNull TermStringBuilder replace(int start, int end, TermString termString);
+
+  @NotNull TextStyle getStyle(int pos);
 
   @NotNull TermString build();
 

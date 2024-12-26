@@ -3,6 +3,7 @@ package net.jterminal.text.termstring;
 import java.util.Collection;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
+import net.jterminal.text.TerminalColor;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.style.TextStyle.FontOption;
@@ -88,12 +89,14 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
 
   @Override
   public @NotNull TermStringBuilder foregroundColor(@Nullable ForegroundColor foregroundColor) {
-    return appendStyle(TextStyle.create(foregroundColor, null));
+    return appendStyle(TextStyle.create(foregroundColor == null ?
+        TerminalColor.DEFAULT : foregroundColor, null));
   }
 
   @Override
   public @NotNull TermStringBuilder backgroundColor(@Nullable BackgroundColor backgroundColor) {
-    return appendStyle(TextStyle.create(null, backgroundColor));
+    return appendStyle(TextStyle.create(null,
+        backgroundColor == null ? TerminalColor.DEFAULT : backgroundColor));
   }
 
   @Override
@@ -165,6 +168,13 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
   }
 
   @Override
+  public @NotNull TermStringBuilder insertStyle(int index,
+      @NotNull TextStyle textStyle, boolean explicit) {
+    data.add(index, explicit ? textStyle.asExplicitStyle() : textStyle);
+    return this;
+  }
+
+  @Override
   public @NotNull TermStringBuilder region(int start, int end) {
     String str = sb.substring(start, end);
     sb.setLength(0);
@@ -201,6 +211,7 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
     }
     String value = termString.raw();
     sb.replace(start, end, value);
+
     IndexedStyleData prefix = data.sub(-1, start);
     IndexedStyleData insertData = termString.data().shift(start);
     IndexedStyleData suffix = data.sub(end, -1).shift(-(end-start) + value.length());
@@ -209,6 +220,11 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
     data.clear();
     data.assign(prefix, false);
     return this;
+  }
+
+  @Override
+  public @NotNull TextStyle getStyle(int pos) {
+    return data.at(pos);
   }
 
   @Override
