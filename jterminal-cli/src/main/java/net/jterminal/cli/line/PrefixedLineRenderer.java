@@ -1,8 +1,7 @@
 package net.jterminal.cli.line;
 
 import java.util.function.Supplier;
-import net.jterminal.Terminal;
-import net.jterminal.TerminalBuffer;
+import net.jterminal.cli.CLITerminal;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.util.TerminalDimension;
 import org.jetbrains.annotations.NotNull;
@@ -16,19 +15,23 @@ public class PrefixedLineRenderer extends DefaultLineRenderer {
   }
 
   @Override
-  public @NotNull LineView view(@NotNull Terminal terminal, @NotNull LineReader lineReader) {
+  public @NotNull LineView view(@NotNull CLITerminal terminal, @NotNull LineReader lineReader) {
     TermString prefixTermString = prefixSupply.get();
     TerminalDimension winSize = terminal.windowSize();
-    TermString termString = TermString.builder()
+    TermString termString = TermString.value(lineReader.displayingInput());
+    termString = terminal.modifyCommandLineView(termString, lineReader.displayingInput());
+
+    TermString viewString = TermString.builder()
         .append(prefixTermString)
-        .append(lineReader.displayingInput())
+        .append(termString)
         .build();
-    return LineView.create(termString, lineReader.cursor()
-        + prefixTermString.length(), winSize, termString.length());
+
+    return LineView.create(viewString, lineReader.cursor()
+        + prefixTermString.length(), winSize, viewString.length());
   }
 
   @Override
-  public @NotNull TermString legacyView(@NotNull Terminal terminal,
+  public @NotNull TermString legacyView(@NotNull CLITerminal terminal,
       @NotNull LineReader lineReader) {
     TermString prefixTermString = prefixSupply.get();
     return TermString.builder()

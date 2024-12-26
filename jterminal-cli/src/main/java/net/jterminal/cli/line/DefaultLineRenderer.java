@@ -1,7 +1,7 @@
 package net.jterminal.cli.line;
 
-import net.jterminal.Terminal;
 import net.jterminal.TerminalBuffer;
+import net.jterminal.cli.CLITerminal;
 import net.jterminal.text.command.CursorCommand;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.util.TerminalDimension;
@@ -56,14 +56,16 @@ public class DefaultLineRenderer implements LineRenderer {
   }
 
   @Override
-  public @NotNull LineView view(@NotNull Terminal terminal, @NotNull LineReader lineReader) {
+  public @NotNull LineView view(@NotNull CLITerminal terminal, @NotNull LineReader lineReader) {
     TerminalDimension winSize = terminal.windowSize();
     TermString termString = TermString.value(lineReader.displayingInput());
+    termString = terminal.modifyCommandLineView(termString, lineReader.displayingInput());
+
     return LineView.create(termString, lineReader.cursor(), winSize, termString.length());
   }
 
   @Override
-  public @NotNull TermString legacyView(@NotNull Terminal terminal,
+  public @NotNull TermString legacyView(@NotNull CLITerminal terminal,
       @NotNull LineReader lineReader) {
     return TermString.value(lineReader.displayingInput());
   }
