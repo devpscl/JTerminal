@@ -552,6 +552,11 @@ public interface Terminal {
     }
   }
 
+  static <T extends Terminal> @NotNull T getAs(@NotNull Class<T> type) {
+    Terminal terminal = get();
+    return type.cast(terminal);
+  }
+
   /**
    * The enum Execution mode.
    */
