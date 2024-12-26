@@ -1,4 +1,4 @@
-Keycode,State,EC0,EC1,EC2
+#Keycode,State,EC0,EC1,EC2
 KEY_A,NONE,61
 KEY_B,NONE,62
 KEY_C,NONE,63
