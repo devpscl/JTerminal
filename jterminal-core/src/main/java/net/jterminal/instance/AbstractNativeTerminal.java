@@ -24,7 +24,8 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
 
   private static InputEventListener inputEventListener = null;
 
-  private int flags = Terminal.FLAG_LINE_INPUT | Terminal.FLAG_ECHO;
+  private int flags = Terminal.FLAG_LINE_INPUT | Terminal.FLAG_ECHO |
+      Terminal.FLAG_SIGNAL_INPUT;
   private int cursorFlags = Terminal.CURSOR_BLINKING | Terminal.CURSOR_VISIBLE;
   private String title = "Terminal";
   private BufferId buffer = BufferId.MAIN;
