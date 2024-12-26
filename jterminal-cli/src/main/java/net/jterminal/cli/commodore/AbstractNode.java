@@ -81,6 +81,7 @@ public abstract class AbstractNode<T extends CommandArgument, I> {
     return parent.depth() + 1;
   }
 
+  @SuppressWarnings("unchecked")
   public AbstractNode<T, ?>[] getOrderFromRoot() {
     int depth = depth();
     AbstractNode<T, ?>[] arr = new AbstractNode[depth];
