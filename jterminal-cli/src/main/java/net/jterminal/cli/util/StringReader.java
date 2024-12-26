@@ -1,6 +1,8 @@
 package net.jterminal.cli.util;
 
 import net.jterminal.annotation.NoThreadSafety;
+import net.jterminal.cli.exception.StringException;
+import net.jterminal.util.CharFilter;
 import org.jetbrains.annotations.NotNull;
 
 @NoThreadSafety
@@ -74,10 +76,13 @@ public class StringReader {
     position = Math.min(position + n, array.length);
   }
 
-  public void skipAllWhitespaces() {
+  public int skipAllWhitespaces() {
+    int count = 0;
     while (Character.isWhitespace(peek())) {
       skip();
+      count = 1;
     }
+    return count;
   }
 
   public char peekChar() {
@@ -106,42 +111,117 @@ public class StringReader {
   }
 
   public boolean isNextDigit() {
-    int peek = peek();
-    return Character.isDigit(peek);
+    return isNextDigit(0);
   }
 
-  public boolean isNextStringSequence() {
+  public boolean isNextDigit(int off) {
+    int peek = peek(off);
+    return Character.isDigit(peek) || peek == '-' || peek == '.';
+  }
+
+  public boolean isNextEscapeChar() {
+    return isNextEscapeChar(0);
+  }
+
+  public boolean isNextEscapeChar(int off) {
+    int peek = peek(off);
+    return peek == '\n';
+  }
+
+  public boolean isNextQuoted() {
     int peek = peek();
     return peek == '\'' || peek == '\"';
   }
 
-  public int readInt() throws NumberFormatException {
+  public int readInt() throws StringException {
     int len = 0;
-    while (Character.isDigit(peek(len))) {
+    while (isNextDigit(len)) {
       len++;
     }
+    final int pos = position;
     String value = readString(len);
-    return Integer.parseInt(value);
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      throw new StringException(e.getMessage(), pos);
+    }
   }
 
-  public long readLong() throws NumberFormatException {
+  public long readLong() throws StringException {
     int len = 0;
-    while (Character.isDigit(peek(len))) {
+    while (isNextDigit(len)) {
       len++;
     }
+    final int pos = position;
     String value = readString(len);
-    return Long.parseLong(value);
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException e) {
+      throw new StringException(e.getMessage(), pos);
+    }
   }
 
-  public double readDouble() throws NumberFormatException {
+  public double readDouble() throws StringException {
     int len = 0;
-    int buf;
-    while ((buf = peek(len)) != 0 && (Character.isDigit(buf) || buf == '.')) {
+    while (isNextDigit(len)) {
       len++;
     }
+    final int pos = position;
     String value = readString(len);
-    return Double.parseDouble(value);
+    try {
+      return Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      throw new StringException(e.getMessage(), pos);
+    }
   }
 
+  public @NotNull String read(@NotNull CharFilter charFilter) {
+    StringBuilder stringBuilder = new StringBuilder();
+    int peekCh;
+    while(charFilter.isAccept(peekCh = peek()) && avail()) {
+      stringBuilder.append((char) peekCh);
+    }
+    return stringBuilder.toString();
+  }
+
+  public @NotNull String readWhile(int endChar, boolean ignoreEscape) {
+    StringBuilder stringBuilder = new StringBuilder();
+    int ch;
+    boolean escaped = false;
+    while(avail()) {
+      ch = read();
+      if(ignoreEscape && escaped) {
+        stringBuilder.append((char) ch);
+        escaped = false;
+        continue;
+      }
+      if(ch == '\\') {
+        escaped = true;
+      }
+      if(ch == endChar) {
+        stringBuilder.append((char) endChar);
+        break;
+      }
+      stringBuilder.append((char) ch);
+    }
+    return stringBuilder.toString();
+  }
+
+  public @NotNull String readQuoted(int quoteChar) {
+    StringBuilder stringBuilder = new StringBuilder();
+    if(peek() != quoteChar) {
+      return stringBuilder.toString();
+    }
+    char first = readChar();
+    stringBuilder.append(first);
+    String content = readWhile(quoteChar, true);
+    stringBuilder.append(content);
+    return stringBuilder.toString();
+  }
+
+  public @NotNull String readNonWhitespace() {
+    skipAllWhitespaces();
+    return read(CharFilter.NON_WHITESPACE_FILTER);
+  }
 
 }
