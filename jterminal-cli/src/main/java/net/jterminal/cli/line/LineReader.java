@@ -1,6 +1,8 @@
 package net.jterminal.cli.line;
 
+import java.util.List;
 import net.jterminal.cli.history.InputHistory;
+import net.jterminal.cli.tab.TabCompleter;
 import net.jterminal.util.CharFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,6 +14,12 @@ public interface LineReader {
   int FLAG_QUICK_DELETE     = 0x4;
   int FLAG_PRINT_LEGACY     = 0x8;
   int FLAG_NAVIGABLE_CURSOR = 0x10;
+
+  @Nullable TabCompleter tabCompleter();
+
+  void tabCompleter(@Nullable TabCompleter tabCompleter);
+
+  boolean isTabbing();
 
   @Nullable InputHistory inputHistory();
 

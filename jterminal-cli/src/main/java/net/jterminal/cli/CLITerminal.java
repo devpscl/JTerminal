@@ -1,12 +1,31 @@
 package net.jterminal.cli;
 
 import net.jterminal.NativeTerminal;
+import net.jterminal.cli.command.CommandArgument;
+import net.jterminal.cli.command.CommandHandler;
+import net.jterminal.cli.exception.CommandParseException;
 import net.jterminal.cli.line.LineReader;
+import net.jterminal.cli.tab.TabCompleter;
 import net.jterminal.cli.util.RecordingBuffer;
+import net.jterminal.text.termstring.TermString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface CLITerminal extends NativeTerminal {
+
+  @Nullable CommandHandler<?> commandHandler();
+
+  <T extends CommandArgument> CommandHandler<T> commandHandler(Class<T> type);
+
+  void commandHandler(@Nullable CommandHandler<?> commandHandler);
+
+  @NotNull CommandArgument[] parseArguments(@NotNull String input) throws CommandParseException;
+
+  @NotNull TermString modifyCommandLineView(@NotNull TermString termString, @NotNull String input);
+
+  @Nullable TabCompleter generateTabCompleter(@NotNull String input, int cursor);
+
+  boolean dispatchCommand(@NotNull String line);
 
   @NotNull LineReader lineReader();
 

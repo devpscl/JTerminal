@@ -3,6 +3,7 @@ package net.jterminal.cli.line;
 import java.util.Objects;
 import net.jterminal.cli.CLITerminal;
 import net.jterminal.cli.history.InputHistory;
+import net.jterminal.cli.tab.TabCompleter;
 import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.util.CharFilter;
 import net.jterminal.util.CharFilter.CharType;
@@ -17,12 +18,15 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   private StringBuilder input = new StringBuilder();
   private String inputCache = "";
   private int flags = FLAG_ECHO_MODE | FLAG_NAVIGABLE_CURSOR | FLAG_INSERT_MODE;
-  private int cursor = 0;
   private CharFilter charFilter = new CharFilter(CharType.DIGIT,
       CharType.WHITESPACE, CharType.LETTERS_LOWERCASE,
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
   private LineRenderer lineRenderer = new DefaultLineRenderer();
-  private InputHistory inputHistory = null;
+
+  int cursor = 0;
+  InputHistory inputHistory = null;
+  TabCompleter tabCompleter = null;
+  boolean tabbing = false;
 
   protected final SetLock<CLITerminal> terminalSetLock = new SetLock<>("Terminal");
 
@@ -46,6 +50,22 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   @Override
   public void removeFlags(int flags) {
     flags(this.flags & ~flags);
+  }
+
+  @Override
+  public @Nullable TabCompleter tabCompleter() {
+    return tabCompleter;
+  }
+
+  @Override
+  public void tabCompleter(@Nullable TabCompleter tabCompleter) {
+    this.tabCompleter = tabCompleter;
+    this.tabbing = false;
+  }
+
+  @Override
+  public boolean isTabbing() {
+    return tabbing;
   }
 
   @Override
@@ -117,11 +137,19 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   public void releaseLine(boolean event) {
     synchronized (syncLock) {
       String str = input();
-      if (!str.isEmpty()) {
+      boolean strBlank = str.isBlank();
+      if (!strBlank) {
         inputHistory.add(str);
       }
       if(event && terminalSetLock.isSet()) {
-        terminalSetLock.get().eventReleaseLine(str);
+        CLITerminal terminal = terminalSetLock.get();
+        terminal.eventReleaseLine(str);
+        if(!strBlank) {
+          terminal.lineReading(false);
+          terminal.dispatchCommand(str);
+          terminal.lineReading(true);
+        }
+
       }
       clear();
     }
@@ -134,10 +162,48 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     }
   }
 
+  protected void insertTabSuggestion() {
+    if(tabCompleter == null) {
+      return;
+    }
+    String newInput = input()
+        .substring(0, tabCompleter.position())
+        .concat(tabCompleter.suggestion());
+    setEditingInput(newInput);
+  }
+
   protected void setEditingInput(@NotNull String str) {
     input.setLength(0);
     input.append(str);
     cursor = str.length();
+  }
+
+  protected void performTabEvent() {
+    if(tabbing) {
+      if(tabCompleter == null) {
+        return;
+      }
+      tabCompleter.next();
+      insertTabSuggestion();
+      return;
+    }
+    SetLock<CLITerminal> tsl = terminalSetLock;
+    if(!tsl.isSet()) {
+      return;
+    }
+
+    CLITerminal terminal = tsl.get();
+    TabCompleter completer = terminal.generateTabCompleter(input(), cursor);
+    if(completer == null || completer.empty()) {
+      return;
+    }
+    tabCompleter = completer;
+    insertTabSuggestion();
+    tabbing = true;
+  }
+
+  protected void performNonTabEvent() {
+    tabCompleter(null);
   }
 
   protected void performEditEvent() {
@@ -145,9 +211,11 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     if(inputHistory != null) {
       inputHistory.unselect();
     }
+    performNonTabEvent();
   }
 
   protected void performHistoryGoUp() {
+    performNonTabEvent();
     if(inputHistory == null || inputHistory.empty()) {
       return;
     }
@@ -160,6 +228,7 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   }
 
   protected void performHistoryGoDown() {
+    performNonTabEvent();
     if(inputHistory == null || inputHistory.empty()) {
       return;
     }
@@ -173,6 +242,7 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     } else {
       setEditingInput(inputCache);
     }
+
   }
 
   protected void performCharInput(char inputChar) {
@@ -206,11 +276,13 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
           if(cursor > 0 && (flags & FLAG_NAVIGABLE_CURSOR) == FLAG_NAVIGABLE_CURSOR) {
             cursor--;
           }
+          performNonTabEvent();
         }
         case KEY_ARROW_RIGHT -> {
           if(cursor < input.length() && (flags & FLAG_NAVIGABLE_CURSOR) == FLAG_NAVIGABLE_CURSOR) {
             cursor++;
           }
+          performNonTabEvent();
         }
         case KEY_BACKSPACE -> {
           if(cursor <= 0) {
@@ -232,7 +304,11 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
           input.deleteCharAt(cursor);
           performEditEvent();
         }
-        case KEY_ENTER -> releaseLine(true);
+        case KEY_ENTER -> {
+          releaseLine(true);
+          performNonTabEvent();
+        }
+        case KEY_TAB -> performTabEvent();
         default -> {
           final char inputChar = inputEvent.input();
           performCharInput(inputChar);
