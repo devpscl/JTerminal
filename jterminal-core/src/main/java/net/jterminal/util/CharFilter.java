@@ -7,6 +7,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class CharFilter {
 
+  public static final CharFilter WORD_FILTER = new CharFilter(
+      CharType.LETTERS_UPPERCASE, CharType.LETTERS_LOWERCASE
+  );
+  public static final CharFilter NON_WHITESPACE_FILTER = new CharFilter(
+      CharType.LETTERS_UPPERCASE, CharType.LETTERS_LOWERCASE, CharType.DIGIT,
+      CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL
+  );
+
   public enum CharType {
     ISO_CONTROL,
     REGULAR_SYMBOL,
@@ -17,7 +25,6 @@ public class CharFilter {
     OTHER_SYMBOL;
 
     final int bitf = 1 << ordinal();
-
   }
 
   private final int bitflag;
