@@ -17,7 +17,6 @@ import net.jterminal.exception.TerminalRuntimeException;
 import net.jterminal.instance.AbstractTerminal;
 import net.jterminal.instance.NativeTerminalProvider;
 import net.jterminal.instance.NonNativeTerminalProvider;
-import net.jterminal.io.TerminalInputStream;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.element.TextElement;
