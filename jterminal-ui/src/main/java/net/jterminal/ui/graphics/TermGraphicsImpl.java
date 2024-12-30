@@ -41,12 +41,12 @@ public class TermGraphicsImpl implements TermGraphics {
 
   @Override
   public int width() {
-    return buffer.width();
+    return width;
   }
 
   @Override
   public int height() {
-    return buffer.height();
+    return height;
   }
 
   @Override
