@@ -35,6 +35,12 @@ public interface TermString {
 
   @NotNull TermString replaceAll(@NotNull Pattern pattern, @NotNull TermString to);
 
+  @NotNull TermString[] split(@NotNull @RegExp String pattern);
+
+  @NotNull TermString[] split(@NotNull Pattern pattern);
+
+  @NotNull TermString[] split(char ch);
+
   @NotNull TermString substring(int start);
 
   @NotNull TermString substring(int start, int end);

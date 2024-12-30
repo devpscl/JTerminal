@@ -1,6 +1,8 @@
 package net.jterminal.text.termstring;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.jterminal.buffer.ByteBuf;
@@ -111,6 +113,54 @@ class TermStringImpl implements TermString {
       builder.replace(start, end, to);
     }
     return builder.getNoCopy();
+  }
+
+  @Override
+  public @NotNull TermString[] split(@NotNull String pattern) {
+    return split(Pattern.compile(pattern));
+  }
+
+  @Override
+  public @NotNull TermString[] split(@NotNull Pattern pattern) {
+    List<TermString> strings = new ArrayList<>();
+    Matcher matcher = pattern.matcher(value);
+    int index = 0;
+    int start;
+    int end;
+    while(matcher.find()) {
+      start = matcher.start();
+      end = matcher.end();
+      strings.add(substring(index, start));
+      index = end;
+    }
+    end = length();
+    if(index < end) {
+      strings.add(substring(index, end));
+    }
+    return strings.toArray(new TermString[0]);
+  }
+
+  @Override
+  public @NotNull TermString[] split(char ch) {
+    List<TermString> strings = new ArrayList<>();
+    char[] charArray = value.toCharArray();
+
+    int index = 0;
+    int start;
+    int end;
+    for (int idx = 0; idx < charArray.length; idx++) {
+      if(ch == charArray[idx]) {
+        start = idx;
+        end = start + 1;
+        strings.add(substring(index, start));
+        index = end;
+      }
+    }
+    end = length();
+    if(index < end) {
+      strings.add(substring(index, end));
+    }
+    return strings.toArray(new TermString[0]);
   }
 
   @Override
