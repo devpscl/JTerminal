@@ -25,6 +25,15 @@ public class TerminalDimension {
     return height;
   }
 
+  public void securePositive() {
+    if(width < 0) {
+      throw new IllegalArgumentException("Negative width: " + width + " < 0");
+    }
+    if(height < 0) {
+      throw new IllegalArgumentException("Negative height: " + height + " < 0");
+    }
+  }
+
   public @NotNull TerminalDimension width(int width) {
     this.width = width;
     return this;

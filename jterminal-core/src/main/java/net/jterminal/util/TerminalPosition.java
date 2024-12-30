@@ -25,6 +25,15 @@ public class TerminalPosition {
     return y;
   }
 
+  public void secureTruePositive() {
+    if(x < 1) {
+      throw new IllegalArgumentException("Invalid position: (x) " + x + " < 1");
+    }
+    if(y < 1) {
+      throw new IllegalArgumentException("Invalid position: (y) " + y + " < 1");
+    }
+  }
+
   public @NotNull TerminalPosition x(int x) {
     this.x = x;
     return this;
