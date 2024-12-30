@@ -1,12 +1,14 @@
 package net.jterminal.cli;
 
 import net.jterminal.NativeTerminal;
+import net.jterminal.Terminal;
 import net.jterminal.cli.command.CommandArgument;
 import net.jterminal.cli.command.CommandHandler;
 import net.jterminal.cli.exception.CommandParseException;
 import net.jterminal.cli.line.LineReader;
 import net.jterminal.cli.tab.TabCompleter;
 import net.jterminal.cli.util.RecordingBuffer;
+import net.jterminal.exception.TerminalInitializeException;
 import net.jterminal.text.termstring.TermString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,5 +51,9 @@ public interface CLITerminal extends NativeTerminal {
 
   @Override
   void update();
+
+  static @NotNull CLITerminal create() throws TerminalInitializeException {
+    return Terminal.create(CLITerminalProvider.class);
+  }
 
 }
