@@ -1,6 +1,5 @@
 package net.jterminal.cli.line;
 
-import java.util.List;
 import net.jterminal.cli.history.InputHistory;
 import net.jterminal.cli.tab.TabCompleter;
 import net.jterminal.util.CharFilter;
