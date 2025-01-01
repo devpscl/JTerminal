@@ -62,8 +62,11 @@ public class ButtonComponent extends SelectableComponent {
     if(!isSelected()) {
       return;
     }
-    if(event.key() == Keyboard.KEY_ENTER && action != null) {
-      action.run();
+    if(event.key() == Keyboard.KEY_ENTER) {
+      if(action != null) {
+        action.run();
+      }
+      event.cancelledAction(true);
     }
   }
 

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public class ComponentKeyEvent implements Event {
 
   private final KeyboardInputEvent event;
+  private boolean cancelledAction = false;
 
   public ComponentKeyEvent(@NotNull KeyboardInputEvent event) {
     this.event = event;
@@ -24,4 +25,11 @@ public class ComponentKeyEvent implements Event {
     return event.key();
   }
 
+  public boolean cancelledAction() {
+    return cancelledAction;
+  }
+
+  public void cancelledAction(boolean cancelledAction) {
+    this.cancelledAction = cancelledAction;
+  }
 }

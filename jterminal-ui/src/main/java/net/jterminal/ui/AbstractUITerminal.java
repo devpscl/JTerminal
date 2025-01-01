@@ -115,16 +115,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(activeScreen == null) {
       return;
     }
-    activeScreen.processKeyEvent(new ComponentKeyEvent(e));
-
-    Component component = activeScreen.selectedComponent();
-    if(component != null) {
-      if(component instanceof Selectable selectable) {
-        boolean actionAllowed = selectable.allowActionInput(e);
-        if(!actionAllowed) {
-          return;
-        }
-      }
+    ComponentKeyEvent event = new ComponentKeyEvent(e);
+    activeScreen.processKeyEvent(event);
+    if(event.cancelledAction()) {
+      return;
     }
     SelectableComponent selectedComponent = activeScreen.selectedComponent();
     List<SelectableComponent> selectableComponents
