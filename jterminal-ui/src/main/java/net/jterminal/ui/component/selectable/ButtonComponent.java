@@ -1,8 +1,9 @@
-package net.jterminal.ui.component;
+package net.jterminal.ui.component.selectable;
 
 import net.jterminal.input.Keyboard;
 import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.ui.component.Component;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TerminalDimension;

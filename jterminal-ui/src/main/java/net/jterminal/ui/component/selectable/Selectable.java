@@ -1,7 +1,9 @@
-package net.jterminal.ui.component;
+package net.jterminal.ui.component.selectable;
 
 import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.ui.TermScreen;
+import net.jterminal.ui.component.Component;
+import net.jterminal.ui.component.Container;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
