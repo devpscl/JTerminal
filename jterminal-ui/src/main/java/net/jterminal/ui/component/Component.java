@@ -174,6 +174,14 @@ public abstract class Component implements Displayable, Comparable<Component> {
         .subtract(1);
   }
 
+  public @NotNull TerminalPosition displayMidPosition() {
+    TerminalPosition start = displayPosition();
+    TerminalDimension effSize = effectiveSize();
+    int midWidth = Math.max((effSize.width()-1)/2, 0);
+    int midHeight = Math.max((effSize.height()-1)/2, 0);
+    return start.addX(midWidth).addY(midHeight);
+  }
+
   public @NotNull EventBus eventBus() {
     return eventBus;
   }
