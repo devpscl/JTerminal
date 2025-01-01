@@ -394,6 +394,8 @@ public interface Terminal {
   @NotNull
   TerminalDimension windowSize();
 
+  @NotNull TerminalDimension defaultWindowSize();
+
   /**
    * Update.
    */

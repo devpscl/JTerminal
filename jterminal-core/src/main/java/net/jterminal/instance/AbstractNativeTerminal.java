@@ -22,6 +22,8 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
     extends AbstractTerminal<T>
     implements NativeTerminal {
 
+  private static TerminalDimension defaultWindowSize = null;
+
   private static InputEventListener inputEventListener = null;
 
   private int flags = Terminal.FLAG_LINE_INPUT | Terminal.FLAG_ECHO |
@@ -67,6 +69,10 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
     _setCursorFlags((byte) cursorFlags);
     _setBuffer((byte) buffer.ordinal());
     updateInputEventListener();
+
+    if(defaultWindowSize == null) {
+      defaultWindowSize = windowSize();
+    }
   }
 
   @Override
@@ -97,6 +103,11 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   public @NotNull TerminalDimension windowSize() {
     int dim = _getDim();
     return new TerminalDimension(dim & 0xFF, (dim >> 16) & 0xFF);
+  }
+
+  @Override
+  public @NotNull TerminalDimension defaultWindowSize() {
+    return defaultWindowSize;
   }
 
   @Override

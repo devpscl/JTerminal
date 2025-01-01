@@ -126,6 +126,11 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
   }
 
   @Override
+  public @NotNull TerminalDimension defaultWindowSize() {
+    return new TerminalDimension(80, 25);
+  }
+
+  @Override
   public void update() {
     if(!isEnabled()) {
       return;
