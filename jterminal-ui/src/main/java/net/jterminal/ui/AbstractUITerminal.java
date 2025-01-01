@@ -12,8 +12,7 @@ import net.jterminal.input.WindowInputEvent;
 import net.jterminal.instance.AbstractNativeTerminal;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
-import net.jterminal.ui.component.Component;
-import net.jterminal.ui.component.selectable.Selectable;
+import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.ScreenCloseEvent;
 import net.jterminal.ui.event.ScreenOpenEvent;
 import net.jterminal.ui.event.ScreenRenderedEvent;
@@ -127,6 +126,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         }
       }
     }
+    SelectableComponent selectedComponent = activeScreen.selectedComponent();
+    List<SelectableComponent> selectableComponents
+        = new ArrayList<>(activeScreen.deepSelectableComponents());
+
     int key = e.key();
     switch (key) {
       case Keyboard.KEY_TAB:

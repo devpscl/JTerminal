@@ -10,7 +10,7 @@ import net.jterminal.util.TerminalDimension;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ButtonComponent extends Component implements Selectable {
+public class ButtonComponent extends SelectableComponent {
 
   private String text;
   private Runnable action;
@@ -67,8 +67,4 @@ public class ButtonComponent extends Component implements Selectable {
     }
   }
 
-  @Override
-  public boolean allowActionInput(@NotNull KeyboardInputEvent event) {
-    return event.key() != Keyboard.KEY_ENTER;
-  }
 }

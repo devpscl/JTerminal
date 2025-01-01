@@ -4,6 +4,7 @@ import net.jterminal.event.bus.EventBus;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.layout.Layout;
@@ -138,10 +139,8 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return foregroundColor != null;
   }
 
-  public void size(@NotNull TerminalDimension size) {
-    size.securePositive();
-    this.size = size;
-    repaint();
+  public boolean isSelectable() {
+    return this instanceof SelectableComponent;
   }
 
   public @NotNull TerminalDimension size() {

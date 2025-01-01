@@ -90,26 +90,35 @@ public abstract class Container extends Component {
     return Collections.unmodifiableList(childrenComponents);
   }
 
-  private void deepComponents(@NotNull List<Component> list, boolean onlySelectable) {
+  private void deepComponents(@NotNull List<Component> list) {
     for (Component childrenComponent : childrenComponents) {
       if(childrenComponent instanceof Container container) {
-        container.deepComponents(list, onlySelectable);
+        container.deepComponents(list);
       }
-      if(!onlySelectable || childrenComponent instanceof Selectable) {
-        list.add(childrenComponent);
+      list.add(childrenComponent);
+    }
+  }
+
+  private void deepSelectableComponents(@NotNull List<SelectableComponent> list) {
+    for (Component childrenComponent : childrenComponents) {
+      if(childrenComponent instanceof Container container) {
+        container.deepSelectableComponents(list);
+      }
+      if(childrenComponent instanceof SelectableComponent selectableComponent) {
+        list.add(selectableComponent);
       }
     }
   }
 
   public @NotNull Collection<Component> deepComponents() {
     List<Component> list = new ArrayList<>();
-    deepComponents(list, false);
+    deepComponents(list);
     return list;
   }
 
-  public @NotNull Collection<Component> deepSelectableComponents() {
-    List<Component> list = new ArrayList<>();
-    deepComponents(list, true);
+  public @NotNull Collection<SelectableComponent> deepSelectableComponents() {
+    List<SelectableComponent> list = new ArrayList<>();
+    deepSelectableComponents(list);
     return list;
   }
 

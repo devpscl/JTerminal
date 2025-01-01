@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.PaneContainer;
+import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentSelectEvent;
 import net.jterminal.ui.event.component.ComponentUnselectEvent;
 import net.jterminal.util.TerminalDimension;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class TermScreen extends PaneContainer {
 
   UITerminal terminal;
-  private Component selectedComponent = null;
+  private SelectableComponent selectedComponent = null;
 
   @Override
   public void repaint() {
@@ -64,7 +65,7 @@ public class TermScreen extends PaneContainer {
     return new TerminalPosition(1, 1);
   }
 
-  public void select(@NotNull Component selectedComponent) {
+  public void select(@NotNull SelectableComponent selectedComponent) {
     if(this.selectedComponent != null) {
       selectedComponent.eventBus().post(new ComponentUnselectEvent());
     }
@@ -81,19 +82,19 @@ public class TermScreen extends PaneContainer {
     }
   }
 
-  public @Nullable Component selectedComponent() {
+  public @Nullable SelectableComponent selectedComponent() {
     return selectedComponent;
   }
 
   public void performSelect(int x, int y) {
-    Collection<Component> components = deepSelectableComponents();
+    Collection<SelectableComponent> components = deepSelectableComponents();
     if(components.isEmpty()) {
       unselect();
       return;
     }
-    List<Component> priorityComponents = new ArrayList<>(components);
+    List<SelectableComponent> priorityComponents = new ArrayList<>(components);
     Collections.reverse(priorityComponents);
-    for (Component component : priorityComponents) {
+    for (SelectableComponent component : priorityComponents) {
       if(component.contains(x, y)) {
         if(component == selectedComponent) {
           return;
@@ -106,13 +107,13 @@ public class TermScreen extends PaneContainer {
   }
 
   public void selectNext() {
-    Collection<Component> components = deepSelectableComponents();
+    Collection<SelectableComponent> components = deepSelectableComponents();
     if(components.isEmpty()) {
       unselect();
       return;
     }
     boolean next = false;
-    for (Component component : components) {
+    for (SelectableComponent component : components) {
       if(selectedComponent == null) {
         select(component);
         return;
