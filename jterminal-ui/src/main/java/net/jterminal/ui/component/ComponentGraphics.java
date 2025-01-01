@@ -1,16 +1,22 @@
 package net.jterminal.ui.component;
 
+import net.jterminal.text.BackgroundColor;
+import net.jterminal.text.ForegroundColor;
 import net.jterminal.ui.graphics.CellBuffer;
+import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
 import org.jetbrains.annotations.NotNull;
 
 public class ComponentGraphics {
 
   public static void draw(@NotNull TermGraphics graphics, Component component) {
-    CellBuffer buffer = new CellBuffer(component.effectiveSize());
+    ForegroundColor foregroundColor = component.foregroundColor();
+    BackgroundColor backgroundColor = component.backgroundColor();
+    CellData cellData = CellData.empty(foregroundColor, backgroundColor);
+    CellBuffer buffer = new CellBuffer(component.effectiveSize(), cellData);
     TermGraphics innerGraphics = TermGraphics.from(buffer);
-    innerGraphics.foregroundColor(component.foregroundColor());
-    innerGraphics.backgroundColor(component.backgroundColor());
+    innerGraphics.foregroundColor(foregroundColor);
+    innerGraphics.backgroundColor(backgroundColor);
     component.paint(innerGraphics);
     graphics.draw(component.effectivePosition(), innerGraphics);
   }

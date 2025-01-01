@@ -14,4 +14,8 @@ public interface UITerminal extends NativeTerminal {
 
   void drawScreen();
 
+  void drawNewScreen();
+
+  long lastRenderTime();
+
 }
