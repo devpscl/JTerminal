@@ -88,8 +88,17 @@ public interface TermGraphics {
     return create(dim.width(), dim.height());
   }
 
+  static @NotNull TermGraphics create(@NotNull TerminalDimension dim, @NotNull CellData cellData) {
+    return create(dim.width(), dim.height(), cellData);
+  }
+
   static @NotNull TermGraphics create(int width, int height) {
     CellBuffer buffer = new CellBuffer(width, height);
+    return new TermGraphicsImpl(buffer, -1, -1, width, height);
+  }
+
+  static @NotNull TermGraphics create(int width, int height, @NotNull CellData cellData) {
+    CellBuffer buffer = new CellBuffer(width, height, cellData);
     return new TermGraphicsImpl(buffer, -1, -1, width, height);
   }
 

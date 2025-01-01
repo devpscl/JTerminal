@@ -11,11 +11,17 @@ public class CellBuffer {
 
   private final int width;
   private final int height;
+  private final CellData defaultData;
 
   public CellBuffer(int width, int height) {
+    this(width, height, CellData.create());
+  }
+
+  public CellBuffer(int width, int height, @NotNull CellData defaultData) {
     this.width = Math.max(0, width);
     this.height = Math.max(0, height);
     this.buffer = new CellData[this.height][];
+    this.defaultData = defaultData;
     clear();
   }
 
@@ -23,10 +29,14 @@ public class CellBuffer {
     this(dim.width(), dim.height());
   }
 
+  public CellBuffer(@NotNull TerminalDimension dim, @NotNull CellData defaultData) {
+    this(dim.width(), dim.height(), defaultData);
+  }
+
   public void clear() {
     for (int idx = 0; idx < height; idx++) {
       CellData[] row = new CellData[width];
-      Arrays.fill(row, CellData.create());
+      Arrays.fill(row, defaultData);
       buffer[idx] = row;
     }
   }
