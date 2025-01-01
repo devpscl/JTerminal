@@ -124,14 +124,4 @@ class EventBusImpl implements EventBus {
     return this;
   }
 
-  @Override
-  public @NotNull EventBus unregisterAll() {
-    syncLock.lock();
-    try {
-      map.clear();
-    } finally {
-      syncLock.unlock();
-    }
-    return this;
-  }
 }

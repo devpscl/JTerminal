@@ -18,8 +18,6 @@ public interface EventBus {
 
   @NotNull EventBus unregister(@NotNull Class<? extends Event> type);
 
-  @NotNull EventBus unregisterAll();
-
   static @NotNull EventBus create() {
     return new EventBusImpl();
   }
