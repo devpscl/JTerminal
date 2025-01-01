@@ -41,11 +41,6 @@ public class LabelComponent extends Component {
   }
 
   @Override
-  public void size(@NotNull TerminalDimension size) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void paint(@NotNull TermGraphics graphics) {
     graphics.drawString(1, 1, text);
   }

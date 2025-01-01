@@ -1,9 +1,7 @@
 package net.jterminal.ui.component.selectable;
 
 import net.jterminal.input.Keyboard;
-import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.text.TerminalColor;
-import net.jterminal.ui.component.Component;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TerminalDimension;
@@ -38,11 +36,6 @@ public class ButtonComponent extends SelectableComponent {
   public void text(@NotNull String text) {
     this.text = text;
     size = new TerminalDimension(text.length() + 2, 1);
-  }
-
-  @Override
-  public void size(@NotNull TerminalDimension size) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
