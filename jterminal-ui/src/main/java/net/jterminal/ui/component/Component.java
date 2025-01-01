@@ -31,9 +31,11 @@ public abstract class Component implements Displayable, Comparable<Component> {
   public void updatePositionSize() {
     if(parent != null) {
       final Layout layout = parent.layout();
-      final TerminalDimension containerSize = parent.effectiveSize;
-      effectiveSize = layout.resize(this, containerSize.clone());
-      effectivePosition = layout.move(this, containerSize.clone());
+      final TerminalDimension containerSize = parent.effectiveSize();
+      final TerminalDimension containerOriginalSize = parent.size();
+      effectiveSize = layout.resize(this, containerSize.clone(),
+          containerOriginalSize.clone());
+      effectivePosition = layout.move(this, containerSize, containerOriginalSize);
     }
   }
 

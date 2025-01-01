@@ -18,13 +18,13 @@ public class AbsoluteLayout implements Layout {
 
   @Override
   public @NotNull TerminalPosition move(@NotNull Component component,
-      @NotNull TerminalDimension containerSize) {
+      @NotNull TerminalDimension containerSize, @NotNull TerminalDimension originalSize) {
     return component.position();
   }
 
   @Override
   public @NotNull TerminalDimension resize(@NotNull Component component,
-      @NotNull TerminalDimension containerSize) {
+      @NotNull TerminalDimension containerSize, @NotNull TerminalDimension originalSize) {
     return component.size();
   }
 }

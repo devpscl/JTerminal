@@ -12,10 +12,10 @@ public interface Layout {
   void removeComponent(@NotNull Component component);
 
   @NotNull TerminalPosition move(@NotNull Component component,
-      @NotNull TerminalDimension containerSize);
+      @NotNull TerminalDimension containerSize, @NotNull TerminalDimension originalContainerSize);
 
   @NotNull TerminalDimension resize(@NotNull Component component,
-      @NotNull TerminalDimension containerSize);
+      @NotNull TerminalDimension containerSize, @NotNull TerminalDimension originalContainerSize);
 
 
 }

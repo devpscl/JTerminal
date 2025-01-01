@@ -9,7 +9,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class ComponentGraphics {
 
-  public static void draw(@NotNull TermGraphics graphics, Component component) {
+  public static void prepare(@NotNull Component component) {
+    component.updatePositionSize();
+  }
+
+  public static void draw(@NotNull TermGraphics graphics, @NotNull Component component) {
     ForegroundColor foregroundColor = component.foregroundColor();
     BackgroundColor backgroundColor = component.backgroundColor();
     CellData cellData = CellData.empty(foregroundColor, backgroundColor);
