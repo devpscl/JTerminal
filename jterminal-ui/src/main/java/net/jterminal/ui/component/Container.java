@@ -113,12 +113,14 @@ public abstract class Container extends Component {
   public @NotNull Collection<Component> deepComponents() {
     List<Component> list = new ArrayList<>();
     deepComponents(list);
+    Collections.sort(list);
     return list;
   }
 
   public @NotNull Collection<SelectableComponent> deepSelectableComponents() {
     List<SelectableComponent> list = new ArrayList<>();
     deepSelectableComponents(list);
+    Collections.sort(list);
     return list;
   }
 

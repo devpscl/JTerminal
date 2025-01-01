@@ -1,5 +1,6 @@
 package net.jterminal.ui.component.selectable;
 
+import net.jterminal.Terminal;
 import net.jterminal.ui.TermScreen;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
@@ -20,14 +21,6 @@ public abstract class SelectableComponent extends Component {
       return screen.selectedComponent() == this;
     }
     return false;
-  }
-
-  @Override
-  public int compareTo(@NotNull Component o) {
-    if(!o.isSelectable()) {
-      return -1;
-    }
-    return super.compareTo(o);
   }
 
   public void selector(@NotNull ComponentSelector selector) {

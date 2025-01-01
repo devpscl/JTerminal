@@ -1,5 +1,6 @@
 package net.jterminal.ui.component;
 
+import java.util.concurrent.atomic.AtomicLong;
 import net.jterminal.event.bus.EventBus;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
@@ -101,7 +102,16 @@ public abstract class Component implements Displayable, Comparable<Component> {
 
   @Override
   public int compareTo(@NotNull Component o) {
-    return Integer.compare(o.priority, priority);
+    if(o instanceof SelectableComponent ^ this instanceof SelectableComponent) {
+      if(o instanceof SelectableComponent) {
+        return -1;
+      }
+      return 1;
+    }
+    if(priority == o.priority) {
+      return Long.compare(id, o.id);
+    }
+    return Integer.compare(priority, o.priority);
   }
 
   @Override
@@ -154,6 +164,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
 
   public boolean isSelectable() {
     return this instanceof SelectableComponent;
+  }
+
+  public boolean isResizeable() {
+    return this instanceof Resizeable;
   }
 
   public @NotNull TerminalDimension size() {
