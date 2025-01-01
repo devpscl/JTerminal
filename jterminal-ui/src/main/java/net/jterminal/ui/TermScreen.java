@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.PaneContainer;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentSelectEvent;
 import net.jterminal.ui.event.component.ComponentUnselectEvent;
+import net.jterminal.ui.selector.SelectionResult;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
@@ -84,6 +84,18 @@ public class TermScreen extends PaneContainer {
 
   public @Nullable SelectableComponent selectedComponent() {
     return selectedComponent;
+  }
+
+  public void performSelect(@NotNull SelectionResult result) {
+    if(result.isIgnoring()) {
+      return;
+    }
+    SelectableComponent component = result.component();
+    if(component == null) {
+      unselect();
+      return;
+    }
+    select(component);
   }
 
   public void performSelect(int x, int y) {

@@ -1,5 +1,7 @@
 package net.jterminal.ui;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.jterminal.Terminal;
 import net.jterminal.annotation.SubscribeEvent;
 import net.jterminal.exception.TerminalProviderException;
@@ -22,6 +24,7 @@ import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.renderer.FastScreenRenderer;
 import net.jterminal.ui.renderer.ScreenRenderer;
+import net.jterminal.ui.selector.SelectionResult;
 import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -125,9 +128,44 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         = new ArrayList<>(activeScreen.deepSelectableComponents());
 
     int key = e.key();
+    SelectionResult result;
     switch (key) {
       case Keyboard.KEY_TAB:
         activeScreen.selectNext();
+        break;
+      case Keyboard.KEY_ARROW_UP:
+        if(selectedComponent == null) {
+          activeScreen.selectNext();
+          break;
+        }
+        result = selectedComponent.selector()
+            .up(selectedComponent, selectableComponents);
+        activeScreen.performSelect(result);
+        break;
+      case Keyboard.KEY_ARROW_DOWN:
+        if(selectedComponent == null) {
+          activeScreen.selectNext();
+          break;
+        }
+        result = selectedComponent.selector()
+            .down(selectedComponent, selectableComponents);
+        activeScreen.performSelect(result);
+        break;
+      case Keyboard.KEY_ARROW_LEFT:
+        if(selectedComponent == null) {
+          activeScreen.selectNext();
+          break;
+        }
+        result = selectedComponent.selector().left(selectedComponent, selectableComponents);
+        activeScreen.performSelect(result);
+        break;
+      case Keyboard.KEY_ARROW_RIGHT:
+        if(selectedComponent == null) {
+          activeScreen.selectNext();
+          break;
+        }
+        result = selectedComponent.selector().right(selectedComponent, selectableComponents);
+        activeScreen.performSelect(result);
         break;
     }
   }
