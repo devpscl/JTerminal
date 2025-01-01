@@ -1,6 +1,5 @@
 package net.jterminal.ui.selector;
 
-import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

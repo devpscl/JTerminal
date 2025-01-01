@@ -1,6 +1,5 @@
 package net.jterminal.ui.component.selectable;
 
-import net.jterminal.Terminal;
 import net.jterminal.ui.TermScreen;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
