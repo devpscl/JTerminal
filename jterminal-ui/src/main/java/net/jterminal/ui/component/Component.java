@@ -15,18 +15,29 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class Component implements Displayable, Comparable<Component> {
 
+  private static final AtomicLong idCounter = new AtomicLong(1);
+
   private Container parent;
   private int priority;
   private boolean visible = true;
   private ForegroundColor foregroundColor;
   private BackgroundColor backgroundColor;
   protected final Object lock = new Object();
+  protected final long id;
   private final EventBus eventBus = EventBus.create();
 
   protected TerminalDimension size = new TerminalDimension(1, 1);
   protected TerminalPosition position = new TerminalPosition(1, 1);
   protected TerminalDimension effectiveSize = size.clone();
   protected TerminalPosition effectivePosition = position.clone();
+
+  public Component() {
+     id = idCounter.getAndIncrement();
+  }
+
+  public long id() {
+    return id;
+  }
 
   public void updatePositionSize() {
     if(parent != null) {
