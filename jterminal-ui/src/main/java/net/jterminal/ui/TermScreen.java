@@ -18,6 +18,7 @@ public class TermScreen extends PaneContainer {
 
   UITerminal terminal;
   private SelectableComponent selectedComponent = null;
+  private TerminalDimension originalSize = null;
 
   @Override
   public void repaint() {
@@ -42,17 +43,27 @@ public class TermScreen extends PaneContainer {
     return terminal.openedScreen() == this;
   }
 
+  public void setOriginalSize(@Nullable TerminalDimension originalSize) {
+    this.originalSize = originalSize;
+  }
+
   @Override
   public @NotNull TerminalDimension size() {
+    if(originalSize != null) {
+      return originalSize;
+    }
     if(terminal == null) {
       return new TerminalDimension();
     }
-    return terminal.windowSize();
+    return terminal.defaultWindowSize();
   }
 
   @Override
   public @NotNull TerminalDimension effectiveSize() {
-    return size();
+    if(terminal == null) {
+      return new TerminalDimension();
+    }
+    return terminal.windowSize();
   }
 
   @Override
