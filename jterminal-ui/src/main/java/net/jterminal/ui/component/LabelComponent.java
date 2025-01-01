@@ -5,16 +5,16 @@ import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TerminalDimension;
 import org.jetbrains.annotations.NotNull;
 
-public class Label extends Component {
+public class LabelComponent extends Component {
 
   private TermString text;
 
-  public Label(@NotNull TermString text) {
+  public LabelComponent(@NotNull TermString text) {
     this.text = text;
     updateSize();
   }
 
-  public Label() {
+  public LabelComponent() {
     this(TermString.empty());
   }
 
