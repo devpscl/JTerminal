@@ -13,4 +13,8 @@ public interface Resizeable {
     }
   }
 
+  @NotNull TerminalDimension minimumSize();
+
+  @NotNull TerminalDimension maximumSize();
+
 }
