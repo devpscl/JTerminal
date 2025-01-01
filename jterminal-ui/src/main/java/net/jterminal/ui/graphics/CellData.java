@@ -59,6 +59,11 @@ public interface CellData {
         fonts, builder.toString());
   }
 
+  static @NotNull CellData empty(@Nullable ForegroundColor foregroundColor,
+      @Nullable BackgroundColor backgroundColor, TextFont... fonts) {
+    return create(EMPTY_SYMBOL, foregroundColor, backgroundColor, fonts);
+  }
+
   static @NotNull Builder builder() {
     return new CellDataBuilderImpl();
   }
