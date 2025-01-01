@@ -1,8 +1,11 @@
 package net.jterminal.ui.component;
 
+import net.jterminal.event.bus.EventBus;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
+import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.layout.Layout;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
@@ -12,11 +15,12 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Component implements Displayable, Comparable<Component> {
 
   private Container parent;
-  private int containerIndex;
+  private int priority;
   private boolean visible = true;
   private ForegroundColor foregroundColor;
   private BackgroundColor backgroundColor;
   protected final Object lock = new Object();
+  private final EventBus eventBus = EventBus.create();
 
   protected TerminalDimension size = new TerminalDimension(1, 1);
   protected TerminalPosition position = new TerminalPosition(1, 1);
@@ -42,6 +46,9 @@ public abstract class Component implements Displayable, Comparable<Component> {
 
   public @Nullable Container rootContainer() {
     if(parent == null) {
+      if(this instanceof Container container) {
+        return container;
+      }
       return null;
     }
     return parent.rootContainer();
@@ -63,17 +70,24 @@ public abstract class Component implements Displayable, Comparable<Component> {
     parent.repaintFully();
   }
 
-  public int containerIndex() {
-    return containerIndex;
+  public int priority() {
+    return priority;
   }
 
-  public void containerIndex(int idx) {
-    this.containerIndex = idx;
+  public void priority(int idx) {
+    this.priority = idx;
+  }
+
+  public int depthIndex() {
+    if(parent == null) {
+      return 0;
+    }
+    return parent.depthIndex() + 1;
   }
 
   @Override
   public int compareTo(@NotNull Component o) {
-    return Integer.compare(containerIndex, o.containerIndex);
+    return Integer.compare(o.priority, priority);
   }
 
   @Override
@@ -159,6 +173,18 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return parent.displayPosition()
         .add(effectivePosition)
         .subtract(1);
+  }
+
+  public @NotNull EventBus eventBus() {
+    return eventBus;
+  }
+
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+    eventBus.post(event);
+  }
+
+  public void processMouseEvent(@NotNull ComponentMouseEvent event) {
+    eventBus.post(event);
   }
 
   public boolean contains(int x, int y) {
