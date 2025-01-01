@@ -1,6 +1,7 @@
 package net.jterminal.text;
 
 import java.awt.Color;
+import org.jetbrains.annotations.NotNull;
 
 class TerminalColorImpl implements TerminalColor {
 
@@ -49,6 +50,11 @@ class TerminalColorImpl implements TerminalColor {
   @Override
   public String getForegroundAnsiCode() {
     return foregroundColor;
+  }
+
+  @Override
+  public @NotNull TerminalColor asUniversalColor() {
+    return this;
   }
 
   @Override

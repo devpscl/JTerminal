@@ -55,6 +55,11 @@ public enum ColorNamePalette implements TerminalColor {
   }
 
   @Override
+  public @NotNull TerminalColor asUniversalColor() {
+    return this;
+  }
+
+  @Override
   public String getForegroundAnsiCode() {
     return color.getForegroundAnsiCode();
   }

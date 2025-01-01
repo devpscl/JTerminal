@@ -1,7 +1,9 @@
 package net.jterminal.text;
 
 import java.awt.Color;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface TerminalColor extends ForegroundColor, BackgroundColor {
 
@@ -45,6 +47,22 @@ public interface TerminalColor extends ForegroundColor, BackgroundColor {
 
   static @NotNull TerminalColor from(String hexCode) {
     return new TerminalColorImpl(Color.decode(hexCode));
+  }
+
+  @Contract("null -> null; !null -> !null")
+  static @Nullable TerminalColor from(@Nullable ForegroundColor foregroundColor) {
+    if(foregroundColor == null) {
+      return null;
+    }
+    return foregroundColor.asUniversalColor();
+  }
+
+  @Contract("null -> null; !null -> !null")
+  static @Nullable TerminalColor from(@Nullable BackgroundColor backgroundColor) {
+    if(backgroundColor == null) {
+      return null;
+    }
+    return backgroundColor.asUniversalColor();
   }
 
 }

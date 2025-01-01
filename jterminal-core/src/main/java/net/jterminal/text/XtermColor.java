@@ -316,6 +316,11 @@ public enum XtermColor implements TerminalColor {
   }
 
   @Override
+  public @NotNull TerminalColor asUniversalColor() {
+    return this;
+  }
+
+  @Override
   public @NotNull Color toColor() {
     return color;
   }
