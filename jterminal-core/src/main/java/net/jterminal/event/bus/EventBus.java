@@ -5,8 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface EventBus {
 
-  @NotNull EventBus subscribe(@NotNull Class<? extends Event> type,
-      @NotNull EventListener<?> listener);
+  <T extends Event> @NotNull EventBus subscribe(@NotNull Class<T> type,
+      @NotNull EventListener<T> listener);
 
   @NotNull EventBus register(@NotNull Object eventHandlerObject);
 

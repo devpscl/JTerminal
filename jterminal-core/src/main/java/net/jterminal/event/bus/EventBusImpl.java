@@ -30,8 +30,13 @@ class EventBusImpl implements EventBus {
   }
 
   @Override
-  public @NotNull EventBus subscribe(@NotNull Class<? extends Event> type,
-      @NotNull EventListener<?> listener) {
+  public @NotNull <T extends Event> EventBus subscribe(@NotNull Class<T> type,
+      @NotNull EventListener<T> listener) {
+    return subscribeNonGeneric(type, listener);
+  }
+
+  private @NotNull EventBus subscribeNonGeneric(
+      @NotNull Class<? extends Event> type, @NotNull EventListener<?> listener) {
     syncLock.lock();
     try {
       List<EventListener<?>> eventListeners = map.getOrDefault(type, new ArrayList<>());
@@ -40,7 +45,6 @@ class EventBusImpl implements EventBus {
     } finally {
       syncLock.unlock();
     }
-
     return this;
   }
 
@@ -59,7 +63,7 @@ class EventBusImpl implements EventBus {
         continue;
       }
       Class<? extends Event> eventType = parameterTypes[0].asSubclass(Event.class);
-      subscribe(eventType, new ReflectEventListener(eventHandlerObject, method));
+      subscribeNonGeneric(eventType, new ReflectEventListener(eventHandlerObject, method));
     }
     return this;
   }
