@@ -5,6 +5,7 @@ import net.jterminal.Terminal;
 import net.jterminal.ui.UITerminal;
 import net.jterminal.ui.exception.GraphicsException;
 import net.jterminal.ui.graphics.CellBuffer;
+import net.jterminal.ui.graphics.TerminalState;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ScreenRenderer  {
@@ -16,10 +17,10 @@ public abstract class ScreenRenderer  {
     this.terminal = terminal;
   }
 
-  public void render(@NotNull CellBuffer cellBuffer) {
+  public void render(@NotNull CellBuffer cellBuffer, @NotNull TerminalState terminalState) {
     lock.lock();
     try {
-      renderSync(cellBuffer, terminal);
+      renderSync(cellBuffer, terminal, terminalState);
     } catch (GraphicsException e) {
       UITerminal.LOGGER.error("Failed to draw screen", e);
     } finally {
@@ -27,7 +28,8 @@ public abstract class ScreenRenderer  {
     }
   }
 
-  public abstract void renderSync(@NotNull CellBuffer cellBuffer, @NotNull Terminal terminal)
+  public abstract void renderSync(@NotNull CellBuffer cellBuffer, @NotNull Terminal terminal,
+      @NotNull TerminalState terminalState)
       throws GraphicsException;
 
 }
