@@ -45,6 +45,13 @@ public interface CursorCommand extends AnsiCommand {
     return new CursorCommandImpl("[" + count + "D");
   }
 
+  static @NotNull CursorCommand blinking(boolean state) {
+    if(state) {
+      return new CursorCommandImpl("[?12h");
+    }
+    return new CursorCommandImpl("[?12l");
+  }
+
   static @NotNull CursorCommand hide() {
     return new CursorCommandImpl("[?25l");
   }
