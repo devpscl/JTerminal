@@ -4,6 +4,7 @@ import java.util.Arrays;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CellBuffer {
 
@@ -47,6 +48,13 @@ public class CellBuffer {
 
   public boolean contains(int x, int y) {
     return x < width && y < height && x >= 0 && y >= 0;
+  }
+
+  public @Nullable CellData read(int x, int y) {
+    if(!contains(x, y)) {
+      return null;
+    }
+    return buffer[y][x];
   }
 
   public void write(int x, int y, @NotNull CellData cellData) {

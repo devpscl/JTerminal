@@ -52,9 +52,8 @@ public interface CellData {
       builder.append(backgroundColor.getBackgroundAnsiCode());
     }
     for (TextFont font : fonts) {
-      builder.append(font.getResetAnsiCode());
+      builder.append(font.getAnsiCode());
     }
-
     return new CellDataImpl(symbol, foregroundColor, backgroundColor,
         fonts, builder.toString());
   }
