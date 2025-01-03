@@ -11,6 +11,7 @@ import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.layout.Layout;
 import net.jterminal.util.TerminalDimension;
 import net.jterminal.util.TerminalPosition;
+import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
   private BackgroundColor backgroundColor;
   protected final Object lock = new Object();
   protected final long id;
-  private final EventBus eventBus = EventBus.create();
+  protected final EventBus eventBus = EventBus.create();
 
   protected TerminalDimension size = new TerminalDimension(1, 1);
   protected TerminalPosition position = new TerminalPosition(1, 1);
@@ -213,13 +214,11 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return eventBus;
   }
 
-  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
-    eventBus.post(event);
-  }
+  @OverrideOnly
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {}
 
-  public void processMouseEvent(@NotNull ComponentMouseEvent event) {
-    eventBus.post(event);
-  }
+  @OverrideOnly
+  public void processMouseEvent(@NotNull ComponentMouseEvent event) {}
 
   public boolean contains(int x, int y) {
     TerminalPosition displayPosition = displayPosition();

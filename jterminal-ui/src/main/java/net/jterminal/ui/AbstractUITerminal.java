@@ -22,6 +22,7 @@ import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
+import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.renderer.FastScreenRenderer;
 import net.jterminal.ui.renderer.ScreenRenderer;
 import net.jterminal.ui.selector.SelectionResult;
@@ -82,6 +83,13 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     synchronized (lock) {
       if(activeScreen != null) {
         long start = System.currentTimeMillis();
+        TerminalState globalState = new TerminalState();
+        SelectableComponent selectableComponent = activeScreen.selectedComponent();
+        if(selectableComponent != null) {
+          TerminalState state = new TerminalState();
+          selectableComponent.updateState(state);
+          globalState = state.offset(selectableComponent.displayPosition());
+        }
         ForegroundColor foregroundColor = activeScreen.foregroundColor();
         BackgroundColor backgroundColor = activeScreen.backgroundColor();
         CellData cellData = CellData.empty(foregroundColor, backgroundColor);
@@ -89,7 +97,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         graphics.foregroundColor(foregroundColor);
         graphics.backgroundColor(backgroundColor);
         activeScreen.paint(graphics);
-        screenRenderer.render(graphics.buffer());
+        screenRenderer.render(graphics.buffer(), globalState);
         long end = System.currentTimeMillis();
         lastRenderTime = end-start;
         eventBus.post(new ScreenRenderedEvent(activeScreen));
@@ -119,11 +127,16 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
       return;
     }
     ComponentKeyEvent event = new ComponentKeyEvent(e);
-    activeScreen.processKeyEvent(event);
-    if(event.cancelledAction()) {
+    activeScreen.eventBus().post(e);
+    if(!event.cancelledAction()) {
+      activeScreen.processKeyEvent(event);
+    }
+
+    SelectableComponent selectedComponent = activeScreen.selectedComponent();
+    if(selectedComponent != null &&
+        selectedComponent.interceptScreenActionInput(e)) {
       return;
     }
-    SelectableComponent selectedComponent = activeScreen.selectedComponent();
     List<SelectableComponent> selectableComponents
         = new ArrayList<>(activeScreen.deepSelectableComponents());
 
@@ -181,7 +194,11 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
       TerminalPosition pos = e.terminalPosition();
       activeScreen.performSelect(pos.x(), pos.y());
     }
-    activeScreen.processMouseEvent(new ComponentMouseEvent(e));
+    ComponentMouseEvent event = new ComponentMouseEvent(e);
+    activeScreen.eventBus().post(e);
+    if(!event.cancelledAction()) {
+      activeScreen.processMouseEvent(event);
+    }
   }
 
 }

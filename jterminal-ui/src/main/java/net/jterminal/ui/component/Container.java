@@ -12,6 +12,9 @@ import net.jterminal.ui.exception.UIException;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.layout.AbsoluteLayout;
 import net.jterminal.ui.layout.Layout;
+import net.jterminal.ui.util.PosDimUtil;
+import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,18 +57,34 @@ public abstract class Container extends Component {
 
   @Override
   public void processKeyEvent(@NotNull ComponentKeyEvent event) {
-    super.processKeyEvent(event);
     for (Component childrenComponent : childrenComponents) {
+      ComponentKeyEvent copiedEvent = event.copy();
+      childrenComponent.eventBus().post(copiedEvent);
+      if(copiedEvent.cancelledAction()) {
+        continue;
+      }
       childrenComponent.processKeyEvent(event);
     }
   }
 
   @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
-    super.processMouseEvent(event);
     for (Component childrenComponent : childrenComponents) {
-      ComponentMouseEvent shiftedEvent = event.shiftPosition(effectivePosition());
-      childrenComponent.processMouseEvent(shiftedEvent);
+      TerminalPosition mousePos = event.position();
+      TerminalPosition effPos = childrenComponent.effectivePosition();
+      TerminalDimension effDim = childrenComponent.effectiveSize();
+      TerminalPosition effEndPos = PosDimUtil.add(effPos, effDim);
+      int x = mousePos.x();
+      int y = mousePos.y();
+      if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {
+        continue;
+      }
+      ComponentMouseEvent copiedEvent = event.shiftPosition(effPos);
+      childrenComponent.eventBus().post(copiedEvent);
+      if(copiedEvent.cancelledAction()) {
+        continue;
+      }
+      childrenComponent.processMouseEvent(copiedEvent);
     }
   }
 

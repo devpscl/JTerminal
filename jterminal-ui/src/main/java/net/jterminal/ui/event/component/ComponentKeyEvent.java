@@ -13,6 +13,11 @@ public class ComponentKeyEvent implements Event {
     this.event = event;
   }
 
+  private ComponentKeyEvent(KeyboardInputEvent event, boolean cancelledAction) {
+    this.event = event;
+    this.cancelledAction = cancelledAction;
+  }
+
   public @NotNull KeyboardInputEvent event() {
     return event;
   }
@@ -32,4 +37,9 @@ public class ComponentKeyEvent implements Event {
   public void cancelledAction(boolean cancelledAction) {
     this.cancelledAction = cancelledAction;
   }
+
+  public @NotNull ComponentKeyEvent copy() {
+    return new ComponentKeyEvent(event, cancelledAction);
+  }
+
 }

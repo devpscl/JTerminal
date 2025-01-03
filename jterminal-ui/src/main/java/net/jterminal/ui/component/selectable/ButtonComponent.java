@@ -1,10 +1,16 @@
 package net.jterminal.ui.component.selectable;
 
 import net.jterminal.input.Keyboard;
+import net.jterminal.input.Mouse.Action;
+import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
+import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.graphics.TermGraphics;
+import net.jterminal.ui.graphics.TerminalState;
+import net.jterminal.ui.graphics.TerminalState.CursorType;
 import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TerminalPosition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +57,6 @@ public class ButtonComponent extends SelectableComponent {
 
   @Override
   public void processKeyEvent(@NotNull ComponentKeyEvent event) {
-    super.processKeyEvent(event);
     if(!isSelected()) {
       return;
     }
@@ -61,6 +66,24 @@ public class ButtonComponent extends SelectableComponent {
       }
       event.cancelledAction(true);
     }
+  }
+
+  @Override
+  public void processMouseEvent(@NotNull ComponentMouseEvent event) {
+    if(!isSelected()) {
+      return;
+    }
+    if(event.action() == Action.RELEASE && event.button() == Button.LEFT) {
+      if(action != null) {
+        action.run();
+      }
+    }
+  }
+
+  @Override
+  public void updateState(@NotNull TerminalState terminalState) {
+    terminalState.cursorPosition(new TerminalPosition(1, 1));
+    terminalState.cursorType(CursorType.STATIC);
   }
 
 }

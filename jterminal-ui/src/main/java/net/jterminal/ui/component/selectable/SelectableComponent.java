@@ -1,10 +1,13 @@
 package net.jterminal.ui.component.selectable;
 
+import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.ui.TermScreen;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
+import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.selector.AutoSelector;
 import net.jterminal.ui.selector.ComponentSelector;
+import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class SelectableComponent extends Component {
@@ -29,4 +32,13 @@ public abstract class SelectableComponent extends Component {
   public @NotNull ComponentSelector selector() {
     return selector;
   }
+
+  @OverrideOnly
+  public void updateState(@NotNull TerminalState terminalState) {}
+
+  @OverrideOnly
+  public boolean interceptScreenActionInput(@NotNull KeyboardInputEvent event) {
+    return false;
+  }
+
 }
