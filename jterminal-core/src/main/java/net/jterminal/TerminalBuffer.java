@@ -12,7 +12,7 @@ import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -176,7 +176,7 @@ public class TerminalBuffer {
     return command(CursorCommand.moveRight(count));
   }
 
-  public TerminalBuffer cursor(@NotNull TerminalPosition pos) {
+  public TerminalBuffer cursor(@NotNull TermPos pos) {
     return command(CursorCommand.move(pos));
   }
 

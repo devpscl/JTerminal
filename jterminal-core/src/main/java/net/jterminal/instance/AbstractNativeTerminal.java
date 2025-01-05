@@ -10,8 +10,8 @@ import net.jterminal.natv.NativeLoader;
 import net.jterminal.system.OperationSystem;
 import net.jterminal.system.SystemInfo;
 import net.jterminal.system.UnsupportedSystemException;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import net.jterminal.windows.WindowsTerminal;
 import net.jterminal.windows.WindowsTerminalImpl;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
     extends AbstractTerminal<T>
     implements NativeTerminal {
 
-  private static TerminalDimension defaultWindowSize = null;
+  private static TermDim defaultWindowSize = null;
 
   private static InputEventListener inputEventListener = null;
 
@@ -92,7 +92,7 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   }
 
   @Override
-  public void windowSize(@NotNull TerminalDimension size) {
+  public void windowSize(@NotNull TermDim size) {
     if(!isEnabled()) {
       return;
     }
@@ -100,13 +100,13 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   }
 
   @Override
-  public @NotNull TerminalDimension windowSize() {
+  public @NotNull TermDim windowSize() {
     int dim = _getDim();
-    return new TerminalDimension(dim & 0xFF, (dim >> 16) & 0xFF);
+    return new TermDim(dim & 0xFF, (dim >> 16) & 0xFF);
   }
 
   @Override
-  public @NotNull TerminalDimension defaultWindowSize() {
+  public @NotNull TermDim defaultWindowSize() {
     return defaultWindowSize;
   }
 
@@ -138,7 +138,7 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   }
 
   @Override
-  public void cursorPosition(@NotNull TerminalPosition pos) {
+  public void cursorPosition(@NotNull TermPos pos) {
     if(!isEnabled()) {
       return;
     }
@@ -146,9 +146,9 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   }
 
   @Override
-  public @NotNull TerminalPosition cursorPosition() {
+  public @NotNull TermPos cursorPosition() {
     int pos = _requestCursor();
-    return new TerminalPosition(pos & 0xFF, (pos >> 16) & 0xFF);
+    return new TermPos(pos & 0xFF, (pos >> 16) & 0xFF);
   }
 
   @Override

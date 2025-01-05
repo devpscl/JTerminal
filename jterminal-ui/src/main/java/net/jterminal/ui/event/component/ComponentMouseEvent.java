@@ -4,20 +4,19 @@ import net.jterminal.event.Event;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.input.MouseInputEvent;
-import net.jterminal.ui.util.PosDimUtil;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public class ComponentMouseEvent implements Event {
 
   private final Button button;
   private final Action action;
-  private final TerminalPosition terminalPosition;
+  private final TermPos terminalPosition;
   private boolean cancelledAction = false;
 
   public ComponentMouseEvent(@NotNull Button button,
       @NotNull Action action,
-      @NotNull TerminalPosition terminalPosition, boolean cancelledAction) {
+      @NotNull TermPos terminalPosition, boolean cancelledAction) {
     this.button = button;
     this.action = action;
     this.terminalPosition = terminalPosition;
@@ -38,7 +37,7 @@ public class ComponentMouseEvent implements Event {
     return action;
   }
 
-  public @NotNull TerminalPosition position() {
+  public @NotNull TermPos position() {
     return terminalPosition;
   }
 
@@ -50,8 +49,8 @@ public class ComponentMouseEvent implements Event {
     this.cancelledAction = cancelledAction;
   }
 
-  public @NotNull ComponentMouseEvent shiftPosition(@NotNull TerminalPosition origin) {
-    TerminalPosition tpos = PosDimUtil.subtract(terminalPosition, origin);
+  public @NotNull ComponentMouseEvent shiftPosition(@NotNull TermPos origin) {
+    TermPos tpos = terminalPosition.subtractShift(origin);
     return new ComponentMouseEvent(button, action, tpos, cancelledAction);
   }
 

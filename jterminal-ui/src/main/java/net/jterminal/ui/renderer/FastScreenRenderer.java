@@ -11,7 +11,7 @@ import net.jterminal.ui.graphics.CellBuffer;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public class FastScreenRenderer extends ScreenRenderer {
@@ -32,7 +32,7 @@ public class FastScreenRenderer extends ScreenRenderer {
         .command(CursorCommand.home())
         .command(CursorCommand.hide());
     TerminalBuffer releaseBuffer = new TerminalBuffer();
-    TerminalPosition cursorPosition = terminalState.cursorPosition();
+    TermPos cursorPosition = terminalState.cursorPosition();
     if(cursorPosition != null) {
       CursorType cursorType = terminalState.cursorType();
       if(cursorType == CursorType.STATIC || cursorType == CursorType.BLINKING) {

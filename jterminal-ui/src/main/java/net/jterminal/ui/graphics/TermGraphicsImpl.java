@@ -8,8 +8,8 @@ import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.graphics.shape.TermShape;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,8 +50,8 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TerminalDimension size() {
-    return new TerminalDimension(width(), height());
+  public @NotNull TermDim size() {
+    return new TermDim(width(), height());
   }
 
   @Override
@@ -108,12 +108,12 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics drawEmpty(@NotNull TerminalPosition pos) {
+  public @NotNull TermGraphics drawEmpty(@NotNull TermPos pos) {
     return drawEmpty(pos.x(), pos.y());
   }
 
   @Override
-  public @NotNull TermGraphics draw(@NotNull TerminalPosition pos, char symbol) {
+  public @NotNull TermGraphics draw(@NotNull TermPos pos, char symbol) {
     return draw(pos.x(), pos.y(), symbol);
   }
 
@@ -131,27 +131,27 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics draw(@NotNull TerminalPosition pos,
+  public @NotNull TermGraphics draw(@NotNull TermPos pos,
       @NotNull TermGraphics termGraphics) {
     return draw(pos.x(), pos.y(), termGraphics);
   }
 
   @Override
-  public @NotNull TermGraphics draw(@NotNull TerminalPosition pos, @NotNull TerminalDimension dim,
+  public @NotNull TermGraphics draw(@NotNull TermPos pos, @NotNull TermDim dim,
       @NotNull TermGraphics termGraphics) {
     return draw(pos.x(), pos.y(), dim.width(), dim.height(), termGraphics);
   }
 
   @Override
   public @NotNull TermGraphics draw(int x, int y, @NotNull TermGraphics graphics) {
-    TerminalDimension size = graphics.size();
+    TermDim size = graphics.size();
     return draw(x, y, size.width(), size.height(), graphics);
   }
 
   @Override
   public @NotNull TermGraphics draw(int x, int y, int width, int height,
       @NotNull TermGraphics graphics) {
-    final TerminalDimension size = graphics.size();
+    final TermDim size = graphics.size();
     final int cols = Math.min(width, size.width());
     final int rows = Math.min(height, size.height());
     buffer.insert(x + xOff, y + yOff, width, height, graphics.buffer());
@@ -159,8 +159,8 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics drawLine(@NotNull TerminalPosition from,
-      @NotNull TerminalPosition to, char symbol) {
+  public @NotNull TermGraphics drawLine(@NotNull TermPos from,
+      @NotNull TermPos to, char symbol) {
     return drawLine(from.x(), from.y(), to.x(), to.y(), symbol);
   }
 
@@ -168,8 +168,8 @@ public class TermGraphicsImpl implements TermGraphics {
   public @NotNull TermGraphics drawLine(int x1, int y1, int x2, int y2, char symbol) {
     CellData cellData = CellData.create(symbol, foregroundColor,
         backgroundColor, fonts);
-    TerminalPosition pos1 = new TerminalPosition(x1, y1);
-    TerminalPosition pos2 = new TerminalPosition(x2, y2);
+    TermPos pos1 = new TermPos(x1, y1);
+    TermPos pos2 = new TermPos(x2, y2);
     final double distance = Math.floor(pos1.distance(pos2));
     final int distanceInt = (int) distance;
 
@@ -184,8 +184,8 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics drawRect(@NotNull TerminalPosition position,
-      @NotNull TerminalDimension dimension, char symbol) {
+  public @NotNull TermGraphics drawRect(@NotNull TermPos position,
+      @NotNull TermDim dimension, char symbol) {
     return drawRect(position.x(), position.y(), dimension.width(),
         dimension.height(), symbol);
   }
@@ -211,8 +211,8 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics fillRect(@NotNull TerminalPosition position,
-      @NotNull TerminalDimension dimension, char symbol) {
+  public @NotNull TermGraphics fillRect(@NotNull TermPos position,
+      @NotNull TermDim dimension, char symbol) {
     return fillRect(position.x(), position.y(), dimension.width(), dimension.height(), symbol);
   }
 
@@ -234,13 +234,13 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics drawString(@NotNull TerminalPosition position,
+  public @NotNull TermGraphics drawString(@NotNull TermPos position,
       @NotNull TermString termString) {
     return drawString(position.x(), position.y(), termString);
   }
 
   @Override
-  public @NotNull TermGraphics drawString(@NotNull TerminalPosition position,
+  public @NotNull TermGraphics drawString(@NotNull TermPos position,
       @NotNull String value) {
     return drawString(position.x(), position.y(), value);
   }
@@ -290,15 +290,15 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
-  public @NotNull TermGraphics drawShape(@NotNull TerminalPosition pos, @NotNull TermShape shape) {
-    TerminalDimension size = shape.size();
+  public @NotNull TermGraphics drawShape(@NotNull TermPos pos, @NotNull TermShape shape) {
+    TermDim size = shape.size();
     shape.render(this, pos, size);
     return this;
   }
 
   @Override
   public @NotNull TermGraphics drawShape(int x, int y, @NotNull TermShape shape) {
-    return drawShape(new TerminalPosition(x, y), shape);
+    return drawShape(new TermPos(x, y), shape);
   }
 
 }

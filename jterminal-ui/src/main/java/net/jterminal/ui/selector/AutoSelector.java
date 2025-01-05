@@ -2,7 +2,7 @@ package net.jterminal.ui.selector;
 
 import java.util.List;
 import net.jterminal.ui.component.selectable.SelectableComponent;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class AutoSelector implements ComponentSelector {
   private @Nullable SelectableComponent find(@NotNull List<SelectableComponent> list,
       boolean above, boolean below, boolean left, boolean right,
       @NotNull SelectableComponent origin) {
-    TerminalPosition originPos = origin.displayPosition();
+    TermPos originPos = origin.displayPosition();
     int ox = originPos.x();
     int oy = originPos.y();
     double distance = Double.MAX_VALUE;
@@ -27,7 +27,7 @@ public class AutoSelector implements ComponentSelector {
       if(component == origin) {
         continue;
       }
-      TerminalPosition midPos = component.displayPosition();
+      TermPos midPos = component.displayPosition();
       int cx = midPos.x();
       int cy = midPos.y();
       if(!above && oy > cy) {

@@ -6,8 +6,8 @@ import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.graphics.shape.TermShape;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +19,7 @@ public interface TermGraphics {
 
   int height();
 
-  @NotNull TerminalDimension size();
+  @NotNull TermDim size();
 
   @NotNull TermGraphics style(@Nullable TextStyle textStyle);
 
@@ -37,58 +37,58 @@ public interface TermGraphics {
 
   @NotNull TextFont[] fonts();
 
-  @NotNull TermGraphics drawEmpty(@NotNull TerminalPosition pos);
+  @NotNull TermGraphics drawEmpty(@NotNull TermPos pos);
 
-  @NotNull TermGraphics draw(@NotNull TerminalPosition pos, char symbol);
+  @NotNull TermGraphics draw(@NotNull TermPos pos, char symbol);
 
   @NotNull TermGraphics drawEmpty(int x, int y);
 
   @NotNull TermGraphics draw(int x, int y, char symbol);
 
-  @NotNull TermGraphics draw(@NotNull TerminalPosition pos, @NotNull TermGraphics termGraphics);
+  @NotNull TermGraphics draw(@NotNull TermPos pos, @NotNull TermGraphics termGraphics);
 
-  @NotNull TermGraphics draw(@NotNull TerminalPosition pos, @NotNull TerminalDimension dim,
+  @NotNull TermGraphics draw(@NotNull TermPos pos, @NotNull TermDim dim,
       @NotNull TermGraphics termGraphics);
 
   @NotNull TermGraphics draw(int x, int y, @NotNull TermGraphics graphics);
 
   @NotNull TermGraphics draw(int x, int y, int width, int height, @NotNull TermGraphics graphics);
 
-  @NotNull TermGraphics drawLine(@NotNull TerminalPosition from,
-      @NotNull TerminalPosition to, char symbol);
+  @NotNull TermGraphics drawLine(@NotNull TermPos from,
+      @NotNull TermPos to, char symbol);
 
   @NotNull TermGraphics drawLine(int x1, int y1, int x2, int y2, char symbol);
 
-  @NotNull TermGraphics drawRect(@NotNull TerminalPosition position,
-      @NotNull TerminalDimension dimension, char symbol);
+  @NotNull TermGraphics drawRect(@NotNull TermPos position,
+      @NotNull TermDim dimension, char symbol);
 
   @NotNull TermGraphics drawRect(int x, int y, int width,
       int height, char symbol);
 
-  @NotNull TermGraphics fillRect(@NotNull TerminalPosition position,
-      @NotNull TerminalDimension dimension, char symbol);
+  @NotNull TermGraphics fillRect(@NotNull TermPos position,
+      @NotNull TermDim dimension, char symbol);
 
   @NotNull TermGraphics fillRect(int x, int y, int width, int height, char symbol);
 
-  @NotNull TermGraphics drawString(@NotNull TerminalPosition position,
+  @NotNull TermGraphics drawString(@NotNull TermPos position,
       @NotNull TermString termString);
 
-  @NotNull TermGraphics drawString(@NotNull TerminalPosition position,
+  @NotNull TermGraphics drawString(@NotNull TermPos position,
       @NotNull String value);
 
   @NotNull TermGraphics drawString(int x, int y, @NotNull TermString termString);
 
   @NotNull TermGraphics drawString(int x, int y, @NotNull String value);
 
-  @NotNull TermGraphics drawShape(@NotNull TerminalPosition pos, @NotNull TermShape shape);
+  @NotNull TermGraphics drawShape(@NotNull TermPos pos, @NotNull TermShape shape);
 
   @NotNull TermGraphics drawShape(int x, int y, @NotNull TermShape shape);
 
-  static @NotNull TermGraphics create(@NotNull TerminalDimension dim) {
+  static @NotNull TermGraphics create(@NotNull TermDim dim) {
     return create(dim.width(), dim.height());
   }
 
-  static @NotNull TermGraphics create(@NotNull TerminalDimension dim, @NotNull CellData cellData) {
+  static @NotNull TermGraphics create(@NotNull TermDim dim, @NotNull CellData cellData) {
     return create(dim.width(), dim.height(), cellData);
   }
 

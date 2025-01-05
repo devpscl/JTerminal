@@ -1,8 +1,8 @@
 package net.jterminal.ui.layout;
 
 import net.jterminal.ui.component.Component;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public interface Layout {
@@ -11,11 +11,11 @@ public interface Layout {
 
   void removeComponent(@NotNull Component component);
 
-  @NotNull TerminalPosition move(@NotNull Component component,
-      @NotNull TerminalDimension containerSize, @NotNull TerminalDimension originalContainerSize);
+  @NotNull TermPos move(@NotNull Component component,
+      @NotNull TermDim containerSize, @NotNull TermDim originalContainerSize);
 
-  @NotNull TerminalDimension resize(@NotNull Component component,
-      @NotNull TerminalDimension containerSize, @NotNull TerminalDimension originalContainerSize);
+  @NotNull TermDim resize(@NotNull Component component,
+      @NotNull TermDim containerSize, @NotNull TermDim originalContainerSize);
 
 
 }

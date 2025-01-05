@@ -21,8 +21,8 @@ import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.IndexedStyleData;
 import net.jterminal.text.termstring.IndexedStyleData.IndexEntry;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 class ByteBufImpl implements ByteBuf {
@@ -160,14 +160,14 @@ class ByteBufImpl implements ByteBuf {
   }
 
   @Override
-  public @NotNull ByteBuf writePosition(@NotNull TerminalPosition position) {
+  public @NotNull ByteBuf writePosition(@NotNull TermPos position) {
     writeUnsignedShort(position.x());
     writeUnsignedShort(position.y());
     return this;
   }
 
   @Override
-  public @NotNull ByteBuf writeDimension(@NotNull TerminalDimension dimension) {
+  public @NotNull ByteBuf writeDimension(@NotNull TermDim dimension) {
     writeUnsignedShort(dimension.width());
     writeUnsignedShort(dimension.height());
     return this;
@@ -383,17 +383,17 @@ class ByteBufImpl implements ByteBuf {
   }
 
   @Override
-  public @NotNull TerminalPosition readPosition() {
+  public @NotNull TermPos readPosition() {
     int x = readShort();
     int y = readShort();
-    return new TerminalPosition(x, y);
+    return new TermPos(x, y);
   }
 
   @Override
-  public @NotNull TerminalDimension readDimension() {
+  public @NotNull TermDim readDimension() {
     int width = readShort();
     int height = readShort();
-    return new TerminalDimension(width, height);
+    return new TermDim(width, height);
   }
 
   @SuppressWarnings("unchecked")

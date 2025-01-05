@@ -12,9 +12,8 @@ import net.jterminal.ui.exception.UIException;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.layout.AbsoluteLayout;
 import net.jterminal.ui.layout.Layout;
-import net.jterminal.ui.util.PosDimUtil;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,10 +69,10 @@ public abstract class Container extends Component {
   @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
     for (Component childrenComponent : childrenComponents) {
-      TerminalPosition mousePos = event.position();
-      TerminalPosition effPos = childrenComponent.effectivePosition();
-      TerminalDimension effDim = childrenComponent.effectiveSize();
-      TerminalPosition effEndPos = PosDimUtil.add(effPos, effDim);
+      TermPos mousePos = event.position();
+      TermPos effPos = childrenComponent.effectivePosition();
+      TermDim effDim = childrenComponent.effectiveSize();
+      TermPos effEndPos = effPos.addShift(effDim);
       int x = mousePos.x();
       int y = mousePos.y();
       if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {

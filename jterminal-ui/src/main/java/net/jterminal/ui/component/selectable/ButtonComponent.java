@@ -9,8 +9,8 @@ import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +41,7 @@ public class ButtonComponent extends SelectableComponent {
 
   public void text(@NotNull String text) {
     this.text = text;
-    size = new TerminalDimension(text.length() + 2, 1);
+    size = new TermDim(text.length() + 2, 1);
   }
 
   @Override
@@ -82,7 +82,7 @@ public class ButtonComponent extends SelectableComponent {
 
   @Override
   public void updateState(@NotNull TerminalState terminalState) {
-    terminalState.cursorPosition(new TerminalPosition(1, 1));
+    terminalState.cursorPosition(new TermPos(1, 1));
     terminalState.cursorType(CursorType.STATIC);
   }
 

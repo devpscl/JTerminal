@@ -3,7 +3,7 @@ package net.jterminal.cli.line;
 import java.util.function.Supplier;
 import net.jterminal.cli.CLITerminal;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
 
 public class PrefixedLineRenderer extends DefaultLineRenderer {
@@ -17,7 +17,7 @@ public class PrefixedLineRenderer extends DefaultLineRenderer {
   @Override
   public @NotNull LineView view(@NotNull CLITerminal terminal, @NotNull LineReader lineReader) {
     TermString prefixTermString = prefixSupply.get();
-    TerminalDimension winSize = terminal.windowSize();
+    TermDim winSize = terminal.windowSize();
     TermString termString = TermString.value(lineReader.displayingInput());
     termString = terminal.modifyCommandLineView(termString, lineReader.displayingInput());
 

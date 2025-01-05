@@ -1,8 +1,8 @@
 package net.jterminal.ui.graphics;
 
 import java.util.Arrays;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,11 +26,11 @@ public class CellBuffer {
     clear();
   }
 
-  public CellBuffer(@NotNull TerminalDimension dim) {
+  public CellBuffer(@NotNull TermDim dim) {
     this(dim.width(), dim.height());
   }
 
-  public CellBuffer(@NotNull TerminalDimension dim, @NotNull CellData defaultData) {
+  public CellBuffer(@NotNull TermDim dim, @NotNull CellData defaultData) {
     this(dim.width(), dim.height(), defaultData);
   }
 
@@ -42,7 +42,7 @@ public class CellBuffer {
     }
   }
 
-  public boolean contains(@NotNull TerminalPosition pos) {
+  public boolean contains(@NotNull TermPos pos) {
     return contains(pos.x(), pos.y());
   }
 
@@ -64,7 +64,7 @@ public class CellBuffer {
     writeUnsafe(x, y, cellData);
   }
 
-  public void write(@NotNull TerminalPosition pos, @NotNull CellData cellData) {
+  public void write(@NotNull TermPos pos, @NotNull CellData cellData) {
     if(!contains(pos)) {
       return;
     }
@@ -75,8 +75,8 @@ public class CellBuffer {
     buffer[y][x] = cellData;
   }
 
-  public void fill(@NotNull TerminalPosition from,
-      @NotNull TerminalPosition to,
+  public void fill(@NotNull TermPos from,
+      @NotNull TermPos to,
       @NotNull CellData cellData) {
     fill(from.x(), from.y(), to.x(), to.y(), cellData);
   }

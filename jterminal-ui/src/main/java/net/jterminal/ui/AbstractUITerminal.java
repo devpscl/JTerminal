@@ -26,7 +26,7 @@ import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.renderer.FastScreenRenderer;
 import net.jterminal.ui.renderer.ScreenRenderer;
 import net.jterminal.ui.selector.SelectionResult;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,7 +88,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         if(selectableComponent != null) {
           TerminalState state = new TerminalState();
           selectableComponent.updateState(state);
-          globalState = state.offset(selectableComponent.displayPosition());
+          globalState = state.origin(selectableComponent.displayPosition());
         }
         ForegroundColor foregroundColor = activeScreen.foregroundColor();
         BackgroundColor backgroundColor = activeScreen.backgroundColor();
@@ -191,7 +191,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   @SubscribeEvent
   public void onMouseEvent(MouseInputEvent e) {
     if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
-      TerminalPosition pos = e.terminalPosition();
+      TermPos pos = e.terminalPosition();
       activeScreen.performSelect(pos.x(), pos.y());
     }
     ComponentMouseEvent event = new ComponentMouseEvent(e);

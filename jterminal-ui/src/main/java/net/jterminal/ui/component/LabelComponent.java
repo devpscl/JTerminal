@@ -2,7 +2,7 @@ package net.jterminal.ui.component;
 
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.graphics.TermGraphics;
-import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
 
 public class LabelComponent extends Component {
@@ -27,7 +27,7 @@ public class LabelComponent extends Component {
         width = line.length();
       }
     }
-    size = new TerminalDimension(width, height);
+    size = new TermDim(width, height);
   }
 
   public @NotNull TermString text() {

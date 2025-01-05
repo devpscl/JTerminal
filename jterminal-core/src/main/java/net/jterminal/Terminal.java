@@ -22,8 +22,8 @@ import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -314,7 +314,7 @@ public interface Terminal {
    *
    * @param pos the pos
    */
-  void cursorPosition(@NotNull TerminalPosition pos);
+  void cursorPosition(@NotNull TermPos pos);
 
   /**
    * Cursor position terminal position.
@@ -322,7 +322,7 @@ public interface Terminal {
    * @return the terminal position
    */
   @NotNull
-  TerminalPosition cursorPosition();
+  TermPos cursorPosition();
 
   /**
    * Clear.
@@ -384,7 +384,7 @@ public interface Terminal {
    *
    * @param size the size
    */
-  void windowSize(@NotNull TerminalDimension size);
+  void windowSize(@NotNull TermDim size);
 
   /**
    * Window size terminal dimension.
@@ -392,9 +392,9 @@ public interface Terminal {
    * @return the terminal dimension
    */
   @NotNull
-  TerminalDimension windowSize();
+  TermDim windowSize();
 
-  @NotNull TerminalDimension defaultWindowSize();
+  @NotNull TermDim defaultWindowSize();
 
   /**
    * Update.

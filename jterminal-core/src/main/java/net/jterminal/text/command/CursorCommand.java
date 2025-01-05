@@ -1,11 +1,11 @@
 package net.jterminal.text.command;
 
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public interface CursorCommand extends AnsiCommand {
 
-  static @NotNull CursorCommand move(@NotNull TerminalPosition pos) {
+  static @NotNull CursorCommand move(@NotNull TermPos pos) {
     return new CursorCommandImpl("[" + pos.y() + ";" + pos.x() + "H");
   }
 

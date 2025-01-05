@@ -1,24 +1,23 @@
 package net.jterminal.input;
 
-import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class WindowInputEvent extends InputEvent {
 
-  private final TerminalDimension oldDimension;
-  private final TerminalDimension newDimension;
+  private final TermDim oldDimension;
+  private final TermDim newDimension;
 
-  public WindowInputEvent(@NotNull String raw, TerminalDimension oldDimension,
-      TerminalDimension newDimension) {
+  public WindowInputEvent(@NotNull String raw, TermDim oldDimension,
+      TermDim newDimension) {
     super(raw);
     this.oldDimension = oldDimension;
     this.newDimension = newDimension;
   }
 
   public WindowInputEvent(byte[] raw, int oldX, int oldY, int newX, int newY) {
-    this(new String(raw), new TerminalDimension(oldX, oldY),
-        new TerminalDimension(newX, newY));
+    this(new String(raw), new TermDim(oldX, oldY),
+        new TermDim(newX, newY));
   }
 
   @Override
@@ -26,11 +25,11 @@ public class WindowInputEvent extends InputEvent {
     return Type.WINDOW;
   }
 
-  public @NotNull TerminalDimension oldDimension() {
+  public @NotNull TermDim oldDimension() {
     return oldDimension;
   }
 
-  public @NotNull TerminalDimension newDimension() {
+  public @NotNull TermDim newDimension() {
     return newDimension;
   }
 

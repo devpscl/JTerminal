@@ -9,8 +9,8 @@ import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentSelectEvent;
 import net.jterminal.ui.event.component.ComponentUnselectEvent;
 import net.jterminal.ui.selector.SelectionResult;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class TermScreen extends PaneContainer {
 
   UITerminal terminal;
   private SelectableComponent selectedComponent = null;
-  private TerminalDimension originalSize = null;
+  private TermDim originalSize = null;
 
   @Override
   public void repaint() {
@@ -43,37 +43,37 @@ public class TermScreen extends PaneContainer {
     return terminal.openedScreen() == this;
   }
 
-  public void setOriginalSize(@Nullable TerminalDimension originalSize) {
+  public void setOriginalSize(@Nullable TermDim originalSize) {
     this.originalSize = originalSize;
   }
 
   @Override
-  public @NotNull TerminalDimension size() {
+  public @NotNull TermDim size() {
     if(originalSize != null) {
       return originalSize;
     }
     if(terminal == null) {
-      return new TerminalDimension();
+      return new TermDim();
     }
     return terminal.defaultWindowSize();
   }
 
   @Override
-  public @NotNull TerminalDimension effectiveSize() {
+  public @NotNull TermDim effectiveSize() {
     if(terminal == null) {
-      return new TerminalDimension();
+      return new TermDim();
     }
     return terminal.windowSize();
   }
 
   @Override
-  public @NotNull TerminalPosition position() {
-    return new TerminalPosition(1, 1);
+  public @NotNull TermPos position() {
+    return new TermPos(1, 1);
   }
 
   @Override
-  public @NotNull TerminalPosition effectivePosition() {
-    return new TerminalPosition(1, 1);
+  public @NotNull TermPos effectivePosition() {
+    return new TermPos(1, 1);
   }
 
   public void select(@NotNull SelectableComponent selectedComponent) {

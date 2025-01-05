@@ -2,18 +2,17 @@ package net.jterminal.input;
 
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class MouseInputEvent extends InputEvent {
 
   private final Button button;
   private final Action action;
-  private final TerminalPosition terminalPosition;
+  private final TermPos terminalPosition;
 
   public MouseInputEvent(@NotNull String raw, @NotNull Button button, @NotNull Action action,
-      @NotNull TerminalPosition terminalPosition) {
+      @NotNull TermPos terminalPosition) {
     super(raw);
     this.button = button;
     this.action = action;
@@ -22,7 +21,7 @@ public class MouseInputEvent extends InputEvent {
 
   public MouseInputEvent(byte[] raw, byte button, byte action, int x, int y) {
     this(new String(raw), Button.values()[button],
-        Action.values()[action], new TerminalPosition(x, y));
+        Action.values()[action], new TermPos(x, y));
   }
 
   @Override
@@ -38,7 +37,7 @@ public class MouseInputEvent extends InputEvent {
     return action;
   }
 
-  public @NotNull TerminalPosition terminalPosition() {
+  public @NotNull TermPos terminalPosition() {
     return terminalPosition;
   }
 }

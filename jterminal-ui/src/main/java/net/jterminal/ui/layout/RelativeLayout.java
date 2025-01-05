@@ -2,8 +2,8 @@ package net.jterminal.ui.layout;
 
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Resizeable;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public class RelativeLayout implements Layout {
@@ -19,9 +19,9 @@ public class RelativeLayout implements Layout {
   }
 
   @Override
-  public @NotNull TerminalPosition move(@NotNull Component component,
-      @NotNull TerminalDimension containerSize,
-      @NotNull TerminalDimension originalContainerSize) {
+  public @NotNull TermPos move(@NotNull Component component,
+      @NotNull TermDim containerSize,
+      @NotNull TermDim originalContainerSize) {
     int difWidth = containerSize.width() - originalContainerSize.width();
     int difHeight = containerSize.height() - originalContainerSize.height();
 
@@ -29,14 +29,14 @@ public class RelativeLayout implements Layout {
   }
 
   @Override
-  public @NotNull TerminalDimension resize(@NotNull Component component,
-      @NotNull TerminalDimension containerSize,
-      @NotNull TerminalDimension originalContainerSize) {
+  public @NotNull TermDim resize(@NotNull Component component,
+      @NotNull TermDim containerSize,
+      @NotNull TermDim originalContainerSize) {
     if(!component.isResizeable()) {
       return component.size();
     }
     Resizeable resizeable = (Resizeable) component;
-    TerminalDimension size = component.size();
+    TermDim size = component.size();
     int difWidth = containerSize.width() - originalContainerSize.width();
     int difHeight = containerSize.height() - originalContainerSize.height();
 
@@ -48,6 +48,6 @@ public class RelativeLayout implements Layout {
     int newWidth = Math.max(0, width);
     int newHeight = Math.max(0, height);
 
-    return new TerminalDimension(newWidth, newHeight);
+    return new TermDim(newWidth, newHeight);
   }
 }

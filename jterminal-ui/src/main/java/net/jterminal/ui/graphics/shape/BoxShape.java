@@ -4,17 +4,17 @@ import java.util.Arrays;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.BoxCharacter;
 import net.jterminal.ui.util.BoxCharacter.Type;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BoxShape implements TermShape {
 
   private final byte[][] data;
-  private final TerminalDimension dimension;
+  private final TermDim dimension;
 
-  public BoxShape(@NotNull TerminalDimension dimension) {
+  public BoxShape(@NotNull TermDim dimension) {
     this.dimension = dimension;
     this.data = new byte[dimension.height()][];
     for (int row = 0; row < dimension.height(); row++) {
@@ -99,13 +99,13 @@ public class BoxShape implements TermShape {
   }
 
   @Override
-  public @NotNull TerminalDimension size() {
+  public @NotNull TermDim size() {
     return dimension;
   }
 
   @Override
-  public void render(@NotNull TermGraphics graphics, @NotNull TerminalPosition pos,
-      @NotNull TerminalDimension dim) {
+  public void render(@NotNull TermGraphics graphics, @NotNull TermPos pos,
+      @NotNull TermDim dim) {
     int width = dim.width();
     int height = dim.height();
     for (int x = 0; x < width; x++) {

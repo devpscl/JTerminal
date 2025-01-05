@@ -9,8 +9,8 @@ import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.layout.Layout;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,10 +28,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   protected final long id;
   protected final EventBus eventBus = EventBus.create();
 
-  protected TerminalDimension size = new TerminalDimension(1, 1);
-  protected TerminalPosition position = new TerminalPosition(1, 1);
-  protected TerminalDimension effectiveSize = size.clone();
-  protected TerminalPosition effectivePosition = position.clone();
+  protected TermDim size = new TermDim(1, 1);
+  protected TermPos position = new TermPos(1, 1);
+  protected TermDim effectiveSize = size.clone();
+  protected TermPos effectivePosition = position.clone();
 
   public Component() {
      id = idCounter.getAndIncrement();
@@ -44,8 +44,8 @@ public abstract class Component implements Displayable, Comparable<Component> {
   public void updatePositionSize() {
     if(parent != null) {
       final Layout layout = parent.layout();
-      final TerminalDimension containerSize = parent.effectiveSize();
-      final TerminalDimension containerOriginalSize = parent.size();
+      final TermDim containerSize = parent.effectiveSize();
+      final TermDim containerOriginalSize = parent.size();
       effectiveSize = layout.resize(this, containerSize.clone(),
           containerOriginalSize.clone());
       effectivePosition = layout.move(this, containerSize, containerOriginalSize);
@@ -171,29 +171,29 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return this instanceof Resizeable;
   }
 
-  public @NotNull TerminalDimension size() {
+  public @NotNull TermDim size() {
     return size;
   }
 
-  public void position(@NotNull TerminalPosition position) {
-    position.secureTruePositive();
+  public void position(@NotNull TermPos position) {
+    position.secureOriginPositive();
     this.position = position;
     repaint();
   }
 
-  public @NotNull TerminalPosition position() {
+  public @NotNull TermPos position() {
     return position.clone();
   }
 
-  public @NotNull TerminalDimension effectiveSize() {
+  public @NotNull TermDim effectiveSize() {
     return effectiveSize.clone();
   }
 
-  public @NotNull TerminalPosition effectivePosition() {
+  public @NotNull TermPos effectivePosition() {
     return effectivePosition.clone();
   }
 
-  public @NotNull TerminalPosition displayPosition() {
+  public @NotNull TermPos displayPosition() {
     if(parent == null) {
       return effectivePosition.clone();
     }
@@ -202,9 +202,9 @@ public abstract class Component implements Displayable, Comparable<Component> {
         .subtract(1);
   }
 
-  public @NotNull TerminalPosition displayMidPosition() {
-    TerminalPosition start = displayPosition();
-    TerminalDimension effSize = effectiveSize();
+  public @NotNull TermPos displayMidPosition() {
+    TermPos start = displayPosition();
+    TermDim effSize = effectiveSize();
     int midWidth = Math.max((effSize.width()-1)/2, 0);
     int midHeight = Math.max((effSize.height()-1)/2, 0);
     return start.addX(midWidth).addY(midHeight);
@@ -221,8 +221,8 @@ public abstract class Component implements Displayable, Comparable<Component> {
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {}
 
   public boolean contains(int x, int y) {
-    TerminalPosition displayPosition = displayPosition();
-    TerminalDimension displaySize = effectiveSize();
+    TermPos displayPosition = displayPosition();
+    TermDim displaySize = effectiveSize();
     if(x < displayPosition.x()) {
       return false;
     }

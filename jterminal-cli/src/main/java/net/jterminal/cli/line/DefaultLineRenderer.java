@@ -4,8 +4,8 @@ import net.jterminal.TerminalBuffer;
 import net.jterminal.cli.CLITerminal;
 import net.jterminal.text.command.CursorCommand;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public class DefaultLineRenderer implements LineRenderer {
@@ -15,7 +15,7 @@ public class DefaultLineRenderer implements LineRenderer {
       @NotNull TerminalBuffer buffer) {
     LineView lineView = view(terminal, lineReader);
     TermString termString = lineView.view();
-    TerminalPosition cursorPos = lineView.cursorPos(new TerminalPosition(0, 0));
+    TermPos cursorPos = lineView.cursorPos(new TermPos(0, 0));
     buffer.command(CursorCommand.hide())
         .resetStyle()
         .append("\r")
@@ -44,7 +44,7 @@ public class DefaultLineRenderer implements LineRenderer {
   public void remove(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
       @NotNull TerminalBuffer buffer, @NotNull LineView lineView) {
     int lines = lineView.usedLines();
-    TerminalPosition cursorPos = lineView.cursorPos(new TerminalPosition(0, 0));
+    TermPos cursorPos = lineView.cursorPos(new TermPos(0, 0));
     buffer.cursorUp(cursorPos.y());
     buffer.cursorSave();
     for (int i = 0; i < lines; i++) {
@@ -57,7 +57,7 @@ public class DefaultLineRenderer implements LineRenderer {
 
   @Override
   public @NotNull LineView view(@NotNull CLITerminal terminal, @NotNull LineReader lineReader) {
-    TerminalDimension winSize = terminal.windowSize();
+    TermDim winSize = terminal.windowSize();
     TermString termString = TermString.value(lineReader.displayingInput());
     termString = terminal.modifyCommandLineView(termString, lineReader.displayingInput());
 

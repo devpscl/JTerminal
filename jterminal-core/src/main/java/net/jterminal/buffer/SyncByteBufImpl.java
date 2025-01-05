@@ -11,8 +11,8 @@ import net.jterminal.text.style.FontMap;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.IndexedStyleData;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 class SyncByteBufImpl extends ByteBufImpl {
@@ -129,7 +129,7 @@ class SyncByteBufImpl extends ByteBufImpl {
   }
 
   @Override
-  public @NotNull ByteBuf writePosition(@NotNull TerminalPosition position) {
+  public @NotNull ByteBuf writePosition(@NotNull TermPos position) {
     synchronized (mutex) {
       return super.writePosition(position);
     }
@@ -137,7 +137,7 @@ class SyncByteBufImpl extends ByteBufImpl {
   }
 
   @Override
-  public @NotNull ByteBuf writeDimension(@NotNull TerminalDimension dimension) {
+  public @NotNull ByteBuf writeDimension(@NotNull TermDim dimension) {
     synchronized (mutex) {
       return super.writeDimension(dimension);
     }
@@ -315,14 +315,14 @@ class SyncByteBufImpl extends ByteBufImpl {
   }
 
   @Override
-  public @NotNull TerminalPosition readPosition() {
+  public @NotNull TermPos readPosition() {
     synchronized (mutex) {
       return super.readPosition();
     }
   }
 
   @Override
-  public @NotNull TerminalDimension readDimension() {
+  public @NotNull TermDim readDimension() {
     synchronized (mutex) {
       return super.readDimension();
     }

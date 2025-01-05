@@ -3,17 +3,17 @@ package net.jterminal.util;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
-public class TerminalDimension {
+public final class TermDim {
 
   private int width;
   private int height;
 
-  public TerminalDimension(int width, int height) {
+  public TermDim(int width, int height) {
     this.width = width;
     this.height = height;
   }
 
-  public TerminalDimension() {
+  public TermDim() {
     this(0, 0);
   }
 
@@ -22,6 +22,14 @@ public class TerminalDimension {
   }
 
   public int height() {
+    return height;
+  }
+
+  public int cols() {
+    return width;
+  }
+
+  public int rows() {
     return height;
   }
 
@@ -34,12 +42,12 @@ public class TerminalDimension {
     }
   }
 
-  public @NotNull TerminalDimension width(int width) {
+  public @NotNull TermDim width(int width) {
     this.width = width;
     return this;
   }
 
-  public @NotNull TerminalDimension height(int height) {
+  public @NotNull TermDim height(int height) {
     this.height = height;
     return this;
   }
@@ -52,7 +60,7 @@ public class TerminalDimension {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TerminalDimension that = (TerminalDimension) o;
+    TermDim that = (TermDim) o;
     return width == that.width && height == that.height;
   }
 
@@ -66,8 +74,8 @@ public class TerminalDimension {
     return "DIM(" + width + ", " + height + ")";
   }
 
-  public @NotNull TerminalDimension clone() {
-    return new TerminalDimension(width, height);
+  public @NotNull TermDim clone() {
+    return new TermDim(width, height);
   }
 
 }

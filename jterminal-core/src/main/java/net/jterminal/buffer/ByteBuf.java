@@ -12,8 +12,8 @@ import net.jterminal.text.style.FontMap;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.IndexedStyleData;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public interface ByteBuf {
@@ -48,9 +48,9 @@ public interface ByteBuf {
 
   @NotNull ByteBuf writeVarInt(int x);
 
-  @NotNull ByteBuf writePosition(@NotNull TerminalPosition position);
+  @NotNull ByteBuf writePosition(@NotNull TermPos position);
 
-  @NotNull ByteBuf writeDimension(@NotNull TerminalDimension dimension);
+  @NotNull ByteBuf writeDimension(@NotNull TermDim dimension);
 
   <T extends Enum<T>> @NotNull ByteBuf writeEnum(T enumElement);
 
@@ -105,9 +105,9 @@ public interface ByteBuf {
 
   int readVarInt();
 
-  @NotNull TerminalPosition readPosition();
+  @NotNull TermPos readPosition();
 
-  @NotNull TerminalDimension readDimension();
+  @NotNull TermDim readDimension();
 
   <T extends Enum<T>> @NotNull T readEnum(Class<? extends T> enumType);
 

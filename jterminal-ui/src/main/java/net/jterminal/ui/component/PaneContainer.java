@@ -1,13 +1,13 @@
 package net.jterminal.ui.component;
 
 import net.jterminal.ui.graphics.TermGraphics;
-import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
 
 public class PaneContainer extends Container implements Resizeable {
 
-  private TerminalDimension minimumSize = new TerminalDimension(1, 1);
-  private TerminalDimension maximumSize = new TerminalDimension(Integer.MAX_VALUE,
+  private TermDim minimumSize = new TermDim(1, 1);
+  private TermDim maximumSize = new TermDim(Integer.MAX_VALUE,
       Integer.MAX_VALUE);
 
   @Override
@@ -17,20 +17,20 @@ public class PaneContainer extends Container implements Resizeable {
   }
 
   @Override
-  public @NotNull TerminalDimension minimumSize() {
+  public @NotNull TermDim minimumSize() {
     return minimumSize;
   }
 
   @Override
-  public @NotNull TerminalDimension maximumSize() {
+  public @NotNull TermDim maximumSize() {
     return maximumSize;
   }
 
-  public void minimumSize(@NotNull TerminalDimension minimumSize) {
+  public void minimumSize(@NotNull TermDim minimumSize) {
     this.minimumSize = minimumSize;
   }
 
-  public void maximumSize(@NotNull TerminalDimension maximumSize) {
+  public void maximumSize(@NotNull TermDim maximumSize) {
     this.maximumSize = maximumSize;
   }
 }

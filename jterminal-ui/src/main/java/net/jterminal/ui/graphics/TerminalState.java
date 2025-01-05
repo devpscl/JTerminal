@@ -1,7 +1,6 @@
 package net.jterminal.ui.graphics;
 
-import net.jterminal.ui.util.PosDimUtil;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,24 +12,24 @@ public class TerminalState {
     BLOCK
   }
 
-  private TerminalPosition cursorPosition;
+  private TermPos cursorPosition;
   private CursorType cursorType;
 
   public TerminalState() {
     this(null, CursorType.STATIC);
   }
 
-  public TerminalState(@Nullable TerminalPosition cursorPosition,
+  public TerminalState(@Nullable TermPos cursorPosition,
       @NotNull CursorType cursorType) {
     this.cursorPosition = cursorPosition;
     this.cursorType = cursorType;
   }
 
-  public void cursorPosition(@Nullable TerminalPosition cursorPosition) {
+  public void cursorPosition(@Nullable TermPos cursorPosition) {
     this.cursorPosition = cursorPosition;
   }
 
-  public @Nullable TerminalPosition cursorPosition() {
+  public @Nullable TermPos cursorPosition() {
     if(cursorPosition == null) {
       return null;
     }
@@ -45,9 +44,9 @@ public class TerminalState {
     return cursorType;
   }
 
-  public @NotNull TerminalState offset(@NotNull TerminalPosition offset) {
+  public @NotNull TerminalState origin(@NotNull TermPos offset) {
     return new TerminalState(cursorPosition == null ? null
-        : PosDimUtil.add(cursorPosition, offset), cursorType);
+        : cursorPosition.addShift(offset), cursorType);
   }
 
 }

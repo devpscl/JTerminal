@@ -6,8 +6,8 @@ import net.jterminal.Terminal;
 import net.jterminal.exception.TerminalProviderException;
 import net.jterminal.exception.TerminalRuntimeException;
 import net.jterminal.system.SystemInfo;
-import net.jterminal.util.TerminalDimension;
-import net.jterminal.util.TerminalPosition;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,12 +39,12 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
   }
 
   @Override
-  public void cursorPosition(@NotNull TerminalPosition pos) {
+  public void cursorPosition(@NotNull TermPos pos) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public @NotNull TerminalPosition cursorPosition() {
+  public @NotNull TermPos cursorPosition() {
     throw new UnsupportedOperationException();
   }
 
@@ -116,18 +116,18 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
   }
 
   @Override
-  public void windowSize(@NotNull TerminalDimension size) {
+  public void windowSize(@NotNull TermDim size) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public @NotNull TerminalDimension windowSize() {
+  public @NotNull TermDim windowSize() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public @NotNull TerminalDimension defaultWindowSize() {
-    return new TerminalDimension(80, 25);
+  public @NotNull TermDim defaultWindowSize() {
+    return new TermDim(80, 25);
   }
 
   @Override

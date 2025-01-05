@@ -23,7 +23,7 @@ import net.jterminal.instance.AbstractNativeTerminal;
 import net.jterminal.io.ListenedPrintStream;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.util.SetLock;
-import net.jterminal.util.TerminalDimension;
+import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -272,7 +272,7 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
     updateLine();
   }
 
-  protected void updateWindowSize(@NotNull TerminalDimension windowSize) {
+  protected void updateWindowSize(@NotNull TermDim windowSize) {
     lock.lock();
     try {
       if(lineView == null) {
