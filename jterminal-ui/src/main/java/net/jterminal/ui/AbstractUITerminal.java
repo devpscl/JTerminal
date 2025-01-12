@@ -2,6 +2,7 @@ package net.jterminal.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jterminal.Terminal;
 import net.jterminal.annotation.SubscribeEvent;
 import net.jterminal.exception.TerminalProviderException;
@@ -14,18 +15,23 @@ import net.jterminal.input.WindowInputEvent;
 import net.jterminal.instance.AbstractNativeTerminal;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
+import net.jterminal.ui.component.Component;
+import net.jterminal.ui.component.Container;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.ScreenCloseEvent;
 import net.jterminal.ui.event.ScreenOpenEvent;
 import net.jterminal.ui.event.ScreenRenderedEvent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.component.ComponentResizeEvent;
+import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.renderer.FastScreenRenderer;
 import net.jterminal.ui.renderer.ScreenRenderer;
 import net.jterminal.ui.selector.SelectionResult;
+import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +42,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   TermScreen activeScreen = null;
   private final ScreenRenderer screenRenderer;
   private final Object lock = new Object();
+  private final ReentrantLock renderLock = new ReentrantLock();
   private long lastRenderTime = 0L;
 
   public AbstractUITerminal(Class<T> interfaceType) {
@@ -81,14 +88,29 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   @Override
   public void drawScreen() {
     synchronized (lock) {
+      renderScreenSync();
+    }
+  }
+
+  private void renderScreenSync() {
+    if(renderLock.isLocked()) {
+      return;
+    }
+    renderLock.lock();
+    try {
       if(activeScreen != null) {
         long start = System.currentTimeMillis();
         TerminalState globalState = new TerminalState();
         SelectableComponent selectableComponent = activeScreen.selectedComponent();
         if(selectableComponent != null) {
-          TerminalState state = new TerminalState();
-          selectableComponent.updateState(state);
-          globalState = state.origin(selectableComponent.displayPosition());
+          if(selectableComponent.isEnabled()) {
+            TerminalState state = new TerminalState();
+            selectableComponent.updateState(state);
+            globalState = state.origin(selectableComponent.currentDisplayPosition());
+          } else {
+            activeScreen.unselect();
+            selectableComponent = null;
+          }
         }
         ForegroundColor foregroundColor = activeScreen.foregroundColor();
         BackgroundColor backgroundColor = activeScreen.backgroundColor();
@@ -102,6 +124,8 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         lastRenderTime = end-start;
         eventBus.post(new ScreenRenderedEvent(activeScreen));
       }
+    } finally {
+      renderLock.unlock();
     }
   }
 
