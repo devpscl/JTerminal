@@ -1,9 +1,9 @@
 package net.jterminal.ui.component.selectable;
 
-import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.ui.TermScreen;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
+import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.selector.AutoSelector;
 import net.jterminal.ui.selector.ComponentSelector;
@@ -36,9 +36,6 @@ public abstract class SelectableComponent extends Component {
   @OverrideOnly
   public void updateState(@NotNull TerminalState terminalState) {}
 
-  @OverrideOnly
-  public boolean interceptScreenActionInput(@NotNull KeyboardInputEvent event) {
-    return false;
-  }
+  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {}
 
 }
