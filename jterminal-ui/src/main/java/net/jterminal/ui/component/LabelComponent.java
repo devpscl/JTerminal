@@ -2,7 +2,6 @@ package net.jterminal.ui.component;
 
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.graphics.TermGraphics;
-import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
 
 public class LabelComponent extends Component {

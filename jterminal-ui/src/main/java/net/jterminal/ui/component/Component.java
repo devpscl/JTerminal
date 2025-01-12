@@ -256,7 +256,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   protected void setHeight(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
-    heightDimProperty = new DimProperty(positionValue, modifiers);;
+    heightDimProperty = new DimProperty(positionValue, modifiers);
     repaint();
   }
 

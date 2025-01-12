@@ -109,7 +109,6 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
             globalState = state.origin(selectableComponent.currentDisplayPosition());
           } else {
             activeScreen.unselect();
-            selectableComponent = null;
           }
         }
         ForegroundColor foregroundColor = activeScreen.foregroundColor();

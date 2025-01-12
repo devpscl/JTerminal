@@ -1,7 +1,6 @@
 package net.jterminal.ui.layout;
 
 import net.jterminal.ui.layout.Layout.DimensionValue;
-import net.jterminal.ui.layout.Layout.PositionValue;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;

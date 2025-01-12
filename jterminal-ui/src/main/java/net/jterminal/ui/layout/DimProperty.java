@@ -3,7 +3,6 @@ package net.jterminal.ui.layout;
 import java.util.Arrays;
 import net.jterminal.ui.layout.Layout.DimensionValue;
 import net.jterminal.ui.layout.Layout.Modifier;
-import net.jterminal.ui.layout.Layout.PositionValue;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
