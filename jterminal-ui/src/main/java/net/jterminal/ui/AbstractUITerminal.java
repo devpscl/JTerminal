@@ -121,22 +121,67 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     return lastRenderTime;
   }
 
+  protected boolean sendKeyInput(@NotNull Component component,
+      @NotNull KeyboardInputEvent e) {
+    if(!component.isVisible()) {
+      return false;
+    }
+    boolean interceptInput = false;
+    ComponentKeyEvent keyEvent = new ComponentKeyEvent(e);
+    component.eventBus().post(keyEvent);
+    if(!keyEvent.cancelledAction()) {
+      component.processKeyEvent(keyEvent);
+    }
+    if(component instanceof SelectableComponent selectableComponent) {
+      SelectableComponentKeyEvent scke
+          = new SelectableComponentKeyEvent(e, keyEvent.cancelledAction());
+      selectableComponent.processKeyEvent(scke);
+      interceptInput = scke.interceptInput();
+    }
+    if(component instanceof Container c) {
+      for (Component child : c.components()) {
+        boolean state = sendKeyInput(child, e);
+        interceptInput |= state;
+      }
+    }
+    return interceptInput;
+  }
+
+  protected void sendMouseInput(@NotNull Component component, @NotNull ComponentMouseEvent e) {
+    if(!component.isVisible()) {
+      return;
+    }
+    component.eventBus().post(e);
+    if(!e.cancelledAction()) {
+      component.processMouseEvent(e);
+    }
+    if(component instanceof Container c) {
+      for (Component child : c.components()) {
+        TermPos mousePos = e.position();
+        TermPos effPos = child.currentPosition();
+        TermDim effDim = child.currentDimension();
+        TermPos effEndPos = effPos.addShift(effDim);
+        int x = mousePos.x();
+        int y = mousePos.y();
+        if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {
+          continue;
+        }
+        ComponentMouseEvent copiedEvent = e.shiftPosition(effPos);
+        sendMouseInput(child, copiedEvent);
+      }
+    }
+  }
+
   @SubscribeEvent
   public void onInputEvent(KeyboardInputEvent e) {
     if(activeScreen == null) {
       return;
     }
-    ComponentKeyEvent event = new ComponentKeyEvent(e);
-    activeScreen.eventBus().post(e);
-    if(!event.cancelledAction()) {
-      activeScreen.processKeyEvent(event);
-    }
-
-    SelectableComponent selectedComponent = activeScreen.selectedComponent();
-    if(selectedComponent != null &&
-        selectedComponent.interceptScreenActionInput(e)) {
+    boolean interceptInput = sendKeyInput(activeScreen, e);
+    if(interceptInput) {
       return;
     }
+    SelectableComponent selectedComponent = activeScreen.selectedComponent();
     List<SelectableComponent> selectableComponents
         = new ArrayList<>(activeScreen.deepSelectableComponents());
 
@@ -194,15 +239,15 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @SubscribeEvent
   public void onMouseEvent(MouseInputEvent e) {
+    if(activeScreen == null) {
+      return;
+    }
     if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
       TermPos pos = e.terminalPosition();
       activeScreen.performSelect(pos.x(), pos.y());
     }
     ComponentMouseEvent event = new ComponentMouseEvent(e);
-    activeScreen.eventBus().post(e);
-    if(!event.cancelledAction()) {
-      activeScreen.processMouseEvent(event);
-    }
+    sendMouseInput(activeScreen, event);
   }
 
 }

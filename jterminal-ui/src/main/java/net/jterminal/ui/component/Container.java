@@ -56,40 +56,20 @@ public abstract class Container extends Component {
 
   @Override
   public void processKeyEvent(@NotNull ComponentKeyEvent event) {
-    for (Component childrenComponent : childrenComponents) {
-      ComponentKeyEvent copiedEvent = event.copy();
-      childrenComponent.eventBus().post(copiedEvent);
-      if(copiedEvent.cancelledAction()) {
-        continue;
-      }
-      childrenComponent.processKeyEvent(event);
-    }
+
   }
 
   @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
-    for (Component childrenComponent : childrenComponents) {
-      TermPos mousePos = event.position();
-      TermPos effPos = childrenComponent.effectivePosition();
-      TermDim effDim = childrenComponent.effectiveSize();
-      TermPos effEndPos = effPos.addShift(effDim);
-      int x = mousePos.x();
-      int y = mousePos.y();
-      if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {
-        continue;
-      }
-      ComponentMouseEvent copiedEvent = event.shiftPosition(effPos);
-      childrenComponent.eventBus().post(copiedEvent);
-      if(copiedEvent.cancelledAction()) {
-        continue;
-      }
-      childrenComponent.processMouseEvent(copiedEvent);
-    }
+
   }
 
   @Override
   public void paint(@NotNull TermGraphics graphics) {
     for (Component component : components()) {
+      if(!component.isVisible()) {
+        continue;
+      }
       paint(graphics, component);
     }
   }

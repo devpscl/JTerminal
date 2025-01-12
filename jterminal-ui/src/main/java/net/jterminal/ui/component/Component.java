@@ -296,4 +296,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return y - displayPosition.y() < displaySize.height();
   }
 
+  public final boolean isInterceptInput() {
+    return interceptInput;
+  }
 }
