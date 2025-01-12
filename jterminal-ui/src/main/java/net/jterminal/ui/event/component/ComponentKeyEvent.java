@@ -13,7 +13,7 @@ public class ComponentKeyEvent implements Event {
     this.event = event;
   }
 
-  private ComponentKeyEvent(KeyboardInputEvent event, boolean cancelledAction) {
+  protected ComponentKeyEvent(KeyboardInputEvent event, boolean cancelledAction) {
     this.event = event;
     this.cancelledAction = cancelledAction;
   }
