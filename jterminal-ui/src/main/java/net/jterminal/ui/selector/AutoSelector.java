@@ -18,16 +18,19 @@ public class AutoSelector implements ComponentSelector {
   private @Nullable SelectableComponent find(@NotNull List<SelectableComponent> list,
       boolean above, boolean below, boolean left, boolean right,
       @NotNull SelectableComponent origin) {
-    TermPos originPos = origin.displayPosition();
+    TermPos originPos = origin.currentDisplayPosition();
     int ox = originPos.x();
     int oy = originPos.y();
     double distance = Double.MAX_VALUE;
     SelectableComponent found = null;
     for (SelectableComponent component : list) {
+      if(!component.isEnabled() || !component.isVisible()) {
+        continue;
+      }
       if(component == origin) {
         continue;
       }
-      TermPos midPos = component.displayPosition();
+      TermPos midPos = component.currentDisplayPosition();
       int cx = midPos.x();
       int cy = midPos.y();
       if(!above && oy > cy) {

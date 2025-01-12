@@ -25,6 +25,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
   private Container parent;
   private int priority;
   private boolean visible = true;
+  private boolean enabled = true;
   private ForegroundColor foregroundColor;
   private BackgroundColor backgroundColor;
   protected final Object lock = new Object();
@@ -43,6 +44,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
 
   public Component() {
      id = idCounter.getAndIncrement();
+  }
+
+  public @NotNull Component asComponent() {
+    return this;
   }
 
   public long id() {
@@ -130,14 +135,24 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return Integer.compare(priority, o.priority);
   }
 
+  public boolean isEnabled() {
+    return enabled && visible;
+  }
+
   @Override
   public boolean isVisible() {
     return visible;
   }
 
+  public void enabled(boolean enabled) {
+    this.enabled = enabled;
+    repaint();
+  }
+
   @Override
   public void visible(boolean visible) {
     this.visible = visible;
+    repaint();
   }
 
   public void foregroundColor(@Nullable ForegroundColor foregroundColor) {
