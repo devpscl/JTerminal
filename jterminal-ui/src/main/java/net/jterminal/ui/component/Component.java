@@ -263,6 +263,9 @@ public abstract class Component implements Displayable, Comparable<Component> {
   @OverrideOnly
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {}
 
+  @OverrideOnly
+  public void processResizeEvent(@NotNull ComponentResizeEvent event) {}
+
   public boolean contains(int x, int y) {
     TermPos displayPosition = currentDisplayPosition();
     TermDim displaySize = currentDimension();

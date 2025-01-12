@@ -186,6 +186,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   @SubscribeEvent
   public void onWindowEvent(WindowInputEvent e) {
     drawNewScreen();
+    if(activeScreen != null) {
+      activeScreen.processResizeEvent(
+          new ComponentResizeEvent(e.oldDimension(), e.newDimension()));
+    }
   }
 
   @SubscribeEvent
