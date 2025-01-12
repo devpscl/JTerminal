@@ -8,6 +8,7 @@ import net.jterminal.text.TerminalColor;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.component.ComponentResizeEvent;
 import net.jterminal.ui.layout.DimProperty;
 import net.jterminal.ui.layout.Layout;
 import net.jterminal.ui.layout.PosProperty;
@@ -245,9 +246,8 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   public @NotNull TermPos displayMidPosition() {
-    TermPos start = displayPosition();
-    TermDim effSize = effectiveSize();
     TermPos start = currentDisplayPosition();
+    TermDim effSize = currentDimension();
     int midWidth = Math.max((effSize.width()-1)/2, 0);
     int midHeight = Math.max((effSize.height()-1)/2, 0);
     return start.addX(midWidth).addY(midHeight);
