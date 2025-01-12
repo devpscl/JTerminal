@@ -41,7 +41,8 @@ public class ButtonComponent extends SelectableComponent {
 
   public void text(@NotNull String text) {
     this.text = text;
-    size = new TermDim(text.length() + 2, 1);
+    setWidth(text.length() + 2);
+    setHeight(1);
   }
 
   @Override

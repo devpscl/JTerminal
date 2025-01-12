@@ -1,20 +1,26 @@
 package net.jterminal.ui.component;
 
-import net.jterminal.util.TermDim;
+import net.jterminal.ui.layout.Layout;
 import org.jetbrains.annotations.NotNull;
 
 public interface Resizeable {
 
-  default void size(@NotNull TermDim size) {
-    size.securePositive();
-    if(this instanceof Component c) {
-      c.size = size;
-      c.repaint();
-    }
+  @NotNull Component asComponent();
+
+  default void width(int value, Layout.Modifier...modifiers) {
+    asComponent().setWidth(value, modifiers);
   }
 
-  @NotNull TermDim minimumSize();
+  default void width(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
+    asComponent().setWidth(positionValue, modifiers);
+  }
 
-  @NotNull TermDim maximumSize();
+  default void height(int value, Layout.Modifier...modifiers) {
+    asComponent().setHeight(value, modifiers);
+  }
+
+  default void height(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
+    asComponent().setHeight(positionValue, modifiers);
+  }
 
 }

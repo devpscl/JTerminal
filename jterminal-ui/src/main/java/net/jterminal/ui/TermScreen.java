@@ -48,7 +48,14 @@ public class TermScreen extends PaneContainer {
   }
 
   @Override
-  public @NotNull TermDim size() {
+  public @NotNull TermDim currentDimension() {
+    if(terminal == null) {
+      return defaultDimension();
+    }
+    return terminal.windowSize();
+  }
+
+  public @NotNull TermDim defaultDimension() {
     if(originalSize != null) {
       return originalSize;
     }
@@ -59,20 +66,12 @@ public class TermScreen extends PaneContainer {
   }
 
   @Override
-  public @NotNull TermDim effectiveSize() {
-    if(terminal == null) {
-      return new TermDim();
-    }
-    return terminal.windowSize();
-  }
-
-  @Override
-  public @NotNull TermPos position() {
+  public @NotNull TermPos currentPosition() {
     return new TermPos(1, 1);
   }
 
   @Override
-  public @NotNull TermPos effectivePosition() {
+  public @NotNull TermPos currentDisplayPosition() {
     return new TermPos(1, 1);
   }
 

@@ -27,7 +27,8 @@ public class LabelComponent extends Component {
         width = line.length();
       }
     }
-    size = new TermDim(width, height);
+    setWidth(width);
+    setHeight(height);
   }
 
   public @NotNull TermString text() {

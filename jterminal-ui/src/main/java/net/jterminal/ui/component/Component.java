@@ -8,7 +8,9 @@ import net.jterminal.text.TerminalColor;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.layout.DimProperty;
 import net.jterminal.ui.layout.Layout;
+import net.jterminal.ui.layout.PosProperty;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
@@ -28,10 +30,15 @@ public abstract class Component implements Displayable, Comparable<Component> {
   protected final long id;
   protected final EventBus eventBus = EventBus.create();
 
-  protected TermDim size = new TermDim(1, 1);
-  protected TermPos position = new TermPos(1, 1);
-  protected TermDim effectiveSize = size.clone();
-  protected TermPos effectivePosition = position.clone();
+  protected PosProperty xPosProperty = new PosProperty();
+  protected PosProperty yPosProperty = new PosProperty();
+  protected DimProperty widthDimProperty = new DimProperty();
+  protected DimProperty heightDimProperty = new DimProperty();
+
+  protected volatile TermPos cachedPosition = new TermPos();
+  protected volatile TermDim cachedDim = new TermDim(1, 1);
+
+  boolean interceptInput = false;
 
   public Component() {
      id = idCounter.getAndIncrement();
@@ -41,14 +48,21 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return id;
   }
 
-  public void updatePositionSize() {
+  public void recalculateProperties() {
     if(parent != null) {
-      final Layout layout = parent.layout();
-      final TermDim containerSize = parent.effectiveSize();
-      final TermDim containerOriginalSize = parent.size();
-      effectiveSize = layout.resize(this, containerSize.clone(),
-          containerOriginalSize.clone());
-      effectivePosition = layout.move(this, containerSize, containerOriginalSize);
+      TermDim oldDim = cachedDim;
+      TermDim currentDimension = parent.currentDimension();
+      int x = xPosProperty.calculateX(currentDimension);
+      int y = yPosProperty.calculateY(currentDimension);
+      TermPos pos = new TermPos(x, y);
+      int width = widthDimProperty.calculateWidth(currentDimension, pos);
+      int height = heightDimProperty.calculateHeight(currentDimension, pos);
+      TermDim dim = new TermDim(width, height);
+      cachedPosition = pos;
+      cachedDim = dim;
+      if(!oldDim.equals(dim)) {
+        processResizeEvent(new ComponentResizeEvent(oldDim, dim));
+      }
     }
   }
 
@@ -171,40 +185,69 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return this instanceof Resizeable;
   }
 
-  public @NotNull TermDim size() {
-    return size;
+  public @NotNull TermDim currentDimension() {
+    if(parent == null) {
+      return new TermDim();
+    }
+    return cachedDim.clone();
   }
 
-  public void position(@NotNull TermPos position) {
-    position.secureOriginPositive();
-    this.position = position;
+  public @NotNull TermPos currentPosition() {
+    if(parent == null) {
+      return new TermPos();
+    }
+    return cachedPosition.clone();
+  }
+
+  public @NotNull TermPos currentDisplayPosition() {
+    if(parent == null) {
+      return currentPosition();
+    }
+    return parent.currentDisplayPosition()
+        .add(cachedPosition)
+        .subtract(TermPos.AXIS_ORIGIN);
+  }
+
+  public void x(int value, Layout.Modifier...modifiers) {
+    x(Layout.createPositionValue(value, 0), modifiers);
+  }
+
+  public void x(Layout.PositionValue positionValue, Layout.Modifier...modifiers) {
+    xPosProperty = new PosProperty(positionValue, modifiers);
     repaint();
   }
 
-  public @NotNull TermPos position() {
-    return position.clone();
+  public void y(int value, Layout.Modifier...modifiers) {
+    y(Layout.createPositionValue(0, value), modifiers);
   }
 
-  public @NotNull TermDim effectiveSize() {
-    return effectiveSize.clone();
+  public void y(Layout.PositionValue positionValue, Layout.Modifier...modifiers) {
+    yPosProperty = new PosProperty(positionValue, modifiers);
+    repaint();
   }
 
-  public @NotNull TermPos effectivePosition() {
-    return effectivePosition.clone();
+  protected void setWidth(int value, Layout.Modifier...modifiers) {
+    setWidth(Layout.createDimensionValue(value, 0), modifiers);
   }
 
-  public @NotNull TermPos displayPosition() {
-    if(parent == null) {
-      return effectivePosition.clone();
-    }
-    return parent.displayPosition()
-        .add(effectivePosition)
-        .subtract(1);
+  protected void setWidth(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
+    widthDimProperty = new DimProperty(positionValue, modifiers);
+    repaint();
+  }
+
+  protected void setHeight(int value, Layout.Modifier...modifiers) {
+    setHeight(Layout.createDimensionValue(0, value), modifiers);
+  }
+
+  protected void setHeight(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
+    heightDimProperty = new DimProperty(positionValue, modifiers);;
+    repaint();
   }
 
   public @NotNull TermPos displayMidPosition() {
     TermPos start = displayPosition();
     TermDim effSize = effectiveSize();
+    TermPos start = currentDisplayPosition();
     int midWidth = Math.max((effSize.width()-1)/2, 0);
     int midHeight = Math.max((effSize.height()-1)/2, 0);
     return start.addX(midWidth).addY(midHeight);
@@ -221,8 +264,8 @@ public abstract class Component implements Displayable, Comparable<Component> {
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {}
 
   public boolean contains(int x, int y) {
-    TermPos displayPosition = displayPosition();
-    TermDim displaySize = effectiveSize();
+    TermPos displayPosition = currentDisplayPosition();
+    TermDim displaySize = currentDimension();
     if(x < displayPosition.x()) {
       return false;
     }
