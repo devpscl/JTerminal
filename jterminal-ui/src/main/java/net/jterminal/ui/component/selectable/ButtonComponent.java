@@ -4,13 +4,9 @@ import net.jterminal.input.Keyboard;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.TerminalColor;
-import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
-import net.jterminal.ui.graphics.TerminalState;
-import net.jterminal.ui.graphics.TerminalState.CursorType;
-import net.jterminal.util.TermDim;
-import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,15 +53,15 @@ public class ButtonComponent extends SelectableComponent {
   }
 
   @Override
-  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
     if(!isSelected()) {
       return;
     }
-    if(event.key() == Keyboard.KEY_ENTER) {
+    if(event.key() == Keyboard.KEY_ENTER && !event.cancelledAction()) {
       if(action != null) {
         action.run();
       }
-      event.cancelledAction(true);
+      event.interceptInput(true);
     }
   }
 
@@ -75,16 +71,10 @@ public class ButtonComponent extends SelectableComponent {
       return;
     }
     if(event.action() == Action.RELEASE && event.button() == Button.LEFT) {
-      if(action != null) {
+      if(action != null && !event.cancelledAction()) {
         action.run();
       }
     }
-  }
-
-  @Override
-  public void updateState(@NotNull TerminalState terminalState) {
-    terminalState.cursorPosition(new TermPos(1, 1));
-    terminalState.cursorType(CursorType.STATIC);
   }
 
 }
