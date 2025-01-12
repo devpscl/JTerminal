@@ -117,6 +117,9 @@ public class TermScreen extends PaneContainer {
     List<SelectableComponent> priorityComponents = new ArrayList<>(components);
     Collections.reverse(priorityComponents);
     for (SelectableComponent component : priorityComponents) {
+      if(!component.isEnabled() || !component.isVisible()) {
+        continue;
+      }
       if(component.contains(x, y)) {
         if(component == selectedComponent) {
           return;
@@ -136,6 +139,9 @@ public class TermScreen extends PaneContainer {
     }
     boolean next = false;
     for (SelectableComponent component : components) {
+      if(!component.isEnabled() || !component.isVisible()) {
+        continue;
+      }
       if(selectedComponent == null) {
         select(component);
         return;
