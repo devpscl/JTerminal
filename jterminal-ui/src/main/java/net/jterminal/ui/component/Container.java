@@ -10,17 +10,11 @@ import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.exception.UIException;
 import net.jterminal.ui.graphics.TermGraphics;
-import net.jterminal.ui.layout.AbsoluteLayout;
-import net.jterminal.ui.layout.Layout;
-import net.jterminal.util.TermDim;
-import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class Container extends Component {
 
   private final List<Component> childrenComponents = new ArrayList<>();
-  private Layout layout = new AbsoluteLayout();
 
   public void add(@NotNull Component component) {
     synchronized (lock) {
@@ -75,14 +69,6 @@ public abstract class Container extends Component {
   }
 
   public abstract void paint(@NotNull TermGraphics graphics, @NotNull Component component);
-
-  public @NotNull Layout layout() {
-    return layout;
-  }
-
-  public void setLayout(@Nullable Layout layout) {
-    this.layout = layout == null ? new AbsoluteLayout() : layout;
-  }
 
   public @NotNull Collection<Component> components() {
     return Collections.unmodifiableList(childrenComponents);
