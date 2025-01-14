@@ -102,6 +102,14 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         long start = System.currentTimeMillis();
         TerminalState globalState = new TerminalState();
         SelectableComponent selectableComponent = activeScreen.selectedComponent();
+
+        ForegroundColor foregroundColor = activeScreen.foregroundColor();
+        BackgroundColor backgroundColor = activeScreen.backgroundColor();
+        CellData cellData = CellData.empty(foregroundColor, backgroundColor);
+        TermGraphics graphics = TermGraphics.create(windowSize(), cellData);
+        graphics.foregroundColor(foregroundColor);
+        graphics.backgroundColor(backgroundColor);
+        activeScreen.paint(graphics);
         if(selectableComponent != null) {
           if(selectableComponent.isEnabled()) {
             TerminalState state = new TerminalState();
@@ -111,13 +119,6 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
             activeScreen.unselect();
           }
         }
-        ForegroundColor foregroundColor = activeScreen.foregroundColor();
-        BackgroundColor backgroundColor = activeScreen.backgroundColor();
-        CellData cellData = CellData.empty(foregroundColor, backgroundColor);
-        TermGraphics graphics = TermGraphics.create(windowSize(), cellData);
-        graphics.foregroundColor(foregroundColor);
-        graphics.backgroundColor(backgroundColor);
-        activeScreen.paint(graphics);
         screenRenderer.render(graphics.buffer(), globalState);
         long end = System.currentTimeMillis();
         lastRenderTime = end-start;
