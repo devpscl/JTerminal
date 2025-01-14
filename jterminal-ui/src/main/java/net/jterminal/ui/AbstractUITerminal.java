@@ -173,7 +173,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   }
 
   protected void sendMouseInput(@NotNull Component component, @NotNull ComponentMouseEvent e) {
-    if(!component.isVisible()) {
+    if(!component.isEnabled()) {
       return;
     }
     component.eventBus().post(e);
