@@ -128,14 +128,14 @@ public final class TermPos {
   }
 
   public @NotNull TermPos subtractShift(@NotNull TermPos other) {
-    this.x -= other.x() + AXIS_ORIGIN;
-    this.y -= other.y() + AXIS_ORIGIN;
+    this.x -= other.x() - AXIS_ORIGIN;
+    this.y -= other.y() - AXIS_ORIGIN;
     return this;
   }
 
   public @NotNull TermPos subtractShift(@NotNull TermDim other) {
-    this.x -= other.width() + AXIS_ORIGIN;
-    this.y -= other.height() + AXIS_ORIGIN;
+    this.x -= other.width() - AXIS_ORIGIN;
+    this.y -= other.height() - AXIS_ORIGIN;
     return this;
   }
 
