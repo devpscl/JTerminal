@@ -14,6 +14,7 @@ import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
 import net.jterminal.ui.layout.Layout.DimensionValue;
 import net.jterminal.ui.layout.Layout.Modifier;
+import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.util.CharFilter;
 import net.jterminal.util.CharFilter.CharType;
 import net.jterminal.util.TermDim;
@@ -28,8 +29,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
 
   private String value;
-  private int cursor;
-  private int cursorOffset;
+  private final ViewShifter viewShifter = new ViewShifter();
   private CursorType cursorType = CursorType.BLINKING;
 
   public TextFieldComponent() {
@@ -44,26 +44,27 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
 
   public void value(@NotNull String value) {
     this.value = value;
+    viewShifter.bufferSize(value.length());
     cursor(value.length());
   }
 
   public void cursor(int cursor) {
-    this.cursor = cursor;
-    this.cursorOffset = 0;
+    viewShifter.cursor(cursor);
     repaint();
   }
 
   public int cursor() {
-    return cursor;
+    return viewShifter.cursor();
+  }
+
+  public @NotNull ViewShifter viewShifter() {
+    return viewShifter;
   }
 
   public @NotNull String displayValue() {
-    int len = currentDimension().width();
-    if(this.value.length() <= len) {
-      return value;
-    }
-    int start = Math.max(0, value.length() - len - cursorOffset);
-    int end = value.length() - cursorOffset;
+    viewShifter.viewSize(currentDimension().width());
+    int start = viewShifter.bufferStart();
+    int end = viewShifter.bufferEnd();
     return value.substring(start, end);
   }
 
@@ -75,43 +76,27 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   }
 
   protected void performBackspace() {
-    if(cursor <= 0 || value.isEmpty()) {
+    viewShifter.viewSize(currentDimension().width());
+    if(viewShifter.cursor() <= 0 || value.isEmpty()) {
       return;
     }
     StringBuilder stringBuilder = new StringBuilder(value);
-    stringBuilder.deleteCharAt(cursor - 1);
+    stringBuilder.deleteCharAt(viewShifter.cursor() - 1);
     this.value = stringBuilder.toString();
+    viewShifter.bufferSize(value.length());
     performMoveLeft();
   }
 
   protected boolean performMoveLeft() {
-    if(cursor <= 0) {
-      return false;
-    }
-    cursor--;
-    int len = currentDimension().width();
-    if(this.value.length() <= len) {
-      cursorOffset = 0;
-      repaint();
-      return true;
-    }
-    int start = value.length() - len - cursorOffset;
-    if(cursor < start) {
-      cursorOffset++;
-    }
+    viewShifter.viewSize(currentDimension().width());
+    viewShifter.backward(1);
     repaint();
     return true;
   }
 
   protected boolean performMoveRight() {
-    if(cursor >= value.length()) {
-      return false;
-    }
-    cursor++;
-    int end = value.length() - cursorOffset;
-    if(cursor > end && cursorOffset > 0) {
-      cursorOffset--;
-    }
+    viewShifter.viewSize(currentDimension().width());
+    viewShifter.forward(1);
     repaint();
     return true;
   }
@@ -121,12 +106,15 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
       return false;
     }
     StringBuilder stringBuilder = new StringBuilder(value);
-    stringBuilder.insert(cursor, c);
+    stringBuilder.insert(viewShifter.cursor(), c);
     value = stringBuilder.toString();
     int len = currentDimension().width();
-    if(cursor < value.length() && len < value.length()) {
-      cursorOffset++;
+    viewShifter.viewSize(currentDimension().width());
+    viewShifter.bufferSize(value.length());
+    if(!viewShifter.cursorAtEnd() && viewShifter.viewLesserThanBuffer()) {
+      viewShifter.shiftBackward(1);
     }
+
     performMoveRight();
     return true;
   }
@@ -143,9 +131,9 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
       return;
     }
     TermPos position = event.position();
-    int len = currentDimension().width();
-    int start = Math.max(0, value.length() - len - cursorOffset);
-    cursor = Math.min(start + position.x() - 1, value.length());
+    viewShifter.viewSize(currentDimension().width());
+    int cursor = viewShifter.viewIndexToBufferIndex(position.x() - 1);
+    viewShifter.cursor(cursor);
     repaint();
   }
 
@@ -177,10 +165,10 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
 
   @Override
   public void updateState(@NotNull TerminalState terminalState) {
-    int len = currentDimension().width();
-    int start = Math.max(0, value.length() - len - cursorOffset);
+    viewShifter.viewSize(currentDimension().width());
+    int cursor = viewShifter.viewCursor();
 
-    terminalState.cursorPosition(new TermPos(cursor + 1 - start, 1));
+    terminalState.cursorPosition(new TermPos(cursor + 1, 1));
     terminalState.cursorType(CursorType.BLINKING);
   }
 
