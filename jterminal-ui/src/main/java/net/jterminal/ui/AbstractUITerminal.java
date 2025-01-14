@@ -156,7 +156,8 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(!keyEvent.cancelledAction()) {
       component.processKeyEvent(keyEvent);
     }
-    if(component instanceof SelectableComponent selectableComponent) {
+    if(component instanceof SelectableComponent selectableComponent
+        && selectableComponent.isSelected()) {
       SelectableComponentKeyEvent scke
           = new SelectableComponentKeyEvent(e, keyEvent.cancelledAction());
       selectableComponent.processKeyEvent(scke);
@@ -266,6 +267,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(activeScreen == null) {
       return;
     }
+
     if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
       TermPos pos = e.terminalPosition();
       activeScreen.performSelect(pos.x(), pos.y());
