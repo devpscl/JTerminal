@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ScrollBarComponent extends Component implements Resizeable {
 
-  private ScrollBarStyle style = new DefaultScrollBarStyle();
   private final VirtualScrollBar virtualScrollBar;
 
   public ScrollBarComponent(@NotNull Axis axis) {
@@ -25,20 +24,12 @@ public class ScrollBarComponent extends Component implements Resizeable {
     return virtualScrollBar;
   }
 
-  public void style(@NotNull ScrollBarStyle style) {
-    this.style = style;
-  }
-
-  public @NotNull ScrollBarStyle style() {
-    return style;
-  }
-
   @Override
   public void paint(@NotNull TermGraphics graphics) {
     int len = virtualScrollBar.axis() == Axis.HORIZONTAL ?
         currentDimension().width() : currentDimension().height();
     virtualScrollBar.size(len);
-    virtualScrollBar.draw(new TermPos(1, 1), graphics, style);
+    virtualScrollBar.draw(new TermPos(1, 1), graphics);
   }
 
   @Override

@@ -2,6 +2,7 @@ package net.jterminal.ui.component.scrollbar;
 
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
+import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,14 +10,23 @@ public class VirtualScrollBar {
 
   private final Axis axis;
   private int size = 0;
-  private int endShrinkLevel = 10;
+  private int endShrinkLevel = 30;
   private int currentLevel = 0;
   private int totalLevel = 0;
   private int minBarSize = 1;
   private int maxBarSize = Integer.MAX_VALUE;
+  private ScrollBarStyle style = new DefaultScrollBarStyle();
 
   public VirtualScrollBar(@NotNull Axis axis) {
     this.axis = axis;
+  }
+
+  public @NotNull ScrollBarStyle scrollBarStyle() {
+    return style;
+  }
+
+  public void scrollBarStyle(@NotNull ScrollBarStyle scrollBarStyle) {
+    this.style = scrollBarStyle;
   }
 
   public @NotNull Axis axis() {
@@ -56,6 +66,13 @@ public class VirtualScrollBar {
     this.currentLevel = Math.max(0, Math.min(index, this.totalLevel));
   }
 
+  public void setup(@NotNull ViewShifter viewShifter, boolean reversed) {
+    int maxOffset = viewShifter.maxOffset();
+    int offset = viewShifter.offset();
+    totalLevel(maxOffset + 1);
+    currentLevelIndex(reversed ? maxOffset - offset : offset);
+  }
+
   public int minBarSize() {
     return minBarSize;
   }
@@ -84,13 +101,14 @@ public class VirtualScrollBar {
     final int scrollableSize = size - 2;
     final int maxSize = Math.min(maxBarSize, scrollableSize);
     final int levelEndIndex = totalLevel - 1;
+    final int safeCurrentLevel = Math.max(0, Math.min(currentLevel, totalLevel - 1));
 
     double levelShrinkQuote = Math.min(0, 1D - ((double) levelEndIndex / endShrinkLevel));
     double offsetLength = (maxSize - minBarSize) * levelShrinkQuote;
     int barLength = Math.max(minBarSize, (int) Math.floor(offsetLength) + minBarSize);
     int halfBarLength = (int) Math.floor(barLength/2D);
     double halfBarLengthD = barLength/2D;
-    double levelPortion = (double) currentLevel / levelEndIndex;
+    double levelPortion = (double) safeCurrentLevel / levelEndIndex;
     double regionEnd = scrollableSize - halfBarLengthD;
     double offsetPosition = (regionEnd-halfBarLengthD) * levelPortion;
 
@@ -102,13 +120,11 @@ public class VirtualScrollBar {
     return new ScrollBarActiveRegion(start, end);
   }
 
-  public void draw(@NotNull TermPos pos, @NotNull TermGraphics graphics,
-      @NotNull ScrollBarStyle style) {
-    draw(pos.x(), pos.y(), graphics, style);
+  public void draw(@NotNull TermPos pos, @NotNull TermGraphics graphics) {
+    draw(pos.x(), pos.y(), graphics);
   }
 
-  public void draw(int x, int y, @NotNull TermGraphics graphics,
-      @NotNull ScrollBarStyle style) {
+  public void draw(int x, int y, @NotNull TermGraphics graphics) {
     if(size < 2) {
       return;
     }
