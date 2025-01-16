@@ -6,10 +6,10 @@ public class ViewShifter {
   private int viewSize;
   private int offset;
   private int cursor;
-  private final boolean delayedShift;
+  private final boolean textShifter;
 
-  public ViewShifter(boolean delayedShift) {
-    this.delayedShift = delayedShift;
+  public ViewShifter(boolean textShifter) {
+    this.textShifter = textShifter;
   }
 
   public int maxOffset() {
@@ -45,14 +45,14 @@ public class ViewShifter {
   }
 
   public void cursor(int cursor) {
-    if(delayedShift) {
+    if(textShifter) {
       this.cursor = Math.max(0, Math.min(bufferSize, cursor));
     } else {
       this.cursor = Math.max(0, Math.min(bufferSize - 1, cursor));
     }
     int minOffset = Math.max(0, bufferSize - this.cursor - viewSize);
     int maxOffset = Math.max(0, bufferSize - this.cursor);
-    if(!delayedShift) {
+    if(!textShifter) {
       maxOffset = maxOffset > 0 ? maxOffset - 1 : maxOffset;
     }
     this.offset = Math.min(maxOffset, Math.max(minOffset, offset));
