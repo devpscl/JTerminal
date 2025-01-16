@@ -67,6 +67,11 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
+  public @NotNull TextStyle style() {
+    return TextStyle.create(foregroundColor, backgroundColor, fonts);
+  }
+
+  @Override
   public @NotNull TermGraphics resetStyle() {
     this.foregroundColor = null;
     this.backgroundColor = null;

@@ -23,6 +23,8 @@ public interface TermGraphics {
 
   @NotNull TermGraphics style(@Nullable TextStyle textStyle);
 
+  @NotNull TextStyle style();
+
   @NotNull TermGraphics resetStyle();
 
   @NotNull TermGraphics foregroundColor(@Nullable ForegroundColor foregroundColor);
