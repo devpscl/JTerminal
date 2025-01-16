@@ -4,7 +4,6 @@ import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class VirtualScrollBar {
 
