@@ -156,6 +156,9 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(!keyEvent.cancelledAction()) {
       component.processKeyEvent(keyEvent);
     }
+    if(keyEvent.cancelledAction() && component instanceof TermScreen) {
+      return false;
+    }
     if(component instanceof SelectableComponent selectableComponent
         && selectableComponent.isSelected()) {
       SelectableComponentKeyEvent scke
@@ -179,6 +182,9 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     component.eventBus().post(e);
     if(!e.cancelledAction()) {
       component.processMouseEvent(e);
+    }
+    if(e.cancelledAction() && component instanceof TermScreen) {
+      return;
     }
     if(component instanceof Container c) {
       for (Component child : c.components()) {
