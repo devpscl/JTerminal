@@ -67,7 +67,6 @@ public class ScrollBarComponent extends Component implements Resizeable {
     if(virtualScrollBar.suffixCharPosition(new TermPos()).equals(position)) {
       virtualScrollBar.scrollDown(1);
       repaint();
-      return;
     }
   }
 
