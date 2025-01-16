@@ -29,7 +29,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
 
   private String value;
-  private final ViewShifter viewShifter = new ViewShifter();
+  private final ViewShifter viewShifter = new ViewShifter(true);
   private CursorType cursorType = CursorType.BLINKING;
 
   public TextFieldComponent() {
