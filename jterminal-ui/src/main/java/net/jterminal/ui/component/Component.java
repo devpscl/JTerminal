@@ -44,6 +44,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
 
   public Component() {
      id = idCounter.getAndIncrement();
+     eventBus.register(this);
   }
 
   public @NotNull Component asComponent() {
