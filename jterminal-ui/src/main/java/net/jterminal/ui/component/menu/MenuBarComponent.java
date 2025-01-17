@@ -3,7 +3,6 @@ package net.jterminal.ui.component.menu;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.swing.text.Position;
 import net.jterminal.annotation.SubscribeEvent;
 import net.jterminal.input.Keyboard;
 import net.jterminal.input.Keyboard.State;
