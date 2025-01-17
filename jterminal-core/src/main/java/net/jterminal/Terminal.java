@@ -558,6 +558,10 @@ public interface Terminal {
     return type.cast(terminal);
   }
 
+  static boolean isSet() {
+    return InternalFields.instance != null;
+  }
+
   /**
    * The enum Execution mode.
    */
