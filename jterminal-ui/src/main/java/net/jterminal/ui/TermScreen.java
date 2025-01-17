@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import net.jterminal.ui.component.Component;
+import net.jterminal.ui.component.HeadSurfacePainter;
 import net.jterminal.ui.component.PaneContainer;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentSelectEvent;
 import net.jterminal.ui.event.component.ComponentUnselectEvent;
+import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.selector.SelectionResult;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
@@ -73,6 +76,19 @@ public class TermScreen extends PaneContainer {
   @Override
   public @NotNull TermPos currentDisplayPosition() {
     return new TermPos(1, 1);
+  }
+
+  @Override
+  public void paint(@NotNull TermGraphics graphics) {
+    super.paint(graphics);
+    for (Component component : deepComponents()) {
+      if(component instanceof HeadSurfacePainter painter) {
+        if(!component.isVisible()) {
+          continue;
+        }
+        painter.paintGlobal(graphics);
+      }
+    }
   }
 
   public void select(@NotNull SelectableComponent selectedComponent) {

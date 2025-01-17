@@ -17,6 +17,7 @@ import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
+import net.jterminal.ui.component.HeadSurfacePainter;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.ScreenCloseEvent;
 import net.jterminal.ui.event.ScreenOpenEvent;
@@ -273,7 +274,18 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(activeScreen == null) {
       return;
     }
-
+    boolean cancelled = false;
+    for (Component deepComponent : activeScreen.deepComponents()) {
+      if(!deepComponent.isEnabled()) {
+        continue;
+      }
+      if(deepComponent instanceof HeadSurfacePainter headSurfacePainter) {
+        cancelled |= !headSurfacePainter.processGlobalMouseInput(e);
+      }
+    }
+    if(cancelled) {
+      return;
+    }
     if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
       TermPos pos = e.terminalPosition();
       activeScreen.performSelect(pos.x(), pos.y());
