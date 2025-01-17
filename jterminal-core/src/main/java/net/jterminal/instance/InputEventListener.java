@@ -78,9 +78,14 @@ class InputEventListener {
   }
 
   public void stop() {
-    stopped = true;
-    condition.signalAll();
-    terminalInput.close();
+    lock.lock();
+    try {
+      stopped = true;
+      condition.signalAll();
+      terminalInput.close();
+    } finally {
+      lock.unlock();
+    }
   }
 
 }
