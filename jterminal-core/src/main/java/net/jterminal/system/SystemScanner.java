@@ -30,8 +30,10 @@ class SystemScanner {
   public static @NotNull ProcessorArchitecture detectArchitecture() {
     String propertyValue = System.getProperty(PROP_OS_ARCH);
     for (ProcessorArchitecture architecture : ProcessorArchitecture.values()) {
-      if(propertyValue.equalsIgnoreCase(architecture.mnemonic())) {
-        return architecture;
+      for (String name : architecture.names()) {
+        if(propertyValue.equalsIgnoreCase(name)) {
+          return architecture;
+        }
       }
     }
     return ProcessorArchitecture.UNKNOWN;
