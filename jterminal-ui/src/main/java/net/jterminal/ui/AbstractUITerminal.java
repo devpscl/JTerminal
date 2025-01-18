@@ -55,7 +55,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   public void initialize() throws TerminalProviderException {
     super.initialize();
     inputEventListenerEnabled(true);
-    flags(FLAG_EXTENDED_INPUT | FLAG_WINDOW_INPUT | FLAG_MOUSE_INPUT);
+    flags(FLAG_EXTENDED_INPUT | FLAG_WINDOW_INPUT | FLAG_MOUSE_INPUT | FLAG_SIGNAL_INPUT);
     eventBus().register(this);
   }
 
