@@ -45,8 +45,9 @@ void Window::setCursor(const pos_t& pos) {
 void Window::getDimension(dim_t* dim_ptr) {
   CONSOLE_SCREEN_BUFFER_INFO buffer_info;
   GetConsoleScreenBufferInfo(STDOUT_HANDLE, &buffer_info);
-  uint16_t width = buffer_info.dwSize.X;
-  uint16_t height = buffer_info.dwSize.Y;
+  uint16_t height = buffer_info.srWindow.Bottom - buffer_info.srWindow.Top  + 1;
+  uint16_t width = buffer_info.srWindow.Right  - buffer_info.srWindow.Left + 1;
+
   dim_ptr->width = width;
   dim_ptr->height = height;
 }
