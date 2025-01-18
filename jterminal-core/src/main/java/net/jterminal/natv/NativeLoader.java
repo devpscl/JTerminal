@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import net.jterminal.Terminal;
 import net.jterminal.annotation.NativeType;
+import net.jterminal.system.SystemInfo;
 import net.jterminal.system.UnsupportedSystemException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,7 +67,7 @@ public class NativeLoader {
     }
     NativeLibrary library = new NativeLibrary(name, version);
     if(!library.isSupportedForCurrent()) {
-      throw new UnsupportedSystemException();
+      throw new UnsupportedSystemException(SystemInfo.current().toString());
     }
     NativeLink link = new NativeLink(library, nativeTypeClass);
     File file = library.temporaryFile();
