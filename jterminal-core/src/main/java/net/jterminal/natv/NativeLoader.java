@@ -72,7 +72,10 @@ public class NativeLoader {
     NativeLink link = new NativeLink(library, nativeTypeClass);
     File file = library.temporaryFile();
     if(!dir.exists()) {
-      dir.mkdir();
+      if(!dir.mkdir()) {
+        Terminal.LOGGER.warn("Failed to create java native directory: {}",
+            dir.getAbsolutePath());
+      }
     }
     if(!file.exists() || Terminal.PropertyManager.isNoLibraryCache()) {
       try {
