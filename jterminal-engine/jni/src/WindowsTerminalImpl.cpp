@@ -59,6 +59,9 @@ JNIEXPORT jintArray JNICALL Java_net_jterminal_windows_WindowsTerminalImpl_getWi
 JNIEXPORT jboolean JNICALL Java_net_jterminal_windows_WindowsTerminalImpl_isWindowOnFocus
   (JNIEnv* env, jobject) {
   HWND console_window = GetConsoleWindow();
+  if(console_window == nullptr) {
+    return false;
+  }
   return GetForegroundWindow() == console_window;
 }
 
