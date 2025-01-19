@@ -1,10 +1,14 @@
 package net.jterminal.util;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class StringUtil {
+
+  public static final Pattern NEXT_LINE_PATTERN =
+      Pattern.compile("(?<!\\\\)\\n");
 
   public static final String EMPTY_STRING = "";
 
