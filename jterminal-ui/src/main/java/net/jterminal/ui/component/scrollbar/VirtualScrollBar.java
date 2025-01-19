@@ -2,6 +2,7 @@ package net.jterminal.ui.component.scrollbar;
 
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
+import net.jterminal.ui.util.MathUtil;
 import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +70,7 @@ public class VirtualScrollBar {
   public void setup(@NotNull ViewShifter viewShifter, boolean reversed) {
     int maxOffset = viewShifter.maxShift();
     int offset = viewShifter.shift();
-    totalLevel(maxOffset + 1);
+    totalLevel(maxOffset);
     currentLevelIndex(reversed ? maxOffset - offset : offset);
   }
 
@@ -101,11 +102,13 @@ public class VirtualScrollBar {
     final int scrollableSize = size - 2;
     final int maxSize = Math.min(maxBarSize, scrollableSize);
     final int levelEndIndex = totalLevel - 1;
-    final int safeCurrentLevel = Math.max(0, Math.min(currentLevel, totalLevel - 1));
+    final int safeCurrentLevel = MathUtil.nonNegative(Math.min(currentLevel, totalLevel - 1));
 
-    double levelShrinkQuote = Math.min(0, 1D - ((double) levelEndIndex / endShrinkLevel));
+    double levelShrinkQuote =
+        MathUtil.nonNegative(1D - ((double) levelEndIndex / endShrinkLevel));
     double offsetLength = (maxSize - minBarSize) * levelShrinkQuote;
     int barLength = Math.max(minBarSize, (int) Math.floor(offsetLength) + minBarSize);
+
     int halfBarLength = (int) Math.floor(barLength/2D);
     double halfBarLengthD = barLength/2D;
     double levelPortion = (double) safeCurrentLevel / levelEndIndex;
@@ -120,11 +123,7 @@ public class VirtualScrollBar {
     return new ScrollBarActiveRegion(start, end);
   }
 
-  public void draw(@NotNull TermPos pos, @NotNull TermGraphics graphics) {
-    draw(pos.x(), pos.y(), graphics);
-  }
-
-  public void draw(int x, int y, @NotNull TermGraphics graphics) {
+  public void draw(@NotNull TermGraphics graphics) {
     if(size < 2) {
       return;
     }

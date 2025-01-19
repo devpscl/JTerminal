@@ -87,6 +87,7 @@ public class ListComponent extends SelectableComponent implements Resizeable {
       return;
     }
     scrollBar.setup(viewShifter, false);
+    scrollBar.endShrinkLevel(viewShifter.viewSize() / 4);
   }
 
   public void elements(List<String> elements) {
@@ -122,7 +123,7 @@ public class ListComponent extends SelectableComponent implements Resizeable {
       scrollBar.size(len);
       TermGraphics innerGraphics = TermGraphics.create(1, len);
       innerGraphics.style(initStyle);
-      scrollBar.draw(1, 1, innerGraphics);
+      scrollBar.draw(innerGraphics);
       graphics.draw(currentDimension().width(), 1, innerGraphics);
     }
   }

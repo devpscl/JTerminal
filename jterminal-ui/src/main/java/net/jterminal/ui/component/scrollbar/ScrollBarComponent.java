@@ -29,7 +29,7 @@ public class ScrollBarComponent extends Component implements Resizeable {
     int len = virtualScrollBar.axis() == Axis.HORIZONTAL ?
         currentDimension().width() : currentDimension().height();
     virtualScrollBar.size(len);
-    virtualScrollBar.draw(new TermPos(1, 1), graphics);
+    virtualScrollBar.draw(graphics);
   }
 
   @Override
