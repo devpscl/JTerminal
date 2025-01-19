@@ -223,6 +223,17 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
   }
 
   @Override
+  public @NotNull TermStringBuilder deleteAt(int index) {
+    sb.deleteCharAt(index);
+    IndexedStyleData prefix = data.sub(-1, index);
+    IndexedStyleData suffix = data.sub(index + 1, -1).shift(-1);
+    prefix.mix(suffix);
+    data.clear();
+    data.assign(prefix, false);
+    return this;
+  }
+
+  @Override
   public @NotNull TextStyle getStyle(int pos) {
     return data.at(pos);
   }

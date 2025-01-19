@@ -66,6 +66,8 @@ public interface TermStringBuilder {
 
   @NotNull TermStringBuilder replace(int start, int end, TermString termString);
 
+  @NotNull TermStringBuilder deleteAt(int index);
+
   @NotNull TextStyle getStyle(int pos);
 
   @NotNull TermString build();
