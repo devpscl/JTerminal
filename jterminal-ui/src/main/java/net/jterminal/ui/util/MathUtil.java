@@ -10,4 +10,8 @@ public class MathUtil {
     return Math.max(value, 0);
   }
 
+  public static double nonNegative(double value) {
+    return Math.max(value, 0);
+  }
+
 }
