@@ -1,19 +1,41 @@
 package net.jterminal.ui.util;
 
+import static java.lang.Math.min;
+import static net.jterminal.ui.util.MathUtil.*;
+
+import org.jetbrains.annotations.NotNull;
+
 public class ViewShifter {
+
+  public enum Type {
+    INDEX_SHIFTER,
+    POINTER_SHIFTER
+  }
 
   private int bufferSize;
   private int viewSize;
-  private int offset;
+  private int shift;
   private int cursor;
-  private final boolean textShifter;
+  private final Type type;
 
-  public ViewShifter(boolean textShifter) {
-    this.textShifter = textShifter;
+  public ViewShifter(Type type) {
+    this.type = type;
   }
 
-  public int maxOffset() {
-    return Math.max(0, bufferSize - viewSize);
+  public @NotNull Type type() {
+    return type;
+  }
+
+  private int modifiedBufferSize() {
+    return type == Type.INDEX_SHIFTER ? nonNegative(bufferSize - 1) : bufferSize;
+  }
+
+  private int modifiedViewSize() {
+    return type == Type.INDEX_SHIFTER ? nonNegative(viewSize - 1) : viewSize;
+  }
+
+  public int maxShift() {
+    return nonNegative(modifiedBufferSize() - modifiedViewSize());
   }
 
   public int bufferSize() {
@@ -40,47 +62,44 @@ public class ViewShifter {
     return cursor;
   }
 
-  public int offset() {
-    return offset;
+  public int shift() {
+    return shift;
   }
 
   public void cursor(int cursor) {
-    if(textShifter) {
-      this.cursor = Math.max(0, Math.min(bufferSize, cursor));
-    } else {
-      this.cursor = Math.max(0, Math.min(bufferSize - 1, cursor));
+    this.cursor = range(cursor, 0, modifiedBufferSize());
+    final int minShift = nonNegative(this.cursor - modifiedViewSize());
+    final int maxShift = nonNegative(this.cursor);
+    if(!viewLesserThanBuffer()) {
+      shift = 0;
+      return;
     }
-    int minOffset = Math.max(0, bufferSize - this.cursor - viewSize);
-    int maxOffset = Math.max(0, bufferSize - this.cursor);
-    if(!textShifter) {
-      maxOffset = maxOffset > 0 ? maxOffset - 1 : maxOffset;
-    }
-    this.offset = Math.min(maxOffset, Math.max(minOffset, offset));
+    shift = range(shift, minShift, maxShift);
   }
 
-  public void offset(int offset) {
-    this.offset = Math.max(0, Math.min(bufferSize - viewSize, offset));
-    int minCursor = bufferSize - this.offset - viewSize;
-    int maxCursor = bufferSize - this.offset;
-    this.cursor = Math.min(maxCursor, Math.max(minCursor, cursor));
+  public void shift(int shift) {
+    this.shift = range(shift, 0, maxShift());
+    final int minCursor = nonNegative(this.shift);
+    final int maxCursor = this.shift + modifiedViewSize();
+    this.cursor = range(cursor, minCursor, maxCursor);
   }
 
   public void backwardAll() {
     cursor = 0;
-    offset = bufferSize - viewSize;
+    shift = 0;
   }
 
   public void forwardAll() {
-    cursor = bufferSize;
-    offset = 0;
+    cursor = modifiedBufferSize();
+    shift = maxShift();
   }
 
   public void shiftBackward(int n) {
-    offset(offset + n);
+    shift(shift - n);
   }
 
   public void shiftForward(int n) {
-    offset(offset - n);
+    shift(shift + n);
   }
 
   public void backward(int n) {
@@ -92,15 +111,15 @@ public class ViewShifter {
   }
 
   public int bufferStart() {
-    return Math.max(0, bufferSize - viewSize - offset);
+    return nonNegative(shift);
   }
 
   public int bufferEnd() {
-    return bufferSize - offset;
+    return min(shift + viewSize, bufferSize);
   }
 
   public int viewCursor() {
-    return cursor - Math.max(0, bufferSize - viewSize - offset);
+    return nonNegative(cursor - shift);
   }
 
   public int viewIndexToBufferIndex(int viewCursor) {
@@ -108,7 +127,7 @@ public class ViewShifter {
   }
 
   public boolean cursorAtEnd() {
-    return cursor >= bufferSize;
+    return cursor >= modifiedBufferSize();
   }
 
   public boolean cursorAtStart() {
@@ -116,7 +135,7 @@ public class ViewShifter {
   }
 
   public boolean viewCursorAtEnd() {
-    return cursor >= viewSize;
+    return cursor >= modifiedViewSize();
   }
 
   public boolean viewCursorAtStart() {
@@ -124,11 +143,11 @@ public class ViewShifter {
   }
 
   public boolean viewGreaterThanBuffer() {
-    return viewSize >= bufferSize;
+    return modifiedViewSize() >= modifiedBufferSize();
   }
 
   public boolean viewLesserThanBuffer() {
-    return viewSize <= bufferSize;
+    return modifiedViewSize() <= modifiedBufferSize();
   }
 
 }

@@ -67,8 +67,8 @@ public class VirtualScrollBar {
   }
 
   public void setup(@NotNull ViewShifter viewShifter, boolean reversed) {
-    int maxOffset = viewShifter.maxOffset();
-    int offset = viewShifter.offset();
+    int maxOffset = viewShifter.maxShift();
+    int offset = viewShifter.shift();
     totalLevel(maxOffset + 1);
     currentLevelIndex(reversed ? maxOffset - offset : offset);
   }

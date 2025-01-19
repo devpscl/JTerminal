@@ -15,6 +15,7 @@ import net.jterminal.ui.graphics.TerminalState.CursorType;
 import net.jterminal.ui.layout.Layout.DimensionValue;
 import net.jterminal.ui.layout.Layout.Modifier;
 import net.jterminal.ui.util.ViewShifter;
+import net.jterminal.ui.util.ViewShifter.Type;
 import net.jterminal.util.CharFilter;
 import net.jterminal.util.CharFilter.CharType;
 import net.jterminal.util.TermDim;
@@ -29,7 +30,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
 
   private String value;
-  private final ViewShifter viewShifter = new ViewShifter(true);
+  private final ViewShifter viewShifter = new ViewShifter(Type.POINTER_SHIFTER);
   private CursorType cursorType = CursorType.BLINKING;
 
   public TextFieldComponent() {
@@ -111,10 +112,6 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
     int len = currentDimension().width();
     viewShifter.viewSize(currentDimension().width());
     viewShifter.bufferSize(value.length());
-    if(!viewShifter.cursorAtEnd() && viewShifter.viewLesserThanBuffer()) {
-      viewShifter.shiftBackward(1);
-    }
-
     performMoveRight();
     return true;
   }

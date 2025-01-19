@@ -2,7 +2,6 @@ package net.jterminal.ui.component.selectable;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.jterminal.Terminal;
 import net.jterminal.input.Keyboard;
 import net.jterminal.input.Keyboard.State;
 import net.jterminal.input.Mouse.Action;
@@ -17,13 +16,14 @@ import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.ViewShifter;
+import net.jterminal.ui.util.ViewShifter.Type;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ListComponent extends SelectableComponent implements Resizeable {
 
-  private final ViewShifter viewShifter = new ViewShifter(false);
+  private final ViewShifter viewShifter = new ViewShifter(Type.INDEX_SHIFTER);
   private List<String> elements = new ArrayList<>();
   private TextStyle cursorStyle = TextStyle.create(
       null, null, TextFont.REVERSED);
@@ -86,7 +86,7 @@ public class ListComponent extends SelectableComponent implements Resizeable {
     if(scrollBar == null) {
       return;
     }
-    scrollBar.setup(viewShifter, true);
+    scrollBar.setup(viewShifter, false);
   }
 
   public void elements(List<String> elements) {
@@ -148,7 +148,6 @@ public class ListComponent extends SelectableComponent implements Resizeable {
       updateScrollBar();
       event.interceptInput(true);
       repaint();
-      Terminal.get().title(viewShifter.offset() + ", " + viewShifter.cursor());
     }
     if(key == Keyboard.KEY_ENTER) {
       int current = viewShifter.cursor();
