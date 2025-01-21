@@ -35,7 +35,7 @@ public interface IndexedStyleData {
 
   void assign(@NotNull IndexedStyleData indexedStyleData, boolean copy);
 
-  @NotNull IndexedStyleData clone();
+  @NotNull IndexedStyleData copy();
 
   record IndexEntry(int index, @NotNull TextStyle textStyle) {}
 

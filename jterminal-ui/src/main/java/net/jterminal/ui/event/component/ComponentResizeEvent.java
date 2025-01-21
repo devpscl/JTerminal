@@ -15,10 +15,10 @@ public class ComponentResizeEvent implements Event {
   }
 
   public @NotNull TermDim oldDimension() {
-    return oldDimension.clone();
+    return oldDimension.copy();
   }
 
   public @NotNull TermDim newDimension() {
-    return newDimension.clone();
+    return newDimension.copy();
   }
 }

@@ -41,11 +41,11 @@ public class ListComponent extends SelectableComponent implements Resizeable {
   }
 
   public @NotNull TextStyle selectedStyle() {
-    return selectedStyle.clone();
+    return selectedStyle.copy();
   }
 
   public @NotNull TextStyle cursorStyle() {
-    return cursorStyle.clone();
+    return cursorStyle.copy();
   }
 
   public @NotNull List<String> elements() {

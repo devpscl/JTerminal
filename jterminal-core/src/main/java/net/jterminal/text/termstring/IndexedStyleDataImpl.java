@@ -47,14 +47,14 @@ class IndexedStyleDataImpl implements IndexedStyleData {
     List<IndexEntry> entries = new ArrayList<>();
     for (Entry<Integer, TextStyle> entry : map.entrySet()) {
       entries.add(new IndexEntry(entry.getKey(),
-          copy ? entry.getValue().clone() : entry.getValue()));
+          copy ? entry.getValue().copy() : entry.getValue()));
     }
     return entries;
   }
 
   @Override
   public @Nullable TextStyle get(int index) {
-    return map.get(index).clone();
+    return map.get(index).copy();
   }
 
   @Override
@@ -141,15 +141,15 @@ class IndexedStyleDataImpl implements IndexedStyleData {
   public void assign(@NotNull IndexedStyleData indexedStyleData, boolean copy) {
     IndexedStyleDataImpl impl = (IndexedStyleDataImpl) indexedStyleData;
     for (Entry<Integer, TextStyle> entry : impl.map.entrySet()) {
-      map.put(entry.getKey(), copy ? entry.getValue().clone() : entry.getValue());
+      map.put(entry.getKey(), copy ? entry.getValue().copy() : entry.getValue());
     }
   }
 
   @Override
-  public @NotNull IndexedStyleData clone() {
+  public @NotNull IndexedStyleData copy() {
     SortedMap<Integer, TextStyle> newMap = new TreeMap<>();
     for (Entry<Integer, TextStyle> entry : map.entrySet()) {
-      newMap.put(entry.getKey(), entry.getValue().clone());
+      newMap.put(entry.getKey(), entry.getValue().copy());
     }
     return new IndexedStyleDataImpl(newMap);
   }

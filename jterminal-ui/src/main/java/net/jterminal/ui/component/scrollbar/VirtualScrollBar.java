@@ -157,9 +157,9 @@ public class VirtualScrollBar {
 
   public @NotNull TermPos suffixCharPosition(@NotNull TermPos offset) {
     if(axis == Axis.VERTICAL) {
-      return offset.clone().addShift(new TermPos(1, size));
+      return offset.copy().addShift(new TermPos(1, size));
     }
-    return offset.clone().addShift(new TermPos(size, 1));
+    return offset.copy().addShift(new TermPos(size, 1));
   }
 
   public record ScrollBarActiveRegion(int start, int end) {}

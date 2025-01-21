@@ -206,14 +206,14 @@ public abstract class Component implements Displayable, Comparable<Component> {
     if(parent == null) {
       return new TermDim();
     }
-    return cachedDim.clone();
+    return cachedDim.copy();
   }
 
   public @NotNull TermPos currentPosition() {
     if(parent == null) {
       return new TermPos();
     }
-    return cachedPosition.clone();
+    return cachedPosition.copy();
   }
 
   public @NotNull TermPos currentDisplayPosition() {

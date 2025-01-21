@@ -187,7 +187,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         TermPos mousePos = e.position();
         TermPos effPos = child.currentPosition();
         TermDim effDim = child.currentDimension();
-        TermPos effEndPos = effPos.clone().addShift(effDim);
+        TermPos effEndPos = effPos.copy().addShift(effDim);
         int x = mousePos.x();
         int y = mousePos.y();
         if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {

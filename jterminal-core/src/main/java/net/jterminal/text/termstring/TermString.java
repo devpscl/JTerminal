@@ -116,12 +116,12 @@ public interface TermString {
 
   static @NotNull TermStringBuilder builder(@NotNull TermString termString) {
     return new TermStringBuilderImpl(new StringBuilder(termString.raw()),
-        termString.data().clone());
+        termString.data().copy());
   }
 
   static @NotNull TermStringBuilder builder(@NotNull String value,
       @NotNull IndexedStyleData data) {
-    return new TermStringBuilderImpl(value, data.clone());
+    return new TermStringBuilderImpl(value, data.copy());
   }
 
 }

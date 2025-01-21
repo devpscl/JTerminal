@@ -117,7 +117,7 @@ class TextStyleImpl implements TextStyle {
   }
 
   @Override
-  public @NotNull TextStyle clone() {
+  public @NotNull TextStyle copy() {
     return new TextStyleImpl(foregroundColor, backgroundColor, new FontMap(fontMap));
   }
 
@@ -133,7 +133,7 @@ class TextStyleImpl implements TextStyle {
     }
     return foregroundColor == impl.foregroundColor &&
         backgroundColor == impl.backgroundColor &&
-        fontMap.equals(((TextStyleImpl) obj).fontMap);
+        fontMap.equals(impl.fontMap);
   }
 
   @Override

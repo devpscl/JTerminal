@@ -72,7 +72,7 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   public @NotNull TextStyle selectedStyle() {
-    return selectedStyle.clone();
+    return selectedStyle.copy();
   }
 
   public int tabCount() {

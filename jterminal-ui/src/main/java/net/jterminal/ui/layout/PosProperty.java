@@ -30,18 +30,18 @@ public class PosProperty {
   }
 
   public int calculateX(@NotNull TermDim dimension) {
-    int value = positionValue.x(dimension.clone());
+    int value = positionValue.x(dimension.copy());
     for (Modifier modifier : modifiers) {
-      value = modifier.get(dimension.clone(), value, Axis.HORIZONTAL);
+      value = modifier.get(dimension.copy(), value, Axis.HORIZONTAL);
     }
     value = Math.max(1, Math.min(value, dimension.width()));
     return value;
   }
 
   public int calculateY(@NotNull TermDim dimension) {
-    int value = positionValue.y(dimension.clone());
+    int value = positionValue.y(dimension.copy());
     for (Modifier modifier : modifiers) {
-      value = modifier.get(dimension.clone(), value, Axis.VERTICAL);
+      value = modifier.get(dimension.copy(), value, Axis.VERTICAL);
     }
     value = Math.max(1, Math.min(value, dimension.height()));
     return value;

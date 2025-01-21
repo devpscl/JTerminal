@@ -28,7 +28,7 @@ public class TerminalBuffer {
 
   public TerminalBuffer(@NotNull TerminalBuffer buffer) {
     stringBuffer = new StringBuilder(buffer.stringBuffer);
-    textStyle = buffer.textStyle.clone();
+    textStyle = buffer.textStyle.copy();
   }
 
   public TerminalBuffer append(Object x) {

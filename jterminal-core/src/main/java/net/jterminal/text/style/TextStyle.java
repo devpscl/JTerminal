@@ -58,7 +58,7 @@ public interface TextStyle {
   FontMap fontMap();
 
   @NotNull
-  TextStyle clone();
+  TextStyle copy();
 
   TextStyle asExplicitStyle();
 

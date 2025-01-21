@@ -33,7 +33,7 @@ public class TerminalState {
     if(cursorPosition == null) {
       return null;
     }
-    return cursorPosition.clone();
+    return cursorPosition.copy();
   }
 
   public void cursorType(@NotNull CursorType cursorType) {

@@ -21,7 +21,7 @@ class TextElementImpl implements TextElement {
 
   public TextElementImpl(@NotNull String value, @NotNull TextStyle textStyle) {
     this.value = value;
-    this.textStyle = textStyle.clone();
+    this.textStyle = textStyle.copy();
   }
 
   @Override

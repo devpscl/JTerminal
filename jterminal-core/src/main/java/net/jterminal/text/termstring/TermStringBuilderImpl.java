@@ -258,7 +258,7 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
 
   @Override
   public @NotNull TermString build() {
-    return new TermStringImpl(sb.toString(), data.clone());
+    return new TermStringImpl(sb.toString(), data.copy());
   }
 
   public @NotNull TermString getNoCopy() {

@@ -215,8 +215,7 @@ public final class TermPos {
     return "POS(" + x + ", " + y + ")";
   }
 
-
-  public @NotNull TermPos clone() {
+  public @NotNull TermPos copy() {
     return new TermPos(this.x, this.y);
   }
 

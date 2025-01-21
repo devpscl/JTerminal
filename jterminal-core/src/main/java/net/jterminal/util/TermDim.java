@@ -74,7 +74,7 @@ public final class TermDim {
     return "DIM(" + width + ", " + height + ")";
   }
 
-  public @NotNull TermDim clone() {
+  public @NotNull TermDim copy() {
     return new TermDim(width, height);
   }
 

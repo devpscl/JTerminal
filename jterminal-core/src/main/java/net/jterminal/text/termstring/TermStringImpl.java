@@ -52,7 +52,7 @@ class TermStringImpl implements TermString {
 
   @Override
   public @NotNull TermString replace(char from, char to) {
-    return new TermStringImpl(value.replace(from, to), indexedStyleData.clone());
+    return new TermStringImpl(value.replace(from, to), indexedStyleData.copy());
   }
 
   @Override
@@ -271,6 +271,6 @@ class TermStringImpl implements TermString {
 
   @Override
   public @NotNull TermString clone() {
-    return new TermStringImpl(value, indexedStyleData.clone());
+    return new TermStringImpl(value, indexedStyleData.copy());
   }
 }

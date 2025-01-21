@@ -69,13 +69,13 @@ public class ComponentMouseEvent implements Event {
   }
 
   public @NotNull ComponentMouseEvent shiftPosition(@NotNull TermPos origin) {
-    TermPos tpos = terminalPosition.clone().subtractShift(origin);
+    TermPos tpos = terminalPosition.copy().subtractShift(origin);
     return new ComponentMouseEvent(button, action, tpos, cancelledAction,
         intercept, ignoreChildComponents);
   }
 
   public @NotNull ComponentMouseEvent copy() {
-    return new ComponentMouseEvent(button, action, terminalPosition.clone(),
+    return new ComponentMouseEvent(button, action, terminalPosition.copy(),
         cancelledAction, intercept, ignoreChildComponents);
   }
 

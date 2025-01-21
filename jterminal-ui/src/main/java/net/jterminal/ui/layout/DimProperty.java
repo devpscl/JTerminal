@@ -31,18 +31,18 @@ public class DimProperty {
   }
 
   public int calculateWidth(@NotNull TermDim dimension, @NotNull TermPos position) {
-    int value = dimensionValue.width(dimension.clone(), position.clone());
+    int value = dimensionValue.width(dimension.copy(), position.copy());
     for (Modifier modifier : modifiers) {
-      value = modifier.get(dimension.clone(), value, Axis.HORIZONTAL);
+      value = modifier.get(dimension.copy(), value, Axis.HORIZONTAL);
     }
     value = Math.max(0, Math.min(value, dimension.width() - position.x() + TermPos.AXIS_ORIGIN));
     return value;
   }
 
   public int calculateHeight(@NotNull TermDim dimension, @NotNull TermPos position) {
-    int value = dimensionValue.height(dimension.clone(), position.clone());
+    int value = dimensionValue.height(dimension.copy(), position.copy());
     for (Modifier modifier : modifiers) {
-      value = modifier.get(dimension.clone(), value, Axis.VERTICAL);
+      value = modifier.get(dimension.copy(), value, Axis.VERTICAL);
     }
     value = Math.max(0, Math.min(value, dimension.height() - position.y() + TermPos.AXIS_ORIGIN));
     return value;

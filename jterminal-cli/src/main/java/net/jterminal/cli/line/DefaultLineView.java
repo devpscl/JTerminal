@@ -46,7 +46,7 @@ class DefaultLineView implements LineView {
   public @NotNull TermPos cursorPos(@NotNull TermPos origin) {
     int x = cursor % (preferredWindowSize.width());
     int y = cursor / (preferredWindowSize.width());
-    return origin.clone().addX(x).addY(y);
+    return origin.copy().addX(x).addY(y);
   }
 
   @Override
