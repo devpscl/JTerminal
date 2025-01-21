@@ -13,7 +13,7 @@ import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TermGraphicsImpl implements TermGraphics {
+class TermGraphicsImpl implements TermGraphics {
 
   private final CellBuffer buffer;
   private final int xOff;
@@ -23,15 +23,17 @@ public class TermGraphicsImpl implements TermGraphics {
   private ForegroundColor foregroundColor;
   private BackgroundColor backgroundColor;
   private TextFont[] fonts;
+  private final TextStyle initStyle;
 
   public TermGraphicsImpl(@NotNull CellBuffer cellBuffer, int xOff, int yOff,
-      int width, int height) {
+      int width, int height, @NotNull TextStyle initStyle) {
     this.buffer = cellBuffer;
     this.xOff = xOff;
     this.yOff = yOff;
     this.width = width;
     this.height = height;
-    resetStyle();
+    this.initStyle = initStyle;
+    style(initStyle);
   }
 
   @Override
@@ -72,10 +74,13 @@ public class TermGraphicsImpl implements TermGraphics {
   }
 
   @Override
+  public @NotNull TextStyle initStyle() {
+    return initStyle.copy();
+  }
+
+  @Override
   public @NotNull TermGraphics resetStyle() {
-    this.foregroundColor = null;
-    this.backgroundColor = null;
-    this.fonts = new TextFont[0];
+    style(initStyle);
     return this;
   }
 

@@ -25,6 +25,8 @@ public interface TermGraphics {
 
   @NotNull TextStyle style();
 
+  @NotNull TextStyle initStyle();
+
   @NotNull TermGraphics resetStyle();
 
   @NotNull TermGraphics foregroundColor(@Nullable ForegroundColor foregroundColor);
@@ -95,18 +97,46 @@ public interface TermGraphics {
   }
 
   static @NotNull TermGraphics create(int width, int height) {
-    CellBuffer buffer = new CellBuffer(width, height);
-    return new TermGraphicsImpl(buffer, -1, -1, width, height);
+    return create(width, height, TextStyle.create());
   }
 
   static @NotNull TermGraphics create(int width, int height, @NotNull CellData cellData) {
-    CellBuffer buffer = new CellBuffer(width, height, cellData);
-    return new TermGraphicsImpl(buffer, -1, -1, width, height);
+    return create(width, height, cellData, TextStyle.create());
   }
 
   static @NotNull TermGraphics from(@NotNull CellBuffer buffer) {
+    return from(buffer, TextStyle.create());
+  }
+
+  static @NotNull TermGraphics create(@NotNull TermDim dim, @NotNull CellData cellData,
+      @NotNull TextStyle initStyle) {
+    return create(dim.width(), dim.height(), cellData, initStyle);
+  }
+
+  static @NotNull TermGraphics create(@NotNull TermDim dim, @NotNull TextStyle initStyle) {
+    return create(dim.width(), dim.height(), initStyle);
+  }
+
+  static @NotNull TermGraphics create(int width, int height, @NotNull TextStyle initStyle) {
+    CellBuffer buffer = new CellBuffer(width, height);
+    return new TermGraphicsImpl(buffer, -1, -1, width, height, initStyle);
+  }
+
+  static @NotNull TermGraphics create(int width, int height,
+      @NotNull CellData cellData, @NotNull TextStyle initStyle) {
+    CellBuffer buffer = new CellBuffer(width, height, cellData);
+    return new TermGraphicsImpl(buffer, -1, -1, width, height, initStyle);
+  }
+
+  static @NotNull TermGraphics from(@NotNull CellBuffer buffer,
+      @NotNull TextStyle initStyle) {
     return new TermGraphicsImpl(buffer, -1, -1,
-        buffer.width(), buffer.height());
+        buffer.width(), buffer.height(), initStyle);
+  }
+
+  static @NotNull TermGraphics transfer(@NotNull TermGraphics another,
+      @NotNull TextStyle initStyle) {
+    return from(another.buffer(), initStyle);
   }
 
 }
