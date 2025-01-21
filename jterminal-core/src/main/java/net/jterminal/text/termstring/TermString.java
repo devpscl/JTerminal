@@ -75,7 +75,7 @@ public interface TermString {
 
   byte[] rawBytes(@NotNull Charset charset);
 
-  @NotNull TermString clone();
+  @NotNull TermString copy();
 
   static @NotNull TermString value(@Nullable String x) {
     return new TermStringImpl(x);

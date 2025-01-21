@@ -270,7 +270,7 @@ class TermStringImpl implements TermString {
   }
 
   @Override
-  public @NotNull TermString clone() {
+  public @NotNull TermString copy() {
     return new TermStringImpl(value, indexedStyleData.copy());
   }
 }
