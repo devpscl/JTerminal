@@ -86,7 +86,7 @@ public class TermScreen extends PaneContainer {
         if(!component.isVisible()) {
           continue;
         }
-        painter.paintGlobal(graphics);
+        painter.paintSurface(graphics);
       }
     }
   }

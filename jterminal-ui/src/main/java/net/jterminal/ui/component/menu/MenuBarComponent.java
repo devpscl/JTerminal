@@ -124,7 +124,7 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   @Override
-  public void paintGlobal(@NotNull TermGraphics graphics) {
+  public void paintSurface(@NotNull TermGraphics graphics) {
     if(!isSelected()) {
       return;
     }
@@ -261,10 +261,10 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   @Override
-  public boolean processGlobalMouseInput(@NotNull MouseInputEvent event) {
-    TermPos position = event.terminalPosition();
+  public void processSurfaceMouseInput(@NotNull ComponentMouseEvent event) {
+    TermPos position = event.position();
     if(event.action() != Action.PRESS || event.button() != Button.LEFT) {
-      return true;
+      return;
     }
     if(isSelected() && selectedTab != null && position.y() > 1) {
       int startX = 1;

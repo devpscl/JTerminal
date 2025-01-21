@@ -280,7 +280,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         continue;
       }
       if(deepComponent instanceof HeadSurfacePainter headSurfacePainter) {
-        cancelled |= !headSurfacePainter.processGlobalMouseInput(e);
+        headSurfacePainter.processSurfaceMouseInput(event);
       }
     }
     if(cancelled) {
