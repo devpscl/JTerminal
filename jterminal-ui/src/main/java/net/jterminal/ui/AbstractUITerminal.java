@@ -25,7 +25,6 @@ import net.jterminal.ui.event.ScreenRenderedEvent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.component.ComponentResizeEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
@@ -154,19 +153,13 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     boolean interceptInput = false;
     ComponentKeyEvent keyEvent = new ComponentKeyEvent(e);
     component.eventBus().post(keyEvent);
-    if(!keyEvent.cancelledAction()) {
+    if(!keyEvent.isCancelledAction()) {
       component.processKeyEvent(keyEvent);
     }
-    if(keyEvent.cancelledAction() && component instanceof TermScreen) {
-      return false;
+    if(keyEvent.isIgnoreChildComponents()) {
+      return interceptInput;
     }
-    if(component instanceof SelectableComponent selectableComponent
-        && selectableComponent.isSelected()) {
-      SelectableComponentKeyEvent scke
-          = new SelectableComponentKeyEvent(e, keyEvent.cancelledAction());
-      selectableComponent.processKeyEvent(scke);
-      interceptInput = scke.interceptInput();
-    }
+    interceptInput |= keyEvent.isIntercept();
     if(component instanceof Container c) {
       for (Component child : c.components()) {
         boolean state = sendKeyInput(child, e);
@@ -176,16 +169,18 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     return interceptInput;
   }
 
-  protected void sendMouseInput(@NotNull Component component, @NotNull ComponentMouseEvent e) {
+  protected boolean sendMouseInput(@NotNull Component component, @NotNull ComponentMouseEvent e) {
     if(!component.isEnabled()) {
-      return;
+      return false;
     }
+    boolean interceptInput = false;
     component.eventBus().post(e);
-    if(!e.cancelledAction()) {
+    if(!e.isCancelledAction()) {
       component.processMouseEvent(e);
     }
-    if(e.cancelledAction() && component instanceof TermScreen) {
-      return;
+    interceptInput |= e.isIntercept();
+    if(e.isIgnoreChildComponents()) {
+      return interceptInput;
     }
     if(component instanceof Container c) {
       for (Component child : c.components()) {
@@ -199,9 +194,11 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
           continue;
         }
         ComponentMouseEvent copiedEvent = e.shiftPosition(effPos);
-        sendMouseInput(child, copiedEvent);
+        boolean state = sendMouseInput(child, copiedEvent);
+        interceptInput |= state;
       }
     }
+    return interceptInput;
   }
 
   @SubscribeEvent
@@ -274,7 +271,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(activeScreen == null) {
       return;
     }
-    boolean cancelled = false;
+    ComponentMouseEvent event = new ComponentMouseEvent(e);
     for (Component deepComponent : activeScreen.deepComponents()) {
       if(!deepComponent.isEnabled()) {
         continue;
@@ -283,15 +280,16 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         headSurfacePainter.processSurfaceMouseInput(event);
       }
     }
-    if(cancelled) {
-      return;
+    boolean intercept = event.isIntercept();
+    if(!event.isIgnoreChildComponents()) {
+      intercept |= sendMouseInput(activeScreen, event);
     }
-    if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
-      TermPos pos = e.terminalPosition();
-      activeScreen.performSelect(pos.x(), pos.y());
+    if(!intercept) {
+      if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
+        TermPos pos = e.terminalPosition();
+        activeScreen.performSelect(pos.x(), pos.y());
+      }
     }
-    ComponentMouseEvent event = new ComponentMouseEvent(e);
-    sendMouseInput(activeScreen, event);
   }
 
 }

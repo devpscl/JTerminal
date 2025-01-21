@@ -11,8 +11,8 @@ import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.component.scrollbar.VirtualScrollBar;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.ViewShifter;
@@ -129,7 +129,11 @@ public class ListComponent extends SelectableComponent implements Resizeable {
   }
 
   @Override
-  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+    super.processKeyEvent(event);
+    if(!isSelected()) {
+      return;
+    }
     int key = event.key();
     if(key == Keyboard.KEY_ARROW_UP) {
       if(event.event().state() == State.CONTROL) {
@@ -137,7 +141,7 @@ public class ListComponent extends SelectableComponent implements Resizeable {
       }
       viewShifter.backward(1);
       updateScrollBar();
-      event.interceptInput(true);
+      event.intercept(true);
       repaint();
       return;
     }
@@ -147,7 +151,7 @@ public class ListComponent extends SelectableComponent implements Resizeable {
       }
       viewShifter.forward(1);
       updateScrollBar();
-      event.interceptInput(true);
+      event.intercept(true);
       repaint();
     }
     if(key == Keyboard.KEY_ENTER) {
@@ -163,10 +167,15 @@ public class ListComponent extends SelectableComponent implements Resizeable {
   @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
     super.processMouseEvent(event);
+
     TermPos position = event.position();
     if(event.action() == Action.PRESS && event.button() == Button.LEFT) {
       int bufIdx = viewShifter.viewIndexToBufferIndex(position.y() - 1);
-      if(viewShifter.cursor() == bufIdx) {
+      if(viewShifter.cursor() == bufIdx && isSelected()) {
+        if(selectedIndex == bufIdx) {
+          select(-1);
+          return;
+        }
         select(bufIdx);
         return;
       }

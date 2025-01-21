@@ -7,7 +7,6 @@ import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.component.ComponentResizeEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
@@ -117,11 +116,6 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   }
 
   @Override
-  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
-
-  }
-
-  @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
     super.processMouseEvent(event);
     if (event.action() != Action.PRESS || event.button() != Button.LEFT) {
@@ -135,26 +129,29 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   }
 
   @Override
-  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
     super.processKeyEvent(event);
+    if(!isSelected()) {
+      return;
+    }
     switch (event.key()) {
       case KEY_BACKSPACE -> {
         performBackspace();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       case KEY_ARROW_LEFT -> {
         if(performMoveLeft()) {
-          event.interceptInput(true);
+          event.intercept(true);
         }
       }
       case KEY_ARROW_RIGHT -> {
         if(performMoveRight()) {
-          event.interceptInput(true);
+          event.intercept(true);
         }
       }
       default -> {
         if(performCharInput(event.input())) {
-          event.interceptInput(true);
+          event.intercept(true);
         }
       }
     }

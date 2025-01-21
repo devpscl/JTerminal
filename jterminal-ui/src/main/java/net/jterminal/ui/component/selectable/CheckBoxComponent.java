@@ -6,8 +6,8 @@ import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.component.Resizeable;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -64,9 +64,13 @@ public class CheckBoxComponent extends SelectableComponent implements Resizeable
   }
 
   @Override
-  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+    super.processKeyEvent(event);
+    if(!isSelected()) {
+      return;
+    }
     if(event.key() == Keyboard.KEY_ENTER) {
-      event.interceptInput(true);
+      event.intercept(true);
       checked(!checked);
     }
   }

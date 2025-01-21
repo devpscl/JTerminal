@@ -8,16 +8,15 @@ import net.jterminal.input.Keyboard;
 import net.jterminal.input.Keyboard.State;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
-import net.jterminal.input.MouseInputEvent;
 import net.jterminal.text.Combiner;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.HeadSurfacePainter;
 import net.jterminal.ui.component.selectable.SelectableComponent;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.component.ComponentSelectEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.shape.BoxShape;
 import net.jterminal.ui.layout.Layout;
@@ -170,7 +169,10 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   @Override
-  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+    if(!isSelected()) {
+      return;
+    }
     int key = event.key();
     int currentIndex = findIndex(selectedTab);
     int count = tabCount();
@@ -178,7 +180,7 @@ public class MenuBarComponent extends SelectableComponent
       if(event.event().state() == State.CONTROL) {
         return;
       }
-      event.interceptInput(true);
+      event.intercept(true);
       currentIndex = Math.max(0, currentIndex - 1);
       selectTab(tabs.get(currentIndex));
       return;
@@ -187,7 +189,7 @@ public class MenuBarComponent extends SelectableComponent
       if(event.event().state() == State.CONTROL) {
         return;
       }
-      event.interceptInput(true);
+      event.intercept(true);
       currentIndex = Math.min(count - 1, currentIndex + 1);
       selectTab(tabs.get(currentIndex));
       return;
@@ -196,7 +198,7 @@ public class MenuBarComponent extends SelectableComponent
       if(event.event().state() == State.CONTROL) {
         return;
       }
-      event.interceptInput(true);
+      event.intercept(true);
       if(selectedTab == null) {
         return;
       }
@@ -207,7 +209,7 @@ public class MenuBarComponent extends SelectableComponent
       if(event.event().state() == State.CONTROL) {
         return;
       }
-      event.interceptInput(true);
+      event.intercept(true);
       if(selectedTab == null) {
         return;
       }
@@ -218,7 +220,7 @@ public class MenuBarComponent extends SelectableComponent
       if(event.event().state() == State.CONTROL) {
         return;
       }
-      event.interceptInput(true);
+      event.intercept(true);
       if(selectedTab == null) {
         return;
       }
@@ -283,15 +285,16 @@ public class MenuBarComponent extends SelectableComponent
         if(position.x() >= startX + 1 && position.x() <= startX + width) {
           if(position.y() == offset) {
             performItemClick(idx);
-            return false;
+            event.intercept(true);
+            event.ignoreChildComponents(true);
+            return;
           }
         }
         offset++;
         idx++;
       }
-      return true;
+      return;
     }
-    return true;
   }
 
   @Override

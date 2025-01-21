@@ -4,8 +4,8 @@ import net.jterminal.input.Keyboard;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,15 +53,16 @@ public class ButtonComponent extends SelectableComponent {
   }
 
   @Override
-  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+    super.processKeyEvent(event);
     if(!isSelected()) {
       return;
     }
-    if(event.key() == Keyboard.KEY_ENTER && !event.cancelledAction()) {
+    if(event.key() == Keyboard.KEY_ENTER) {
       if(action != null) {
         action.run();
       }
-      event.interceptInput(true);
+      event.intercept(true);
     }
   }
 
@@ -71,7 +72,7 @@ public class ButtonComponent extends SelectableComponent {
       return;
     }
     if(event.action() == Action.RELEASE && event.button() == Button.LEFT) {
-      if(action != null && !event.cancelledAction()) {
+      if(action != null && !event.isCancelledAction()) {
         action.run();
       }
     }

@@ -19,8 +19,8 @@ import net.jterminal.text.termstring.TermString;
 import net.jterminal.text.termstring.TermStringBuilder;
 import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.component.scrollbar.VirtualScrollBar;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
-import net.jterminal.ui.event.component.SelectableComponentKeyEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
@@ -324,40 +324,43 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   }
 
   @Override
-  public void processKeyEvent(@NotNull SelectableComponentKeyEvent event) {
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
     super.processKeyEvent(event);
-    if(event.event().state() == State.CONTROL) {
+    if(!isSelected()) {
+      return;
+    }
+    if(event.state() == State.CONTROL) {
       return;
     }
     updateViewSize();
     switch (event.key()) {
       case KEY_BACKSPACE -> {
         performBackspace();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       case KEY_ARROW_LEFT -> {
         performMoveLeft();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       case KEY_ARROW_RIGHT -> {
         performMoveRight();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       case KEY_ARROW_UP -> {
         performMoveUp();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       case KEY_ARROW_DOWN -> {
         performMoveDown();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       case KEY_ENTER -> {
         performNewLine();
-        event.interceptInput(true);
+        event.intercept(true);
       }
       default -> {
         performCharInput(event.input());
-        event.interceptInput(true);
+        event.intercept(true);
       }
     }
   }
