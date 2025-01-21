@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.HeadSurfacePainter;
 import net.jterminal.ui.component.PaneContainer;
@@ -86,7 +87,8 @@ public class TermScreen extends PaneContainer {
         if(!component.isVisible()) {
           continue;
         }
-        painter.paintSurface(graphics);
+        TermGraphics g = TermGraphics.transfer(graphics, component.toStyle());
+        painter.paintSurface(g);
       }
     }
   }

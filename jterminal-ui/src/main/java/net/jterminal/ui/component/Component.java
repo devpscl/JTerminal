@@ -5,6 +5,7 @@ import net.jterminal.event.bus.EventBus;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
@@ -184,6 +185,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
       return parent.backgroundColor();
     }
     return backgroundColor;
+  }
+
+  public @NotNull TextStyle toStyle() {
+    return TextStyle.create(foregroundColor, backgroundColor);
   }
 
   public boolean isForegroundColorSet() {

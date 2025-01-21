@@ -132,10 +132,7 @@ public class MenuBarComponent extends SelectableComponent
       if(selectedTab == tab) {
         int width = Math.max(selectedTab.preferredWidth(), minimumMenuWidth);
         TermGraphics innerGraphics = TermGraphics.create(
-            width + 2, selectedTab.count() + 2);
-
-        innerGraphics.foregroundColor(foregroundColor());
-        innerGraphics.backgroundColor(backgroundColor());
+            width + 2, selectedTab.count() + 2, graphics.initStyle());
 
         paintTabList(innerGraphics, selectedTab);
         graphics.draw(offset, 2, innerGraphics);
@@ -147,7 +144,7 @@ public class MenuBarComponent extends SelectableComponent
 
   protected void paintTabList(@NotNull TermGraphics graphics, @NotNull MenuTab tab) {
     TermDim size = graphics.size();
-    TextStyle initStyle = graphics.style();
+    TextStyle initStyle = graphics.initStyle();
     BoxShape frameShape = new BoxShape(size);
     frameShape.addHorizontal(1, 1, size.width(), Type.DOUBLE);
     frameShape.addHorizontal(1, size.height(), size.width(), Type.DOUBLE);
@@ -163,7 +160,7 @@ public class MenuBarComponent extends SelectableComponent
         graphics.style(Combiner.combine(selectedStyle, initStyle));
       }
       graphics.drawString(2, off++, item.name());
-      graphics.style(initStyle);
+      graphics.resetStyle();
       idx++;
     }
   }

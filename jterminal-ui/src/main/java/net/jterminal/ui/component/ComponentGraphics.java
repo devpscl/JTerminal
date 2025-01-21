@@ -2,6 +2,7 @@ package net.jterminal.ui.component;
 
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
+import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.graphics.CellBuffer;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
@@ -18,7 +19,8 @@ public class ComponentGraphics {
     BackgroundColor backgroundColor = component.backgroundColor();
     CellData cellData = CellData.empty(foregroundColor, backgroundColor);
     CellBuffer buffer = new CellBuffer(component.currentDimension(), cellData);
-    TermGraphics innerGraphics = TermGraphics.from(buffer);
+    TermGraphics innerGraphics = TermGraphics.from(buffer,
+        TextStyle.create(foregroundColor, backgroundColor));
     innerGraphics.foregroundColor(foregroundColor);
     innerGraphics.backgroundColor(backgroundColor);
     component.paint(innerGraphics);

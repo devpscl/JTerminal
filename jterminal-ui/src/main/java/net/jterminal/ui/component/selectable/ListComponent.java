@@ -100,8 +100,8 @@ public class ListComponent extends SelectableComponent implements Resizeable {
   @Override
   public void paint(@NotNull TermGraphics graphics) {
     updateScrollBar();
-    final TextStyle initStyle = graphics.style();
-    final TextStyle cursorStyle = Combiner.combine(this.cursorStyle, initStyle);
+    final TextStyle defaultStyle = graphics.style();
+    final TextStyle cursorStyle = Combiner.combine(this.cursorStyle, defaultStyle);
     int len = currentDimension().height();
     viewShifter.viewSize(len);
     int start = viewShifter.bufferStart();
@@ -117,12 +117,12 @@ public class ListComponent extends SelectableComponent implements Resizeable {
         graphics.style(selectedStyle);
       }
       graphics.drawString(1, counter++, elements.get(x));
-      graphics.style(initStyle);
+      graphics.resetStyle();
     }
     if(scrollBar != null) {
       scrollBar.size(len);
       TermGraphics innerGraphics = TermGraphics.create(1, len);
-      innerGraphics.style(initStyle);
+      innerGraphics.style(defaultStyle);
       scrollBar.draw(innerGraphics);
       graphics.draw(currentDimension().width(), 1, innerGraphics);
     }

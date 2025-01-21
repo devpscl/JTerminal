@@ -15,6 +15,7 @@ import net.jterminal.input.WindowInputEvent;
 import net.jterminal.instance.AbstractNativeTerminal;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
+import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
 import net.jterminal.ui.component.HeadSurfacePainter;
@@ -106,7 +107,8 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         ForegroundColor foregroundColor = activeScreen.foregroundColor();
         BackgroundColor backgroundColor = activeScreen.backgroundColor();
         CellData cellData = CellData.empty(foregroundColor, backgroundColor);
-        TermGraphics graphics = TermGraphics.create(windowSize(), cellData);
+        TermGraphics graphics = TermGraphics.create(windowSize(), cellData,
+            TextStyle.create(foregroundColor, backgroundColor));
         graphics.foregroundColor(foregroundColor);
         graphics.backgroundColor(backgroundColor);
         activeScreen.paint(graphics);
