@@ -293,7 +293,6 @@ public class MenuBarComponent extends SelectableComponent
         offset++;
         idx++;
       }
-      return;
     }
   }
 
