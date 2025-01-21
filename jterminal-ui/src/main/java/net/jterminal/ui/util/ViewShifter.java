@@ -8,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 public class ViewShifter {
 
   public enum Type {
+    /**recommend for navigate lists*/
     INDEX_SHIFTER,
+    /**recommend for navigate text cursor*/
     POINTER_SHIFTER
   }
 
