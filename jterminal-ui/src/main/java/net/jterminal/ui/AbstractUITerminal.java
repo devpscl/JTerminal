@@ -136,6 +136,14 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     if(activeScreen == null) {
       return;
     }
+    int flags = FLAG_EXTENDED_INPUT | FLAG_WINDOW_INPUT | FLAG_SIGNAL_INPUT;
+    if(activeScreen.isMouseInputEnabled()) {
+      flags |= FLAG_MOUSE_INPUT;
+      if(activeScreen.isMouseMoveInputEnabled()) {
+        flags |= FLAG_MOUSE_EXTENDED_INPUT;
+      }
+    }
+    flags(flags);
     foregroundColor(activeScreen.foregroundColor());
     backgroundColor(activeScreen.backgroundColor());
     clear();

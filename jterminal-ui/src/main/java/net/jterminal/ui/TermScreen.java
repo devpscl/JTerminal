@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.HeadSurfacePainter;
 import net.jterminal.ui.component.PaneContainer;
@@ -23,6 +22,8 @@ public class TermScreen extends PaneContainer {
   UITerminal terminal;
   private SelectableComponent selectedComponent = null;
   private TermDim originalSize = null;
+  private boolean mouseInputEnabled = false;
+  private boolean mouseMoveInputEnabled = false;
 
   @Override
   public void repaint() {
@@ -178,4 +179,21 @@ public class TermScreen extends PaneContainer {
     }
   }
 
+  public boolean isMouseInputEnabled() {
+    return mouseInputEnabled;
+  }
+
+  public boolean isMouseMoveInputEnabled() {
+    return mouseMoveInputEnabled;
+  }
+
+  public void setMouseInputEnabled(boolean mouseInputEnabled) {
+    this.mouseInputEnabled = mouseInputEnabled;
+    repaintFully();
+  }
+
+  public void setMouseMoveInputEnabled(boolean mouseMoveInputEnabled) {
+    this.mouseMoveInputEnabled = mouseMoveInputEnabled;
+    repaintFully();
+  }
 }
