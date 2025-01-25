@@ -291,6 +291,13 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     repaint();
   }
 
+  protected void postTextChangeEvent() {
+    if(eventBus.isListenedTo(TextChangedEvent.class)) {
+      TermString text = text();
+      eventBus.post(new TextChangedEvent(text));
+    }
+  }
+
   protected void performNewLine() {
     int lineIndex = cursorLine();
     int charIndex = cursorChar();
@@ -304,6 +311,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     xShifter.backwardAll();
     yShifter.forward(1);
     repaint();
+    postTextChangeEvent();
   }
 
   protected void performBackspace() {
@@ -316,6 +324,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
       setLine(lineIndex, content);
       updateShifters();
       performMoveLeft();
+      postTextChangeEvent();
       return;
     }
     if(lineIndex <= 0) {
@@ -330,6 +339,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     xShifter.cursor(upperLineLength);
     updateShifters();
     repaint();
+    postTextChangeEvent();
   }
 
   protected void performCharInput(char c) {
@@ -344,6 +354,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     setLine(lineIndex, content);
     updateShifters();
     performMoveRight();
+    postTextChangeEvent();
   }
 
   @Override

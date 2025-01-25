@@ -78,6 +78,7 @@ public class ButtonComponent extends SelectableComponent {
     if(event.action() == Action.RELEASE && event.button() == Button.LEFT) {
       if(action != null && !event.isCancelledAction()) {
         action.run();
+        eventBus.post(new ButtonClickedEvent(this));
       }
     }
   }

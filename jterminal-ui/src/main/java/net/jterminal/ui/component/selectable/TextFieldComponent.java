@@ -81,6 +81,13 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
     graphics.drawString(1, 1, displayValue());
   }
 
+  protected void postTextChangeEvent() {
+    if(eventBus.isListenedTo(TextChangedEvent.class)) {
+      TermString text = TermString.value(value);
+      eventBus.post(new TextChangedEvent(text));
+    }
+  }
+
   protected void performBackspace() {
     viewShifter.viewSize(currentDimension().width());
     if(viewShifter.cursor() <= 0 || value.isEmpty()) {
@@ -91,6 +98,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
     this.value = stringBuilder.toString();
     viewShifter.bufferSize(value.length());
     performMoveLeft();
+    postTextChangeEvent();
   }
 
   protected boolean performMoveLeft() {
@@ -118,6 +126,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
     viewShifter.viewSize(currentDimension().width());
     viewShifter.bufferSize(value.length());
     performMoveRight();
+    postTextChangeEvent();
     return true;
   }
 

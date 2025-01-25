@@ -8,6 +8,7 @@ import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.special.CheckBoxChangeEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ public class CheckBoxComponent extends SelectableComponent implements Resizeable
 
   public void checked(boolean checked) {
     this.checked = checked;
+    eventBus.post(new CheckBoxChangeEvent(this, checked));
     repaint();
   }
 
