@@ -22,6 +22,10 @@ subprojects {
         }
     }
 
+    dependencies {
+        implementation 'net.devpscl:jeventbus:1.1.0'
+    }
+
     project.group = 'net.' + project.name
     project.version = '1.0-SNAPSHOT'
 
