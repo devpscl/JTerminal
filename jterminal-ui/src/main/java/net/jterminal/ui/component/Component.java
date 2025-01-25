@@ -1,7 +1,8 @@
 package net.jterminal.ui.component;
 
 import java.util.concurrent.atomic.AtomicLong;
-import net.jterminal.event.bus.EventBus;
+import net.devpscl.eventbus.EventBus;
+import net.jterminal.Terminal;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
@@ -13,6 +14,7 @@ import net.jterminal.ui.event.component.ComponentResizeEvent;
 import net.jterminal.ui.layout.DimProperty;
 import net.jterminal.ui.layout.Layout;
 import net.jterminal.ui.layout.PosProperty;
+import net.jterminal.util.Log4JErrorHandler;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
@@ -31,7 +33,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   private BackgroundColor backgroundColor;
   protected final Object lock = new Object();
   protected final long id;
-  protected final EventBus eventBus = EventBus.create();
+  protected final EventBus eventBus = EventBus.builder()
+      .enableListenerPriorities()
+      .errorHandler(new Log4JErrorHandler(Terminal.LOGGER))
+      .build();
 
   protected PosProperty xPosProperty = new PosProperty();
   protected PosProperty yPosProperty = new PosProperty();

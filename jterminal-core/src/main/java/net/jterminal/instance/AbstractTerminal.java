@@ -2,10 +2,10 @@ package net.jterminal.instance;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import net.devpscl.eventbus.EventBus;
 import net.jterminal.Terminal;
 import net.jterminal.TerminalBuffer;
 import net.jterminal.ansi.AnsiCodeSerializer;
-import net.jterminal.event.bus.EventBus;
 import net.jterminal.exception.TerminalProviderException;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
@@ -13,6 +13,7 @@ import net.jterminal.text.TerminalColor;
 import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
+import net.jterminal.util.Log4JErrorHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,10 @@ public abstract class AbstractTerminal<T extends Terminal>
   protected final PrintStream out;
   protected final PrintStream err;
 
-  protected final EventBus eventBus = EventBus.create();
+  protected final EventBus eventBus = EventBus.builder()
+      .enableListenerPriorities()
+      .errorHandler(new Log4JErrorHandler(Terminal.LOGGER))
+      .build();
   protected boolean inputEventListening = false;
 
   private boolean created = false;

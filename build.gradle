@@ -15,7 +15,14 @@ subprojects {
     apply plugin: "java"
     apply plugin: "com.github.johnrengelman.shadow"
 
-    project.group = 'net.jterminal'
+    repositories {
+        maven {
+            url("http://repo.devpscl.de/repository/maven-public/")
+            allowInsecureProtocol = true
+        }
+    }
+
+    project.group = 'net.' + project.name
     project.version = '1.0-SNAPSHOT'
 
     compileJava.options.encoding = "UTF-8"
@@ -43,5 +50,6 @@ subprojects {
         setArchiveClassifier "RELEASE"
     }
 
+    println(project.name + " is configured")
 
 }

@@ -1,6 +1,6 @@
 package net.jterminal.ui.event.component;
 
-import net.jterminal.event.Event;
+import net.devpscl.eventbus.Event;
 import net.jterminal.util.TermDim;
 import org.jetbrains.annotations.NotNull;
 

@@ -6,6 +6,7 @@ import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.special.ButtonClickedEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,6 +63,7 @@ public class ButtonComponent extends SelectableComponent {
       if(action != null) {
         action.run();
       }
+      eventBus().post(new ButtonClickedEvent(this));
       event.intercept(true);
     }
   }

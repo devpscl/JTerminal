@@ -1,6 +1,6 @@
 package net.jterminal.cli.event;
 
-import net.jterminal.event.Event;
+import net.devpscl.eventbus.Event;
 import org.jetbrains.annotations.NotNull;
 
 public class LineReleaseEvent implements Event {

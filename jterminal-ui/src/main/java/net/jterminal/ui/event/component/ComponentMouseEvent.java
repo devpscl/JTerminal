@@ -1,6 +1,6 @@
 package net.jterminal.ui.event.component;
 
-import net.jterminal.event.Event;
+import net.devpscl.eventbus.Event;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.input.MouseInputEvent;

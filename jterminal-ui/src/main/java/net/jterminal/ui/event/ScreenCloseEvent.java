@@ -1,6 +1,6 @@
 package net.jterminal.ui.event;
 
-import net.jterminal.event.Event;
+import net.devpscl.eventbus.Event;
 import net.jterminal.ui.TermScreen;
 import org.jetbrains.annotations.NotNull;
 

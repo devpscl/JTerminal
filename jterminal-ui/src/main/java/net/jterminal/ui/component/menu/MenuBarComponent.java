@@ -3,7 +3,6 @@ package net.jterminal.ui.component.menu;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import net.jterminal.annotation.SubscribeEvent;
 import net.jterminal.input.Keyboard;
 import net.jterminal.input.Keyboard.State;
 import net.jterminal.input.Mouse.Action;
@@ -305,7 +304,6 @@ public class MenuBarComponent extends SelectableComponent
   @Override
   public void y(PositionValue positionValue, Modifier... modifiers) {}
 
-  @SubscribeEvent
   public void onSelect(ComponentSelectEvent e) {
     itemCursor = -1;
     if(tabCount() > 0) {
