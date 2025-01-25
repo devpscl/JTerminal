@@ -61,25 +61,31 @@ public class ListComponent extends SelectableComponent implements Resizeable {
   }
 
   public void select(int selected) {
-    if(elements.isEmpty()) {
-      this.selectedIndex = -1;
+    synchronized (lock) {
+      if(elements.isEmpty()) {
+        this.selectedIndex = -1;
+        repaint();
+        return;
+      }
+      this.selectedIndex = Math.max(-1, Math.min(selected, elements.size()));
       repaint();
-      return;
     }
-    this.selectedIndex = Math.max(-1, Math.min(selected, elements.size()));
-    repaint();
   }
 
   public @NotNull VirtualScrollBar attachScrollBar() {
-    this.scrollBar = new VirtualScrollBar(Axis.VERTICAL);
-    updateScrollBar();
-    repaint();
-    return this.scrollBar;
+    synchronized (lock) {
+      this.scrollBar = new VirtualScrollBar(Axis.VERTICAL);
+      updateScrollBar();
+      repaint();
+      return this.scrollBar;
+    }
   }
 
   public void detachScrollBar() {
-    this.scrollBar = null;
-    repaint();
+    synchronized (lock) {
+      this.scrollBar = null;
+      repaint();
+    }
   }
 
   public void updateScrollBar() {
@@ -91,10 +97,14 @@ public class ListComponent extends SelectableComponent implements Resizeable {
   }
 
   public void elements(List<String> elements) {
-    this.elements = new ArrayList<>(elements);
-    viewShifter.cursor(0);
-    viewShifter.bufferSize(elements.size());
-    selectedIndex = -1;
+    synchronized (lock) {
+      this.elements = new ArrayList<>(elements);
+      viewShifter.cursor(0);
+      viewShifter.bufferSize(elements.size());
+      selectedIndex = -1;
+      repaint();
+    }
+
   }
 
   @Override
