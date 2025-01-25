@@ -13,6 +13,7 @@ import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.component.scrollbar.VirtualScrollBar;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.special.ListChooseItemEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.ViewShifter;
@@ -65,10 +66,12 @@ public class ListComponent extends SelectableComponent implements Resizeable {
       if(elements.isEmpty()) {
         this.selectedIndex = -1;
         repaint();
+        eventBus.post(new ListChooseItemEvent(this, selectedIndex));
         return;
       }
       this.selectedIndex = Math.max(-1, Math.min(selected, elements.size()));
       repaint();
+      eventBus.post(new ListChooseItemEvent(this, selectedIndex));
     }
   }
 
