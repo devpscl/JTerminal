@@ -35,4 +35,18 @@ public abstract class SelectableComponent extends Component {
   @OverrideOnly
   public void updateState(@NotNull TerminalState terminalState) {}
 
+  public void select() {
+    Container container = rootContainer();
+    if(container instanceof TermScreen termScreen) {
+      termScreen.select(this);
+    }
+  }
+
+  public void unselect() {
+    Container container = rootContainer();
+    if(container instanceof TermScreen termScreen) {
+      termScreen.unselect();
+    }
+  }
+
 }
