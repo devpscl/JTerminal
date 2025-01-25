@@ -37,9 +37,11 @@ public class ButtonComponent extends SelectableComponent {
   }
 
   public void text(@NotNull String text) {
-    this.text = text;
-    setWidth(text.length() + 2);
-    setHeight(1);
+    synchronized (lock) {
+      this.text = text;
+      setWidth(text.length() + 2);
+      setHeight(1);
+    }
   }
 
   @Override

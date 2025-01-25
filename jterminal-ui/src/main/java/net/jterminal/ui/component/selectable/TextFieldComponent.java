@@ -3,10 +3,12 @@ package net.jterminal.ui.component.selectable;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.TerminalColor;
+import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.component.ComponentResizeEvent;
+import net.jterminal.ui.event.special.TextChangedEvent;
 import net.jterminal.ui.graphics.CellData;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
@@ -43,14 +45,18 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   }
 
   public void value(@NotNull String value) {
-    this.value = value;
-    viewShifter.bufferSize(value.length());
-    cursor(value.length());
+    synchronized (lock) {
+      this.value = value;
+      viewShifter.bufferSize(value.length());
+      cursor(value.length());
+    }
   }
 
   public void cursor(int cursor) {
-    viewShifter.cursor(cursor);
-    repaint();
+    synchronized (lock) {
+      viewShifter.cursor(cursor);
+      repaint();
+    }
   }
 
   public int cursor() {

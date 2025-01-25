@@ -17,6 +17,7 @@ import net.jterminal.ui.layout.PosProperty;
 import net.jterminal.util.Log4JErrorHandler;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,19 +63,21 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   public void recalculateProperties() {
-    if(parent != null) {
-      TermDim oldDim = cachedDim;
-      TermDim currentDimension = parent.currentDimension();
-      int x = xPosProperty.calculateX(currentDimension);
-      int y = yPosProperty.calculateY(currentDimension);
-      TermPos pos = new TermPos(x, y);
-      int width = widthDimProperty.calculateWidth(currentDimension, pos);
-      int height = heightDimProperty.calculateHeight(currentDimension, pos);
-      TermDim dim = new TermDim(width, height);
-      cachedPosition = pos;
-      cachedDim = dim;
-      if(!oldDim.equals(dim)) {
-        processResizeEvent(new ComponentResizeEvent(oldDim, dim));
+    synchronized (lock) {
+      if(parent != null) {
+        TermDim oldDim = cachedDim;
+        TermDim currentDimension = parent.currentDimension();
+        int x = xPosProperty.calculateX(currentDimension);
+        int y = yPosProperty.calculateY(currentDimension);
+        TermPos pos = new TermPos(x, y);
+        int width = widthDimProperty.calculateWidth(currentDimension, pos);
+        int height = heightDimProperty.calculateHeight(currentDimension, pos);
+        TermDim dim = new TermDim(width, height);
+        cachedPosition = pos;
+        cachedDim = dim;
+        if(!oldDim.equals(dim)) {
+          processResizeEvent(new ComponentResizeEvent(oldDim, dim));
+        }
       }
     }
   }
@@ -240,8 +243,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   public void x(Layout.PositionValue positionValue, Layout.Modifier...modifiers) {
-    xPosProperty = new PosProperty(positionValue, modifiers);
-    repaint();
+    synchronized (lock) {
+      xPosProperty = new PosProperty(positionValue, modifiers);
+      repaint();
+    }
   }
 
   public void y(int value, Layout.Modifier...modifiers) {
@@ -249,8 +254,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   public void y(Layout.PositionValue positionValue, Layout.Modifier...modifiers) {
-    yPosProperty = new PosProperty(positionValue, modifiers);
-    repaint();
+    synchronized (lock) {
+      yPosProperty = new PosProperty(positionValue, modifiers);
+      repaint();
+    }
   }
 
   protected void setWidth(int value, Layout.Modifier...modifiers) {
@@ -258,8 +265,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   protected void setWidth(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
-    widthDimProperty = new DimProperty(positionValue, modifiers);
-    repaint();
+    synchronized (lock) {
+      widthDimProperty = new DimProperty(positionValue, modifiers);
+      repaint();
+    }
   }
 
   protected void setHeight(int value, Layout.Modifier...modifiers) {
@@ -267,8 +276,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   protected void setHeight(Layout.DimensionValue positionValue, Layout.Modifier...modifiers) {
-    heightDimProperty = new DimProperty(positionValue, modifiers);
-    repaint();
+    synchronized (lock) {
+      heightDimProperty = new DimProperty(positionValue, modifiers);
+      repaint();
+    }
   }
 
   public @NotNull TermPos displayMidPosition() {
@@ -310,4 +321,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   public final boolean isInterceptInput() {
     return interceptInput;
   }
+
+  @Internal
+  public final @NotNull Object getLock() {
+    return lock;
+  }
+
 }

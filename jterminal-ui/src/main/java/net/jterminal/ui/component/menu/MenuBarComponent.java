@@ -56,14 +56,16 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   private int findIndex(@Nullable MenuTab menuTab) {
-    int index = 0;
-    for (MenuTab tab : tabs) {
-      if(menuTab == tab) {
-        return index;
+    synchronized (lock) {
+      int index = 0;
+      for (MenuTab tab : tabs) {
+        if(menuTab == tab) {
+          return index;
+        }
+        index++;
       }
-      index++;
+      return 0;
     }
-    return 0;
   }
 
   public void selectedStyle(@NotNull TextStyle selectedStyle) {
@@ -83,14 +85,18 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   public void add(@NotNull MenuTab tab) {
-    this.tabs.add(tab);
-    selectedTab = null;
+    synchronized (lock) {
+      this.tabs.add(tab);
+      selectedTab = null;
+    }
   }
 
   public void remove(@NotNull MenuTab tab) {
-    this.tabs.remove(tab);
-    selectedTab = null;
-    itemCursor = -1;
+    synchronized (lock) {
+      this.tabs.remove(tab);
+      selectedTab = null;
+      itemCursor = -1;
+    }
   }
 
   public @Nullable MenuTab selectedTab() {
@@ -98,9 +104,11 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   public void selectTab(@Nullable MenuTab selectedTab) {
-    this.selectedTab = selectedTab;
-    itemCursor = -1;
-    repaint();
+    synchronized (lock) {
+      this.selectedTab = selectedTab;
+      itemCursor = -1;
+      repaint();
+    }
   }
 
   @Override
@@ -172,6 +180,10 @@ public class MenuBarComponent extends SelectableComponent
     int key = event.key();
     int currentIndex = findIndex(selectedTab);
     int count = tabCount();
+    if(key == Keyboard.KEY_ESCAPE) {
+      unselect();
+      return;
+    }
     if(key == Keyboard.KEY_ARROW_LEFT) {
       if(event.event().state() == State.CONTROL) {
         return;

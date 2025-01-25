@@ -164,7 +164,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     ComponentKeyEvent keyEvent = new ComponentKeyEvent(e);
     component.eventBus().post(keyEvent);
     if(!keyEvent.isCancelledAction()) {
-      component.processKeyEvent(keyEvent);
+      final Object componentLock = component.getLock();
+      synchronized (componentLock) {
+        component.processKeyEvent(keyEvent);
+      }
     }
     if(keyEvent.isIgnoreChildComponents()) {
       return interceptInput;
@@ -186,7 +189,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     boolean interceptInput = false;
     component.eventBus().post(e);
     if(!e.isCancelledAction()) {
-      component.processMouseEvent(e);
+      final Object componentLock = component.getLock();
+      synchronized (componentLock) {
+        component.processMouseEvent(e);
+      }
     }
     interceptInput |= e.isIntercept();
     if(e.isIgnoreChildComponents()) {

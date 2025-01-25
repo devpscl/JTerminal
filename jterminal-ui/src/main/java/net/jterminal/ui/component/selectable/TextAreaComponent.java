@@ -17,10 +17,12 @@ import net.jterminal.text.TerminalColor;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.text.termstring.TermStringBuilder;
+import net.jterminal.text.termstring.TermStringJoiner;
 import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.component.scrollbar.VirtualScrollBar;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.special.TextChangedEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
@@ -64,26 +66,30 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   }
 
   public @NotNull VirtualScrollBar attachScrollBar(@NotNull Axis axis) {
-    if(axis == Axis.VERTICAL) {
-      verticalScrollbar = new VirtualScrollBar(axis);
+    synchronized (lock) {
+      if(axis == Axis.VERTICAL) {
+        verticalScrollbar = new VirtualScrollBar(axis);
+        updateScrollBar();
+        repaint();
+        return verticalScrollbar;
+      }
+      horizontalScrollbar = new VirtualScrollBar(axis);
       updateScrollBar();
       repaint();
-      return verticalScrollbar;
+      return horizontalScrollbar;
     }
-    horizontalScrollbar = new VirtualScrollBar(axis);
-    updateScrollBar();
-    repaint();
-    return horizontalScrollbar;
   }
 
   public void detachScrollBar(@NotNull Axis axis) {
-    if(axis == Axis.VERTICAL) {
-      verticalScrollbar = null;
+    synchronized (lock) {
+      if(axis == Axis.VERTICAL) {
+        verticalScrollbar = null;
+        repaint();
+        return;
+      }
+      horizontalScrollbar = null;
       repaint();
-      return;
     }
-    horizontalScrollbar = null;
-    repaint();
   }
 
   public void updateScrollBar() {
@@ -153,27 +159,44 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   }
 
   public void text(@NotNull String text) {
-    String[] array = StringUtil.NEXT_LINE_PATTERN.split(text);
-    lines.clear();
-    for (String s : array) {
-      lines.add(TermString.value(s));
+    synchronized (lock) {
+      String[] array = StringUtil.NEXT_LINE_PATTERN.split(text);
+      lines.clear();
+      for (String s : array) {
+        lines.add(TermString.value(s));
+      }
+      if(lines.isEmpty()) {
+        lines.add(TermString.empty());
+      }
+      updateShifters();
+      repaint();
+      postTextChangeEvent();
     }
-    if(lines.isEmpty()) {
-      lines.add(TermString.empty());
-    }
-    updateShifters();
-    repaint();
   }
 
   public void text(@NotNull TermString termString) {
-    @NotNull TermString[] split = termString.split(StringUtil.NEXT_LINE_PATTERN);
-    lines.clear();
-    lines.addAll(Arrays.asList(split));
-    if(lines.isEmpty()) {
-      lines.add(TermString.empty());
+    synchronized (lock) {
+      @NotNull TermString[] split = termString.split(StringUtil.NEXT_LINE_PATTERN);
+      lines.clear();
+      lines.addAll(Arrays.asList(split));
+      if(lines.isEmpty()) {
+        lines.add(TermString.empty());
+      }
+      updateShifters();
+      repaint();
+      postTextChangeEvent();
     }
-    updateShifters();
-    repaint();
+  }
+
+  public @NotNull TermString text() {
+    synchronized (lock) {
+      TermStringJoiner joiner = TermString.joiner();
+      for (TermString line : lines) {
+        joiner.add(line);
+      }
+      joiner.delimiter("\n");
+      return joiner.build();
+    }
   }
 
   public @NotNull List<TermString> viewLines() {
