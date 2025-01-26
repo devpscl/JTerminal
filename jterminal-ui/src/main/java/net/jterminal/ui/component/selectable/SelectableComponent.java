@@ -1,8 +1,7 @@
 package net.jterminal.ui.component.selectable;
 
-import net.jterminal.ui.TermScreen;
 import net.jterminal.ui.component.Component;
-import net.jterminal.ui.component.Container;
+import net.jterminal.ui.component.RootContainer;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.selector.AutoSelector;
 import net.jterminal.ui.selector.ComponentSelector;
@@ -14,14 +13,11 @@ public abstract class SelectableComponent extends Component {
   private ComponentSelector selector = new AutoSelector();
 
   public boolean isSelected() {
-    Container container = rootContainer();
+    RootContainer container = rootContainer();
     if(container == null) {
       return false;
     }
-    if(container instanceof TermScreen screen) {
-      return screen.selectedComponent() == this;
-    }
-    return false;
+    return container.selectedComponent() == this;
   }
 
   public void selector(@NotNull ComponentSelector selector) {
@@ -36,17 +32,18 @@ public abstract class SelectableComponent extends Component {
   public void updateState(@NotNull TerminalState terminalState) {}
 
   public void select() {
-    Container container = rootContainer();
-    if(container instanceof TermScreen termScreen) {
-      termScreen.select(this);
+    RootContainer container = rootContainer();
+    if(container != null) {
+      container.select(this);
     }
   }
 
   public void unselect() {
-    Container container = rootContainer();
-    if(container instanceof TermScreen termScreen) {
-      termScreen.unselect();
+    RootContainer container = rootContainer();
+    if(container != null) {
+      container.unselect();
     }
+
   }
 
 }
