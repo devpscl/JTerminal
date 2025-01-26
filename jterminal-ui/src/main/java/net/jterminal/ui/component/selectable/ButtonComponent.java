@@ -3,7 +3,7 @@ package net.jterminal.ui.component.selectable;
 import net.jterminal.input.Keyboard;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
-import net.jterminal.text.TerminalColor;
+import net.jterminal.text.style.TextFont;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.special.ButtonClickedEvent;
@@ -47,10 +47,7 @@ public class ButtonComponent extends SelectableComponent {
   @Override
   public void paint(@NotNull TermGraphics graphics) {
     if(isSelected()) {
-      TerminalColor foregroundColor = TerminalColor.from(graphics.foregroundColor());
-      TerminalColor backgroundColor = TerminalColor.from(graphics.backgroundColor());
-      graphics.foregroundColor(backgroundColor);
-      graphics.backgroundColor(foregroundColor);
+      graphics.fonts(TextFont.REVERSED);
     }
     graphics.drawString(1, 1, "[" + text+ "]");
   }
