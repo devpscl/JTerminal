@@ -36,7 +36,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
 
   public TextFieldComponent() {
     value("");
-    backgroundColor(TerminalColor.WHITE);
+    backgroundColor(TerminalColor.GRAY);
     foregroundColor(TerminalColor.BLACK);
   }
 

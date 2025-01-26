@@ -52,7 +52,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   private VirtualScrollBar horizontalScrollbar;
 
   public TextAreaComponent() {
-    backgroundColor(TerminalColor.WHITE);
+    backgroundColor(TerminalColor.GRAY);
     foregroundColor(TerminalColor.BLACK);
   }
 
