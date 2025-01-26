@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import net.jterminal.ui.component.selectable.SelectableComponent;
+import net.jterminal.ui.component.tool.ContainerViewArea;
+import net.jterminal.ui.component.tool.FullContainerViewArea;
 import net.jterminal.ui.event.component.ComponentSelectEvent;
 import net.jterminal.ui.event.component.ComponentUnselectEvent;
 import net.jterminal.ui.graphics.TermGraphics;
@@ -12,9 +14,20 @@ import net.jterminal.ui.selector.SelectionResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class RootContainer extends PaneContainer {
+public class RootContainer extends Container {
 
   private SelectableComponent selectedComponent = null;
+
+  @Override
+  public void paint(@NotNull TermGraphics graphics, @NotNull Component component) {
+    ComponentGraphics.prepare(component);
+    ComponentGraphics.draw(graphics, component);
+  }
+
+  @Override
+  protected ContainerViewArea containerViewArea() {
+    return new FullContainerViewArea();
+  }
 
   @Override
   public void paint(@NotNull TermGraphics graphics) {
