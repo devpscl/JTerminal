@@ -34,10 +34,14 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   private final ViewShifter viewShifter = new ViewShifter(Type.POINTER_SHIFTER);
   private CursorType cursorType = CursorType.BLINKING;
 
-  public TextFieldComponent() {
+  public TextFieldComponent(@NotNull String value) {
     value("");
     backgroundColor(TerminalColor.GRAY);
     foregroundColor(TerminalColor.BLACK);
+  }
+
+  public TextFieldComponent() {
+    this("");
   }
 
   public @NotNull String value() {
