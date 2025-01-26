@@ -198,6 +198,43 @@ class TermStringImpl implements TermString {
   }
 
   @Override
+  public @NotNull TermString[] wrapLines(int limit) {
+    List<TermString> lines = new ArrayList<>();
+    int start = 0;
+    int lastSpace = 0;
+    boolean prevSpace = false;
+    char[] charArray = value.toCharArray();
+    for (int idx = 0; idx < charArray.length; idx++) {
+      int count = idx - start;
+      char ch = charArray[idx];
+      if(ch == '\n') {
+        lines.add(substring(start, idx));
+        start = idx + 1;
+        prevSpace = false;
+        continue;
+      }
+      if(count > limit) {
+        if(prevSpace) {
+          lines.add(substring(start, lastSpace));
+          start = lastSpace;
+        } else {
+          lines.add(substring(start, idx));
+          start = idx;
+        }
+        prevSpace = false;
+      }
+      if(ch == ' ') {
+        lastSpace = idx + 1;
+        prevSpace = true;
+      }
+    }
+    if(start < value.length() - 1) {
+      lines.add(substring(start));
+    }
+    return lines.toArray(new TermString[0]);
+  }
+
+  @Override
   public boolean equals(@Nullable String str) {
     return value.equals(str);
   }

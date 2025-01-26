@@ -51,6 +51,8 @@ public interface TermString {
 
   @NotNull TextStyle styleAt(int index);
 
+  @NotNull TermString[] wrapLines(int limit);
+
   boolean equals(@Nullable String str);
 
   boolean equalsIgnoreCase(@Nullable String str);
