@@ -12,6 +12,8 @@ public interface TermStringBuilder {
 
   @NotNull TermStringBuilder append(String x);
 
+  @NotNull TermStringBuilder appendFormatted(String x, char sign, @NotNull TextStyle...insertStyles);
+
   @NotNull TermStringBuilder append(char x);
 
   @NotNull TermStringBuilder append(short x);

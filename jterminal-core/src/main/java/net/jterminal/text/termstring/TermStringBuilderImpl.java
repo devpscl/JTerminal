@@ -1,6 +1,7 @@
 package net.jterminal.text.termstring;
 
 import java.util.Collection;
+import java.util.regex.Pattern;
 import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
@@ -23,6 +24,24 @@ class TermStringBuilderImpl implements UnsafeTermStringBuilder {
       @NotNull IndexedStyleData indexedStyleData) {
     sb = stringBuilder;
     data = indexedStyleData;
+  }
+
+  @Override
+  public @NotNull TermStringBuilder appendFormatted(String x, char sign,
+      @NotNull TextStyle... insertStyles) {
+
+    String[] parts = x.split(Pattern.quote(String.valueOf(sign)));
+    if(insertStyles.length != parts.length - 1) {
+      throw new IllegalStateException("Invalid count of insert styles: "
+          + insertStyles.length + " != " + parts.length + "(sign character count)");
+    }
+    for (int idx = 0; idx < parts.length; idx++) {
+      if(idx > 0) {
+        appendStyle(insertStyles[idx - 1]);
+      }
+      append(parts[idx]);
+    }
+    return this;
   }
 
   @Override
