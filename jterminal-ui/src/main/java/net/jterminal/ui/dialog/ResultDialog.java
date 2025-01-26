@@ -1,7 +1,6 @@
 package net.jterminal.ui.dialog;
 
 import java.util.function.Consumer;
-import net.jterminal.Terminal;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.component.FrameContainer;
 import net.jterminal.ui.component.LabelComponent;
