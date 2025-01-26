@@ -28,6 +28,9 @@ public class TermScreen extends RootContainer {
 
   public void openDialog(@NotNull TermDialog dialog) {
     synchronized (lock) {
+      if(openedDialog != null) {
+        openedDialog.setParent(null);
+      }
       openedDialog = dialog;
       openedDialog.setParent(this);
       repaintFully();
@@ -36,6 +39,9 @@ public class TermScreen extends RootContainer {
 
   public void closeDialog() {
     synchronized (lock) {
+      if(openedDialog != null) {
+        openedDialog.setParent(null);
+      }
       openedDialog = null;
       repaintFully();
     }

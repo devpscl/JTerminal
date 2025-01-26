@@ -63,10 +63,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @Override
   public void openScreen(@NotNull TermScreen screen) {
-    if(activeScreen != null) {
-      closeScreen(screen);
-    }
     synchronized (lock) {
+      if(activeScreen != null) {
+        closeScreen(screen);
+      }
       activeScreen = screen;
       activeScreen.terminal = this;
       activeScreen.repaintFully();
