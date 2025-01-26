@@ -199,8 +199,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
       return interceptInput;
     }
     if(component instanceof Container c) {
+      final TermPos origin = c.currentComponentViewOrigin();
+      ComponentMouseEvent viewMouseEvent = e.shiftPosition(origin);
       for (Component child : c.components()) {
-        TermPos mousePos = e.position();
+        TermPos mousePos = viewMouseEvent.position();
         TermPos effPos = child.currentPosition();
         TermDim effDim = child.currentDimension();
         TermPos effEndPos = effPos.copy().addShift(effDim);
@@ -209,7 +211,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {
           continue;
         }
-        ComponentMouseEvent copiedEvent = e.shiftPosition(effPos);
+        ComponentMouseEvent copiedEvent = viewMouseEvent.shiftPosition(effPos);
         boolean state = sendMouseInput(child, copiedEvent);
         interceptInput |= state;
       }

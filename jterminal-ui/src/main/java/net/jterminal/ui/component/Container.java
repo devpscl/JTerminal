@@ -6,10 +6,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import net.jterminal.ui.component.selectable.SelectableComponent;
+import net.jterminal.ui.component.tool.ContainerViewArea;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.exception.UIException;
 import net.jterminal.ui.graphics.TermGraphics;
+import net.jterminal.util.TermDim;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Container extends Component {
@@ -60,15 +63,21 @@ public abstract class Container extends Component {
 
   @Override
   public void paint(@NotNull TermGraphics graphics) {
+    TermPos viewOrigin = currentComponentViewOrigin();
+    TermDim viewSize = currentComponentViewSize();
+    TermGraphics componentGraphics = ComponentGraphics.createGraphics(viewSize, this);
     for (Component component : components()) {
       if(!component.isVisible()) {
         continue;
       }
-      paint(graphics, component);
+      paint(componentGraphics, component);
     }
+    graphics.draw(viewOrigin, componentGraphics);
   }
 
   public abstract void paint(@NotNull TermGraphics graphics, @NotNull Component component);
+
+  protected abstract ContainerViewArea containerViewArea();
 
   public @NotNull Collection<Component> components() {
     return Collections.unmodifiableList(childrenComponents);
@@ -106,6 +115,14 @@ public abstract class Container extends Component {
     deepSelectableComponents(list);
     Collections.sort(list);
     return list;
+  }
+
+  public @NotNull TermPos currentComponentViewOrigin() {
+    return containerViewArea().origin(currentDimension());
+  }
+
+  public @NotNull TermDim currentComponentViewSize() {
+    return containerViewArea().dimension(currentDimension());
   }
 
 }

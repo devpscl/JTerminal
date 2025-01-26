@@ -66,7 +66,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
     synchronized (lock) {
       if(parent != null) {
         TermDim oldDim = cachedDim;
-        TermDim currentDimension = parent.currentDimension();
+        TermDim currentDimension = parent.currentComponentViewSize();
         int x = xPosProperty.calculateX(currentDimension);
         int y = yPosProperty.calculateY(currentDimension);
         TermPos pos = new TermPos(x, y);
@@ -90,9 +90,9 @@ public abstract class Component implements Displayable, Comparable<Component> {
     return parent;
   }
 
-  public @Nullable Container rootContainer() {
+  public @Nullable RootContainer rootContainer() {
     if(parent == null) {
-      if(this instanceof Container container) {
+      if(this instanceof RootContainer container) {
         return container;
       }
       return null;
@@ -234,6 +234,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
       return currentPosition();
     }
     return parent.currentDisplayPosition()
+        .addShift(parent.currentComponentViewOrigin())
         .add(cachedPosition)
         .subtract(TermPos.AXIS_ORIGIN);
   }
