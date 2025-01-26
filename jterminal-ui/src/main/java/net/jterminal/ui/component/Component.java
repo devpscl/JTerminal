@@ -90,10 +90,10 @@ public abstract class Component implements Displayable, Comparable<Component> {
   }
 
   public @Nullable RootContainer rootContainer() {
+    if(this instanceof RootContainer container) {
+      return container;
+    }
     if(parent == null) {
-      if(this instanceof RootContainer container) {
-        return container;
-      }
       return null;
     }
     return parent.rootContainer();
