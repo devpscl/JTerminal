@@ -19,7 +19,9 @@ import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.Component;
 import net.jterminal.ui.component.Container;
 import net.jterminal.ui.component.HeadSurfacePainter;
+import net.jterminal.ui.component.RootContainer;
 import net.jterminal.ui.component.selectable.SelectableComponent;
+import net.jterminal.ui.dialog.TermDialog;
 import net.jterminal.ui.event.ScreenCloseEvent;
 import net.jterminal.ui.event.ScreenOpenEvent;
 import net.jterminal.ui.event.ScreenRenderedEvent;
@@ -87,6 +89,18 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
   }
 
   @Override
+  public @Nullable RootContainer activeRootContainer() {
+    if(activeScreen == null) {
+      return null;
+    }
+    TermDialog termDialog = activeScreen.openedDialog();
+    if(termDialog != null) {
+      return termDialog;
+    }
+    return activeScreen;
+  }
+
+  @Override
   public void drawScreen() {
     synchronized (lock) {
       renderScreenSync();
@@ -98,11 +112,12 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
       return;
     }
     renderLock.lock();
+    RootContainer rootContainer = activeRootContainer();
     try {
-      if(activeScreen != null) {
+      if(rootContainer != null) {
         long start = System.currentTimeMillis();
         TerminalState globalState = new TerminalState();
-        SelectableComponent selectableComponent = activeScreen.selectedComponent();
+        SelectableComponent selectableComponent = rootContainer.selectedComponent();
 
         ForegroundColor foregroundColor = activeScreen.foregroundColor();
         BackgroundColor backgroundColor = activeScreen.backgroundColor();
@@ -211,6 +226,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         if(x < effPos.x() || y < effPos.y() || x > effEndPos.x() || y > effEndPos.y()) {
           continue;
         }
+
         ComponentMouseEvent copiedEvent = viewMouseEvent.shiftPosition(effPos);
         boolean state = sendMouseInput(child, copiedEvent);
         interceptInput |= state;
@@ -221,56 +237,59 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @SubscribeEvent
   public void onInputEvent(KeyboardInputEvent e) {
-    if(activeScreen == null) {
+    RootContainer rootContainer = activeRootContainer();
+    if(rootContainer == null) {
       return;
     }
-    boolean interceptInput = sendKeyInput(activeScreen, e);
+    TermDialog openedDialog = activeScreen.openedDialog();
+
+    boolean interceptInput = sendKeyInput(rootContainer, e);
     if(interceptInput) {
       return;
     }
-    SelectableComponent selectedComponent = activeScreen.selectedComponent();
+    SelectableComponent selectedComponent = rootContainer.selectedComponent();
     List<SelectableComponent> selectableComponents
-        = new ArrayList<>(activeScreen.deepSelectableComponents());
+        = new ArrayList<>(rootContainer.deepSelectableComponents());
 
     int key = e.key();
     SelectionResult result;
     switch (key) {
       case Keyboard.KEY_TAB:
-        activeScreen.selectNext();
+        rootContainer.selectNext();
         break;
       case Keyboard.KEY_ARROW_UP:
         if(selectedComponent == null) {
-          activeScreen.selectNext();
+          rootContainer.selectNext();
           break;
         }
         result = selectedComponent.selector()
             .up(selectedComponent, selectableComponents);
-        activeScreen.performSelect(result);
+        rootContainer.performSelect(result);
         break;
       case Keyboard.KEY_ARROW_DOWN:
         if(selectedComponent == null) {
-          activeScreen.selectNext();
+          rootContainer.selectNext();
           break;
         }
         result = selectedComponent.selector()
             .down(selectedComponent, selectableComponents);
-        activeScreen.performSelect(result);
+        rootContainer.performSelect(result);
         break;
       case Keyboard.KEY_ARROW_LEFT:
         if(selectedComponent == null) {
-          activeScreen.selectNext();
+          rootContainer.selectNext();
           break;
         }
         result = selectedComponent.selector().left(selectedComponent, selectableComponents);
-        activeScreen.performSelect(result);
+        rootContainer.performSelect(result);
         break;
       case Keyboard.KEY_ARROW_RIGHT:
         if(selectedComponent == null) {
-          activeScreen.selectNext();
+          rootContainer.selectNext();
           break;
         }
         result = selectedComponent.selector().right(selectedComponent, selectableComponents);
-        activeScreen.performSelect(result);
+        rootContainer.performSelect(result);
         break;
     }
   }
@@ -286,11 +305,16 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @SubscribeEvent
   public void onMouseEvent(MouseInputEvent e) {
-    if(activeScreen == null) {
+    RootContainer rootContainer = activeRootContainer();
+    if(rootContainer == null) {
       return;
     }
+    TermDialog openedDialog = activeScreen.openedDialog();
     ComponentMouseEvent event = new ComponentMouseEvent(e);
-    for (Component deepComponent : activeScreen.deepComponents()) {
+    if(rootContainer instanceof TermDialog) {
+      event = event.shiftPosition(rootContainer.currentPosition());
+    }
+    for (Component deepComponent : rootContainer.deepComponents()) {
       if(!deepComponent.isEnabled()) {
         continue;
       }
@@ -298,14 +322,15 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         headSurfacePainter.processSurfaceMouseInput(event);
       }
     }
+
     boolean intercept = event.isIntercept();
     if(!event.isIgnoreChildComponents()) {
-      intercept |= sendMouseInput(activeScreen, event);
+      intercept |= sendMouseInput(rootContainer, event);
     }
     if(!intercept) {
       if(e.action() == Action.PRESS && e.button() == Button.LEFT) {
         TermPos pos = e.terminalPosition();
-        activeScreen.performSelect(pos.x(), pos.y());
+        rootContainer.performSelect(pos.x(), pos.y());
       }
     }
   }

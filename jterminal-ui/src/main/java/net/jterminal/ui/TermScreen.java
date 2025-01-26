@@ -1,6 +1,9 @@
 package net.jterminal.ui;
 
+import net.jterminal.ui.component.ComponentGraphics;
 import net.jterminal.ui.component.RootContainer;
+import net.jterminal.ui.dialog.TermDialog;
+import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +15,47 @@ public class TermScreen extends RootContainer {
   private TermDim originalSize = null;
   private boolean mouseInputEnabled = false;
   private boolean mouseMoveInputEnabled = false;
+
+  private volatile TermDialog openedDialog = null;
+
+  public boolean isDialogOpened() {
+    return openedDialog != null;
+  }
+
+  public @Nullable TermDialog openedDialog() {
+    return openedDialog;
+  }
+
+  public void openDialog(@NotNull TermDialog dialog) {
+    synchronized (lock) {
+      openedDialog = dialog;
+      openedDialog.setParent(this);
+      repaintFully();
+    }
+  }
+
+  public void closeDialog() {
+    synchronized (lock) {
+      openedDialog = null;
+      repaintFully();
+    }
+  }
+
+  @Override
+  public @NotNull TermScreen screen() {
+    return this;
+  }
+
+  @Override
+  public void paint(@NotNull TermGraphics graphics) {
+    super.paint(graphics);
+    if(openedDialog != null) {
+      ComponentGraphics.prepare(openedDialog);
+      ComponentGraphics.draw(graphics, openedDialog);
+      openedDialog.paintGlobal(graphics);
+    }
+  }
+
 
   @Override
   public void repaint() {
