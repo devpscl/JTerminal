@@ -1,7 +1,9 @@
 package net.jterminal.ui.dialog;
 
+import net.jterminal.Terminal;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.ui.TermScreen;
+import net.jterminal.ui.UITerminal;
 import net.jterminal.ui.component.Container;
 import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.component.RootContainer;
@@ -56,6 +58,19 @@ public class TermDialog extends RootContainer implements Resizeable {
     }
   }
 
+  public void openDialog() {
+    if(parent() != null) {
+      return;
+    }
+    Terminal terminal = Terminal.get();
+    if(terminal instanceof UITerminal uiTerminal) {
+      TermScreen screen = uiTerminal.openedScreen();
+      if(screen == null) {
+        return;
+      }
+      screen.openDialog(this);
+    }
+  }
 
   public void closeDialog() {
     TermScreen screen = screen();
