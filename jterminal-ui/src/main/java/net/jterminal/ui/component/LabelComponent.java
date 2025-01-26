@@ -10,6 +10,7 @@ public class LabelComponent extends Component implements Resizeable {
 
   private TermString text;
   private TextAlignment textAlignment;
+  private boolean autoWrapLines;
 
   public LabelComponent(@NotNull TermString text) {
     this(text, TextAlignment.LEFT);
@@ -23,6 +24,15 @@ public class LabelComponent extends Component implements Resizeable {
 
   public LabelComponent() {
     this(TermString.empty());
+  }
+
+  public boolean autoWrapLines() {
+    return autoWrapLines;
+  }
+
+  public void autoWrapLines(boolean autoWrapLines) {
+    this.autoWrapLines = autoWrapLines;
+    repaint();
   }
 
   public @NotNull TextAlignment textAlignment() {
@@ -61,7 +71,8 @@ public class LabelComponent extends Component implements Resizeable {
 
   @Override
   public void paint(@NotNull TermGraphics graphics) {
-    TermString[] lines = text.split('\n');
+    int width = graphics.size().width();
+    TermString[] lines = autoWrapLines ? text.wrapLines(width) : text.split('\n');
     TermDim size = currentDimension();
     int midX = (size.width() / 2);
     int y = 1;
