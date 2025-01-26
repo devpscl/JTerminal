@@ -92,7 +92,7 @@ public class CellBuffer {
     if(sy >= height || sy < 0) {
       return;
     }
-    fillUnsafe(sx, sy, ex, ey, cellData);
+    fillUnsafe(sx, sy, Math.min(ex, width - 1), Math.min(ey, height - 1), cellData);
   }
 
   public void fillUnsafe(int x1, int y1, int x2, int y2, @NotNull CellData cellData) {
