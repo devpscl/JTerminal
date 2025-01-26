@@ -49,9 +49,11 @@ public class TermDialog extends RootContainer implements Resizeable {
     TermPos endCorner = origin.copy()
         .addX(size.width())
         .addY(size.height());
-    graphics.backgroundColor(TerminalColor.BLACK);
-    graphics.fillRect(endCorner.x(), origin.y() + 1, 1, size.height(), ' ');
-    graphics.fillRect(origin.x() + 1, endCorner.y(), size.width(), 1, ' ');
+    if(shadow) {
+      graphics.backgroundColor(TerminalColor.BLACK);
+      graphics.fillRect(endCorner.x(), origin.y() + 1, 1, size.height(), ' ');
+      graphics.fillRect(origin.x() + 1, endCorner.y(), size.width(), 1, ' ');
+    }
   }
 
 
