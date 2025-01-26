@@ -7,6 +7,7 @@ import net.jterminal.text.BackgroundColor;
 import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.text.style.TextStyle;
+import net.jterminal.ui.TermScreen;
 import net.jterminal.ui.component.selectable.SelectableComponent;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
@@ -47,8 +48,6 @@ public abstract class Component implements Displayable, Comparable<Component> {
   protected volatile TermPos cachedPosition = new TermPos();
   protected volatile TermDim cachedDim = new TermDim(1, 1);
 
-  boolean interceptInput = false;
-
   public Component() {
      id = idCounter.getAndIncrement();
      eventBus.register(this);
@@ -82,7 +81,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
     }
   }
 
-  void setParent(@Nullable Container parent) {
+  public void setParent(@Nullable Container parent) {
     this.parent = parent;
   }
 
@@ -98,6 +97,13 @@ public abstract class Component implements Displayable, Comparable<Component> {
       return null;
     }
     return parent.rootContainer();
+  }
+
+  public @Nullable TermScreen screen() {
+    if(parent == null) {
+      return null;
+    }
+    return parent.screen();
   }
 
   @Override
@@ -317,10 +323,6 @@ public abstract class Component implements Displayable, Comparable<Component> {
       return false;
     }
     return y - displayPosition.y() < displaySize.height();
-  }
-
-  public final boolean isInterceptInput() {
-    return interceptInput;
   }
 
   @Internal
