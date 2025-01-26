@@ -61,7 +61,7 @@ public class ButtonComponent extends SelectableComponent {
     if(!isSelected()) {
       return;
     }
-    if(event.key() == Keyboard.KEY_ENTER) {
+    if(event.key() == Keyboard.KEY_ENTER && !event.isCancelledAction()) {
       if(action != null) {
         action.run();
       }
@@ -75,11 +75,12 @@ public class ButtonComponent extends SelectableComponent {
     if(!isSelected()) {
       return;
     }
-    if(event.action() == Action.RELEASE && event.button() == Button.LEFT) {
-      if(action != null && !event.isCancelledAction()) {
+    if(event.action() == Action.RELEASE && event.button() == Button.LEFT
+        && !event.isCancelledAction()) {
+      if(action != null) {
         action.run();
-        eventBus.post(new ButtonClickedEvent(this));
       }
+      eventBus().post(new ButtonClickedEvent(this));
     }
   }
 
