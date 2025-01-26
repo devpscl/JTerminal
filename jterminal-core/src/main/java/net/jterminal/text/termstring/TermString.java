@@ -89,6 +89,17 @@ public interface TermString {
     return x == null ? empty() : Element2StringConverter.convert(x);
   }
 
+  static @NotNull TermStringJoiner joiner() {
+    return new TermStringJoinerImpl();
+  }
+
+  static @NotNull TermString join(@NotNull TermString delimiter, @NotNull TermString...strings) {
+    return joiner()
+        .addAll(strings)
+        .delimiter(delimiter)
+        .build();
+  }
+
   static @NotNull TermString empty() {
     return value("");
   }
