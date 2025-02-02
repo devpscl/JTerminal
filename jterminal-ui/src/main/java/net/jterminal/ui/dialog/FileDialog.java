@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import net.jterminal.input.Keyboard;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.text.termstring.TermString;
@@ -31,6 +32,12 @@ public class FileDialog extends TermDialog {
     DIRECTORY_CHOOSER
   }
 
+  public enum Action {
+    OPEN,
+    SAVE,
+    CHOOSE
+  }
+
   private File dir;
   private List<File> viewFileList = new ArrayList<>();
 
@@ -47,11 +54,15 @@ public class FileDialog extends TermDialog {
   private BoxCharacter.Type boxType = BoxCharacter.Type.NORMAL;
   private FileFilter fileFilter;
   private final ChooseType chooseType;
+  private final Action action;
+  private Consumer<File> resultEvent;
 
   public FileDialog(@NotNull File dir, @NotNull String title,
-      @NotNull ChooseType chooseType) {
+      @NotNull ChooseType chooseType, Action action, Consumer<File> resultEvent) {
     this.dir = new File(dir.getAbsolutePath());
     this.chooseType = chooseType;
+    this.action = action;
+    this.resultEvent = resultEvent;
     init(title);
     updateList();
     updateFullPath();
@@ -97,11 +108,13 @@ public class FileDialog extends TermDialog {
     nameFieldLabel.y(Layout.relative(Anchor.BOTTOM), Layout.offset(-1));
 
     cancelButton = new ButtonComponent("Cancel");
+    cancelButton.action(this::handleCancelEvent);
     cancelButton.y(Layout.relative(nameFieldLabel, Anchor.TOP));
     cancelButton.x(Layout.relative(Anchor.RIGHT), Layout.offset(-cancelButton.preferredWidth()),
         Layout.offset(-1));
 
-    actionButton = new ButtonComponent("Open");
+    actionButton = new ButtonComponent(action.name());
+    actionButton.action(this::handleActionEvent);
     actionButton.y(Layout.relative(nameFieldLabel, Anchor.TOP));
     actionButton.x(Layout.relative(cancelButton, Anchor.LEFT),
         Layout.offset(-actionButton.preferredWidth()),
@@ -145,6 +158,10 @@ public class FileDialog extends TermDialog {
 
   public @NotNull Type boxType() {
     return boxType;
+  }
+
+  public @NotNull Action action() {
+    return action;
   }
 
   public void boxType(@NotNull Type boxType) {
@@ -207,6 +224,9 @@ public class FileDialog extends TermDialog {
     for (File file : files) {
       if(file.isDirectory()) {
         dirList.add(file);
+        continue;
+      }
+      if(chooseType == ChooseType.DIRECTORY_CHOOSER) {
         continue;
       }
       fileList.add(file);
@@ -305,6 +325,20 @@ public class FileDialog extends TermDialog {
       return;
     }
     performSelectFile(file);
+  }
+
+  private void handleCancelEvent() {
+    closeDialog();
+    if(resultEvent != null) {
+      resultEvent.accept(null);
+    }
+  }
+
+  private void handleActionEvent() {
+    closeDialog();
+    if(resultEvent != null) {
+      resultEvent.accept(file());
+    }
   }
 
 }
