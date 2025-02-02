@@ -31,7 +31,6 @@ import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.ui.util.ViewShifter.Type;
 import net.jterminal.util.CharFilter;
 import net.jterminal.util.CharFilter.CharType;
-import net.jterminal.util.StringUtil;
 import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -160,7 +159,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
 
   public void text(@NotNull String text) {
     synchronized (lock) {
-      String[] array = StringUtil.NEXT_LINE_PATTERN.split(text);
+      String[] array = text.split("\\r?\\n");
       lines.clear();
       for (String s : array) {
         lines.add(TermString.value(s));
@@ -176,7 +175,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
 
   public void text(@NotNull TermString termString) {
     synchronized (lock) {
-      @NotNull TermString[] split = termString.split(StringUtil.NEXT_LINE_PATTERN);
+      @NotNull TermString[] split = termString.split("\\r?\\n");
       lines.clear();
       lines.addAll(Arrays.asList(split));
       if(lines.isEmpty()) {
