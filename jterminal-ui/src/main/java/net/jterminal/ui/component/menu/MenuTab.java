@@ -1,6 +1,7 @@
 package net.jterminal.ui.component.menu;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -35,8 +36,8 @@ public class MenuTab {
     return name;
   }
 
-  public void add(@NotNull MenuItem item) {
-    items.add(item);
+  public void add(@NotNull MenuItem...item) {
+    items.addAll(Arrays.asList(item));
   }
 
   public void remove(@NotNull MenuItem item) {
