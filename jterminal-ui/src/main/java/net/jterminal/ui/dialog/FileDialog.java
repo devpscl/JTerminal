@@ -66,6 +66,8 @@ public class FileDialog extends TermDialog {
     init(title);
     updateList();
     updateFullPath();
+    width(Layout.fill(), Layout.scale(0.8F));
+    height(Layout.fill(), Layout.scale(0.8F));
   }
 
   private void init(@NotNull String title) {
