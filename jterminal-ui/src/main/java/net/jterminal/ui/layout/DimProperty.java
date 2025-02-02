@@ -35,7 +35,9 @@ public class DimProperty {
     for (Modifier modifier : modifiers) {
       value = modifier.get(dimension.copy(), value, Axis.HORIZONTAL);
     }
-    value = Math.max(0, Math.min(value, dimension.width() - position.x() + TermPos.AXIS_ORIGIN));
+    int max = dimension.width() - position.x() + TermPos.AXIS_ORIGIN;
+
+    value = Math.max(0, Math.min(value, max));
     return value;
   }
 
@@ -44,7 +46,8 @@ public class DimProperty {
     for (Modifier modifier : modifiers) {
       value = modifier.get(dimension.copy(), value, Axis.VERTICAL);
     }
-    value = Math.max(0, Math.min(value, dimension.height() - position.y() + TermPos.AXIS_ORIGIN));
+    int max = dimension.height() - position.y() + TermPos.AXIS_ORIGIN;
+    value = Math.max(0, Math.min(value, max));
     return value;
   }
 
