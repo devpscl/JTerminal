@@ -82,7 +82,7 @@ public class LabelComponent extends Component implements Resizeable {
       if(textAlignment == TextAlignment.RIGHT) {
         x = size.width() - length;
       } else if(textAlignment == TextAlignment.CENTER) {
-        x = midX - (length / 2);
+        x = midX - (length / 2) + 1;
       } else {
         x = 1;
       }
