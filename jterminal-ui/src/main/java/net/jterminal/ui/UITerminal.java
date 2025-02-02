@@ -9,7 +9,7 @@ public interface UITerminal extends NativeTerminal {
 
   void openScreen(@NotNull TermScreen screen);
 
-  void closeScreen(@NotNull TermScreen screen);
+  void closeScreen();
 
   @Nullable TermScreen openedScreen();
 
