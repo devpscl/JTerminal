@@ -336,6 +336,12 @@ public interface Terminal {
    */
   void flags(int flags);
 
+
+  /**
+   * Reset flags to default configuration
+   * */
+  void resetFlags();
+
   /**
    * Flags int.
    *

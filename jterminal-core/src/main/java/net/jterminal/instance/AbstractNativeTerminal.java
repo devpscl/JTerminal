@@ -169,6 +169,11 @@ public abstract class AbstractNativeTerminal<T extends Terminal>
   }
 
   @Override
+  public void resetFlags() {
+    flags(defaultFlags);
+  }
+
+  @Override
   public int flags() {
     return flags;
   }

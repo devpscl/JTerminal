@@ -21,6 +21,9 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractTerminal<T extends Terminal>
     implements Terminal {
 
+  protected static final int defaultFlags = Terminal.FLAG_LINE_INPUT | Terminal.FLAG_ECHO |
+      Terminal.FLAG_SIGNAL_INPUT;
+
   protected final Class<?> interfaceType;
 
   protected final PrintStream out;

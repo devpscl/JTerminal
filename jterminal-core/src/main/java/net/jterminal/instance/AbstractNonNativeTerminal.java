@@ -75,6 +75,11 @@ public class AbstractNonNativeTerminal<T extends Terminal> extends AbstractTermi
   }
 
   @Override
+  public void resetFlags() {
+    //do nothing
+  }
+
+  @Override
   public int flags() {
     return 0;
   }
