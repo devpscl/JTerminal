@@ -237,6 +237,7 @@ public class MenuBarComponent extends SelectableComponent
         return;
       }
       menuItem.performClick();
+      unselect();
     }
   }
 
@@ -263,6 +264,7 @@ public class MenuBarComponent extends SelectableComponent
       MenuItem menuItem = selectedTab.get(index);
       if(menuItem != null) {
         menuItem.performClick();
+        unselect();
         return;
       }
     }
