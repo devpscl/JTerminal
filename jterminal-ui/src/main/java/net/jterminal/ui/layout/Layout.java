@@ -14,7 +14,11 @@ public interface Layout {
   }
 
   static @NotNull DimensionValue fill() {
-    return new FillDimensionValue();
+    return new FillDimensionValue(1.0F);
+  }
+
+  static @NotNull DimensionValue fill(float percent) {
+    return new FillDimensionValue(percent);
   }
 
   static @NotNull PositionValue origin() {
