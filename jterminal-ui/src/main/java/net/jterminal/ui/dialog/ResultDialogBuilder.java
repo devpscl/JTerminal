@@ -16,6 +16,12 @@ public class ResultDialogBuilder {
   private float widthScale = 0.5F;
   private float heightScale = 0.2F;
   private final Map<Integer, Consumer<ResultDialog>> eventMap = new HashMap<>();
+  private int spaceBetweenButtons = 1;
+
+  public @NotNull ResultDialogBuilder spaceBetweenButtons(int count) {
+    this.spaceBetweenButtons = count;
+    return this;
+  }
 
   public @NotNull String title() {
     return title;
@@ -70,6 +76,7 @@ public class ResultDialogBuilder {
   public @NotNull ResultDialog build() {
     final ResultDialog dialog = new ResultDialog(title, optionType);
     dialog.message(message);
+    dialog.spaceBetweenButtons(spaceBetweenButtons);
     dialog.width(Layout.fill(), Layout.scale(widthScale));
     dialog.height(Layout.fill(), Layout.scale(heightScale), Layout.min(5));
     dialog.action(intValue -> {

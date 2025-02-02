@@ -1,10 +1,12 @@
 package net.jterminal.ui.dialog;
 
 import java.util.function.Consumer;
+import net.jterminal.input.Keyboard;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.component.FrameContainer;
 import net.jterminal.ui.component.LabelComponent;
 import net.jterminal.ui.component.selectable.ButtonComponent;
+import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.layout.Anchor;
 import net.jterminal.ui.layout.Layout;
 import net.jterminal.ui.util.BoxCharacter.Type;
@@ -25,6 +27,7 @@ public class ResultDialog extends TermDialog {
   public static final int BUTTON_NO = 3;
   public static final int BUTTON_CANCEL = 4;
 
+  private int buttonSpace = 2;
   private final OptionType type;
   private Consumer<Integer> action = null;
   private final FrameContainer frameContainer = new FrameContainer();
@@ -34,6 +37,14 @@ public class ResultDialog extends TermDialog {
     this.type = type;
     frameContainer.title(title);
     init();
+  }
+
+  public int spaceBetweenButtons() {
+    return buttonSpace;
+  }
+
+  public void spaceBetweenButtons(int buttonSpace) {
+    this.buttonSpace = buttonSpace;
   }
 
   public @NotNull String title() {
@@ -97,12 +108,13 @@ public class ResultDialog extends TermDialog {
   private void addButtons(ButtonComponent...buttonComponents) {
     int length = 0;
     for (ButtonComponent buttonComponent : buttonComponents) {
-      length += buttonComponent.text().length() + 2 + 1;
+      length += buttonComponent.preferredWidth() + buttonSpace;
     }
-
     if(length < 1) {
       return;
     }
+    length -= buttonSpace;
+
     int halfLength = length / 2;
     ButtonComponent lastComponent = null;
     for (ButtonComponent buttonComponent : buttonComponents) {
@@ -148,4 +160,18 @@ public class ResultDialog extends TermDialog {
     closeDialog();
   }
 
+  @Override
+  public void processKeyEvent(@NotNull ComponentKeyEvent event) {
+    super.processKeyEvent(event);
+    if(event.key() == Keyboard.KEY_ESCAPE) {
+      if(type == OptionType.YES_NO_CANCEL_TYPE) {
+        handleCancelButton();
+        return;
+      }
+      if(type == OptionType.OK_CANCEL_TYPE) {
+        handleCancelButton();
+        return;
+      }
+    }
+  }
 }
