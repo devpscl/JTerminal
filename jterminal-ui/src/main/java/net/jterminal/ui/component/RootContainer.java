@@ -45,16 +45,16 @@ public class RootContainer extends Container {
 
   public void select(@NotNull SelectableComponent selectedComponent) {
     if(this.selectedComponent != null) {
-      selectedComponent.eventBus().post(new ComponentUnselectEvent());
+      selectedComponent.eventBus().post(new ComponentUnselectEvent(this.selectedComponent));
     }
     this.selectedComponent = selectedComponent;
-    selectedComponent.eventBus().post(new ComponentSelectEvent());
+    selectedComponent.eventBus().post(new ComponentSelectEvent(selectedComponent));
     repaint();
   }
 
   public void unselect() {
     if(selectedComponent != null) {
-      selectedComponent.eventBus().post(new ComponentUnselectEvent());
+      selectedComponent.eventBus().post(new ComponentUnselectEvent(selectedComponent));
       selectedComponent = null;
       repaint();
     }
