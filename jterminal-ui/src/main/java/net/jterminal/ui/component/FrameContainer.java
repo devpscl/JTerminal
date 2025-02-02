@@ -81,7 +81,7 @@ public class FrameContainer extends PaneContainer {
     super.paint(graphics);
     TermDim size = graphics.size();
     BoxShape boxShape = new BoxShape(size);
-    boxShape.addBox(1, 1, size.width(), size.height(), Type.NORMAL);
+    boxShape.addBox(1, 1, size.width(), size.height(), boxLineType);
     graphics.drawShape(1, 1, boxShape);
     if(!title.isEmpty()) {
       int x;
