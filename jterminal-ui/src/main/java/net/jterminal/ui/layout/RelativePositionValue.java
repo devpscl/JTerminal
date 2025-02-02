@@ -10,10 +10,12 @@ final class RelativePositionValue implements PositionValue {
 
   private final @Nullable Component source;
   private final @NotNull Anchor anchor;
+  private final boolean dockingAnchor;
 
-  public RelativePositionValue(@Nullable Component source, @NotNull Anchor anchor) {
+  public RelativePositionValue(@Nullable Component source, @NotNull Anchor anchor, boolean dockingAnchor) {
     this.source = source;
     this.anchor = anchor;
+    this.dockingAnchor = dockingAnchor;
   }
 
   @Override
@@ -28,10 +30,13 @@ final class RelativePositionValue implements PositionValue {
     if(anchor == Anchor.TOP || anchor == Anchor.BOTTOM) {
       return 1;
     }
+    int value;
     if(anchor == Anchor.RIGHT) {
-      return source.currentPosition().x() + source.currentDimension().width();
+      value = source.currentPosition().x() + source.currentDimension().width();
+      return dockingAnchor ? value : value - 1;
     }
-    return source.currentPosition().x();
+    value = source.currentPosition().x();
+    return dockingAnchor ? value - 1 : value;
   }
 
   @Override
@@ -46,9 +51,12 @@ final class RelativePositionValue implements PositionValue {
     if(anchor == Anchor.LEFT || anchor == Anchor.RIGHT) {
       return 1;
     }
+    int value;
     if(anchor == Anchor.BOTTOM) {
-      return source.currentPosition().y() + source.currentDimension().height();
+      value = source.currentPosition().y() + source.currentDimension().height();
+      return dockingAnchor ? value : value - 1;
     }
-    return source.currentPosition().y();
+    value = source.currentPosition().y();
+    return dockingAnchor ? value - 1 : value;
   }
 }

@@ -26,11 +26,28 @@ public interface Layout {
   }
 
   static @NotNull PositionValue relative(@NotNull Anchor anchor) {
-    return new RelativePositionValue(null, anchor);
+    return new RelativePositionValue(null, anchor, false);
   }
 
   static @NotNull PositionValue relative(@NotNull Component component, @NotNull Anchor anchor) {
-    return new RelativePositionValue(component, anchor);
+    return new RelativePositionValue(component, anchor, false);
+  }
+
+  static @NotNull DimensionValue relativeTo(@NotNull Anchor anchor) {
+    return new RelativeDimensionValue(null, anchor, false);
+  }
+
+  static @NotNull DimensionValue relativeTo(@NotNull Component component,
+      @NotNull Anchor anchor) {
+    return new RelativeDimensionValue(component, anchor, false);
+  }
+
+  static @NotNull PositionValue dock(@NotNull Component component, @NotNull Anchor anchor) {
+    return new RelativePositionValue(component, anchor, true);
+  }
+
+  static @NotNull DimensionValue dockTo(@NotNull Component component, @NotNull Anchor anchor) {
+    return new RelativeDimensionValue(component, anchor, true);
   }
 
   static @NotNull Modifier scale(@Range(from = 0, to = 1) float val) {
