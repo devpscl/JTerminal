@@ -176,7 +176,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
       return false;
     }
     boolean interceptInput = false;
-    ComponentKeyEvent keyEvent = new ComponentKeyEvent(e);
+    ComponentKeyEvent keyEvent = new ComponentKeyEvent(component, e);
     component.eventBus().post(keyEvent);
     if(!keyEvent.isCancelledAction()) {
       final Object componentLock = component.getLock();
@@ -215,7 +215,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     }
     if(component instanceof Container c) {
       final TermPos origin = c.currentComponentViewOrigin();
-      ComponentMouseEvent viewMouseEvent = e.shiftPosition(origin);
+      ComponentMouseEvent viewMouseEvent = e.shiftPosition(origin, c);
       for (Component child : c.components()) {
         TermPos mousePos = viewMouseEvent.position();
         TermPos effPos = child.currentPosition();
@@ -227,7 +227,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
           continue;
         }
 
-        ComponentMouseEvent copiedEvent = viewMouseEvent.shiftPosition(effPos);
+        ComponentMouseEvent copiedEvent = viewMouseEvent.shiftPosition(effPos, child);
         boolean state = sendMouseInput(child, copiedEvent);
         interceptInput |= state;
       }
@@ -299,7 +299,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     drawNewScreen();
     if(activeScreen != null) {
       activeScreen.processResizeEvent(
-          new ComponentResizeEvent(e.oldDimension(), e.newDimension()));
+          new ComponentResizeEvent(activeScreen, e.oldDimension(), e.newDimension()));
     }
   }
 
@@ -310,9 +310,9 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
       return;
     }
     TermDialog openedDialog = activeScreen.openedDialog();
-    ComponentMouseEvent event = new ComponentMouseEvent(e);
+    ComponentMouseEvent event = new ComponentMouseEvent(rootContainer, e);
     if(rootContainer instanceof TermDialog) {
-      event = event.shiftPosition(rootContainer.currentPosition());
+      event = event.shiftPosition(rootContainer.currentPosition(), rootContainer);
     }
     for (Component deepComponent : rootContainer.deepComponents()) {
       if(!deepComponent.isEnabled()) {

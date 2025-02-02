@@ -1,23 +1,27 @@
 package net.jterminal.ui.event.component;
 
-import net.devpscl.eventbus.Event;
 import net.jterminal.input.Keyboard.State;
 import net.jterminal.input.KeyboardInputEvent;
+import net.jterminal.ui.component.Component;
+import net.jterminal.ui.event.special.AbstractComponentEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ComponentKeyEvent implements Event {
+public class ComponentKeyEvent extends AbstractComponentEvent<Component> {
 
   private final KeyboardInputEvent event;
   private boolean cancelledAction = false;
   private boolean intercept = false;
   protected boolean ignoreChildComponents = false;
 
-  public ComponentKeyEvent(@NotNull KeyboardInputEvent event) {
+  public ComponentKeyEvent(@NotNull Component component, @NotNull KeyboardInputEvent event) {
+    super(component);
     this.event = event;
   }
 
-  protected ComponentKeyEvent(KeyboardInputEvent event, boolean cancelledAction,
+  protected ComponentKeyEvent(@NotNull Component component,
+      @NotNull KeyboardInputEvent event, boolean cancelledAction,
       boolean intercept, boolean ignoreChildComponents) {
+    super(component);
     this.event = event;
     this.cancelledAction = cancelledAction;
   }
@@ -63,7 +67,8 @@ public class ComponentKeyEvent implements Event {
   }
 
   public @NotNull ComponentKeyEvent copy() {
-    return new ComponentKeyEvent(event, cancelledAction, intercept, ignoreChildComponents);
+    return new ComponentKeyEvent(component(),
+        event, cancelledAction, intercept, ignoreChildComponents);
   }
 
 }

@@ -1,13 +1,14 @@
 package net.jterminal.ui.event.component;
 
-import net.devpscl.eventbus.Event;
 import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.input.MouseInputEvent;
+import net.jterminal.ui.component.Component;
+import net.jterminal.ui.event.special.AbstractComponentEvent;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
-public class ComponentMouseEvent implements Event {
+public class ComponentMouseEvent extends AbstractComponentEvent<Component> {
 
   private final Button button;
   private final Action action;
@@ -16,17 +17,19 @@ public class ComponentMouseEvent implements Event {
   protected boolean intercept = false;
   protected boolean ignoreChildComponents = false;
 
-  public ComponentMouseEvent(@NotNull Button button,
+  public ComponentMouseEvent(@NotNull Component component, @NotNull Button button,
       @NotNull Action action,
       @NotNull TermPos terminalPosition, boolean cancelledAction,
       boolean intercept, boolean ignoreChildComponents) {
+    super(component);
     this.button = button;
     this.action = action;
     this.terminalPosition = terminalPosition;
     this.cancelledAction = cancelledAction;
   }
 
-  public ComponentMouseEvent(@NotNull MouseInputEvent e) {
+  public ComponentMouseEvent(@NotNull Component component, @NotNull MouseInputEvent e) {
+    super(component);
     this.button = e.button();
     this.action = e.action();
     this.terminalPosition = e.terminalPosition();
@@ -68,14 +71,15 @@ public class ComponentMouseEvent implements Event {
     return ignoreChildComponents;
   }
 
-  public @NotNull ComponentMouseEvent shiftPosition(@NotNull TermPos origin) {
+  public @NotNull ComponentMouseEvent shiftPosition(@NotNull TermPos origin,
+      @NotNull Component component) {
     TermPos tpos = terminalPosition.copy().subtractShift(origin);
-    return new ComponentMouseEvent(button, action, tpos, cancelledAction,
+    return new ComponentMouseEvent(component, button, action, tpos, cancelledAction,
         intercept, ignoreChildComponents);
   }
 
   public @NotNull ComponentMouseEvent copy() {
-    return new ComponentMouseEvent(button, action, terminalPosition.copy(),
+    return new ComponentMouseEvent(component(), button, action, terminalPosition.copy(),
         cancelledAction, intercept, ignoreChildComponents);
   }
 
