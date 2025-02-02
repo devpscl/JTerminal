@@ -71,11 +71,14 @@ public abstract class Component implements Displayable, Comparable<Component> {
         TermPos pos = new TermPos(x, y);
         int width = widthDimProperty.calculateWidth(currentDimension, pos);
         int height = heightDimProperty.calculateHeight(currentDimension, pos);
-        TermDim dim = new TermDim(width, height);
+        TermDim dim = new TermDim(width,
+            height);
         cachedPosition = pos;
         cachedDim = dim;
         if(!oldDim.equals(dim)) {
-          processResizeEvent(new ComponentResizeEvent(oldDim, dim));
+          ComponentResizeEvent event = new ComponentResizeEvent(this, oldDim, dim);
+          processResizeEvent(event);
+          eventBus.post(event);
         }
       }
     }
@@ -145,9 +148,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
       }
       return 1;
     }
-    if(priority == o.priority) {
-      return Long.compare(id, o.id);
-    }
+
     return Integer.compare(priority, o.priority);
   }
 
