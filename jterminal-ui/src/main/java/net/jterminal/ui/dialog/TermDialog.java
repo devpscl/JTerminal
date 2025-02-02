@@ -75,6 +75,9 @@ public class TermDialog extends RootContainer implements Resizeable {
   public void closeDialog() {
     TermScreen screen = screen();
     if(screen != null) {
+      if(screen.openedDialog() != this) {
+        return;
+      }
       screen.closeDialog();
     }
   }
