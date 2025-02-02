@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public class StringUtil {
 
   public static final Pattern NEXT_LINE_PATTERN =
-      Pattern.compile("(?<!\\\\)\\n");
+      Pattern.compile("\\r?\\n");
 
   public static final String EMPTY_STRING = "";
 
