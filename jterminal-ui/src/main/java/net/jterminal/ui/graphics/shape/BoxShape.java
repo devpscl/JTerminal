@@ -36,6 +36,9 @@ public class BoxShape implements TermShape {
   }
 
   protected void write(int x, int y, @NotNull BoxCharEntry entry) {
+    if(x > dimension.width() || y > dimension.height() || x < 1 || y < 1) {
+      return;
+    }
     int data = 0;
     data |= convertTo2Bit(entry.top);
     data |= convertTo2Bit(entry.right) << 2;
@@ -45,6 +48,9 @@ public class BoxShape implements TermShape {
   }
 
   protected @NotNull BoxCharEntry read(int x, int y) {
+    if(x > dimension.width() || y > dimension.height() || x < 1 || y < 1) {
+      return new BoxCharEntry();
+    }
     int data = this.data[y-1][x-1];
     if(data == 0) {
       return new BoxCharEntry();
