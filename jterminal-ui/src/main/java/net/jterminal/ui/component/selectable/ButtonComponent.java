@@ -24,6 +24,10 @@ public class ButtonComponent extends SelectableComponent {
     text(text);
   }
 
+  public int preferredWidth() {
+    return text.length() + 2;
+  }
+
   public @NotNull String text() {
     return text;
   }
