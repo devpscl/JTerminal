@@ -142,7 +142,10 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
         lastRenderTime = end-start;
         eventBus.post(new ScreenRenderedEvent(activeScreen));
       }
-    } finally {
+    } catch (Throwable t) {
+      LOGGER.error("Error while rendering", t);
+    }
+    finally {
       renderLock.unlock();
     }
   }
