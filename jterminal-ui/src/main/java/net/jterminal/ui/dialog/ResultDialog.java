@@ -170,7 +170,6 @@ public class ResultDialog extends TermDialog {
       }
       if(type == OptionType.OK_CANCEL_TYPE) {
         handleCancelButton();
-        return;
       }
     }
   }
