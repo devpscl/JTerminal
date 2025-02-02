@@ -33,7 +33,7 @@ public class TermScreen extends RootContainer {
       }
       openedDialog = dialog;
       openedDialog.setParent(this);
-      repaintFully();
+      repaint();
     }
   }
 
@@ -43,7 +43,7 @@ public class TermScreen extends RootContainer {
         openedDialog.setParent(null);
       }
       openedDialog = null;
-      repaintFully();
+      repaint();
     }
   }
 
