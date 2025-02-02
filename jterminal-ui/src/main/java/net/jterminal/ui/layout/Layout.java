@@ -9,6 +9,10 @@ import org.jetbrains.annotations.Range;
 
 public interface Layout {
 
+  static @NotNull PositionValue center() {
+    return new CenterPositionValue();
+  }
+
   static @NotNull DimensionValue fill() {
     return new FillDimensionValue();
   }
