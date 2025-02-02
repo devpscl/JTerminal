@@ -48,20 +48,6 @@ public class FileDialog extends TermDialog {
   private FileFilter fileFilter;
   private final ChooseType chooseType;
 
-  /*TODO
-   * - tabPriority zu komponenten hinzufügen
-   * - ListViewComponent umbauen, sodass doppelklicks erkannt werden
-   *   -> Methode bereitstellen und diese für ListChooseEvent einsetzen
-   *   -> Auswahl verstecken bei verlassen vom komponent
-   * - Wenn möglich: sortierung mit der uniqueid von jeden komponent löschen
-   * - Scrollbar fixen, Builder hinzufügen
-   * - Events (ComponentKeyEvent) mit AbstractComponentEvent ausrüsten
-   * - Relative modifier hinzufügen bei dimension, um dimension regelungen zu anderen komponenten
-   *   erstellen zu können
-   * - File dialog fertig stellen
-   *
-   * */
-
   public FileDialog(@NotNull File dir, @NotNull String title,
       @NotNull ChooseType chooseType) {
     this.dir = new File(dir.getAbsolutePath());
@@ -287,7 +273,6 @@ public class FileDialog extends TermDialog {
     }
     if(chooseType == ChooseType.DIRECTORY_CHOOSER && file.isDirectory()) {
       nameInputComponent.value(file.getName());
-      return;
     }
   }
 
