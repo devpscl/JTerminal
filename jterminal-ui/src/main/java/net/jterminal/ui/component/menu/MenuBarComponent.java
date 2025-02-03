@@ -260,15 +260,13 @@ public class MenuBarComponent extends SelectableComponent
   }
 
   public void performItemClick(int index) {
-    if(itemCursor == index) {
-      MenuItem menuItem = selectedTab.get(index);
-      if(menuItem != null) {
-        menuItem.performClick();
-        unselect();
-        return;
-      }
-    }
     itemCursor = index;
+    MenuItem menuItem = selectedTab.get(index);
+    if(menuItem != null) {
+      menuItem.performClick();
+      unselect();
+      return;
+    }
     repaint();
   }
 
@@ -294,6 +292,7 @@ public class MenuBarComponent extends SelectableComponent
       for (MenuItem item : selectedTab.items()) {
         if(position.x() >= startX + 1 && position.x() <= startX + width) {
           if(position.y() == offset) {
+
             performItemClick(idx);
             event.intercept(true);
             event.ignoreChildComponents(true);
