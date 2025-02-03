@@ -19,7 +19,7 @@ public class CellDataImpl implements CellData {
       @Nullable BackgroundColor backgroundColor,
       TextFont[] fonts,
       @NotNull String sequence) {
-    this.symbol = symbol;
+    this.symbol = symbol <= 0x1F ? 0x20 : symbol;
     this.foregroundColor = foregroundColor;
     this.backgroundColor = backgroundColor;
     this.fonts = fonts;
