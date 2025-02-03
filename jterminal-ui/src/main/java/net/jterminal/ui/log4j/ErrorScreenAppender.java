@@ -43,16 +43,21 @@ public class ErrorScreenAppender extends AbstractAppender {
     }
     Terminal terminal = Terminal.get();
     if(terminal instanceof UITerminal uit) {
+      TerminalColor bgc = event.getLevel() == Level.ERROR ? TerminalColor.RED : TerminalColor.YELLOW;
+      TerminalColor fgc = TerminalColor.BLACK;
       uit.closeScreen();
-      uit.backgroundColor(event.getLevel() == Level.ERROR ? TerminalColor.RED : TerminalColor.YELLOW);
-      uit.foregroundColor(TerminalColor.BLACK);
+      uit.backgroundColor(bgc);
+      uit.foregroundColor(fgc);
       uit.setBuffer(BufferId.MAIN);
       uit.resetFlags();
       uit.clear();
       Message message = event.getMessage();
-      TerminalBuffer buffer = new TerminalBuffer();
-      buffer.append("[" + event.getLevel().name() + " - " + event.getThreadName() + "]: "
+      TerminalBuffer buffer = new TerminalBuffer()
+          .foregroundColor(fgc)
+          .backgroundColor(bgc)
+          .append("[" + event.getLevel().name() + " - " + event.getThreadName() + "]: "
           + message.getFormattedMessage());
+
       Throwable throwable = message.getThrowable();
       buffer.newLine();
       StringWriter stringWriter = new StringWriter();
