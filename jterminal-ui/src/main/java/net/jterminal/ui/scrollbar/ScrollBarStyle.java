@@ -1,4 +1,4 @@
-package net.jterminal.ui.component.scrollbar;
+package net.jterminal.ui.scrollbar;
 
 import net.jterminal.ui.util.Axis;
 import org.jetbrains.annotations.NotNull;
