@@ -145,11 +145,11 @@ public class ViewShifter {
   }
 
   public boolean viewGreaterThanBuffer() {
-    return modifiedViewSize() >= modifiedBufferSize();
+    return modifiedViewSize() > modifiedBufferSize();
   }
 
   public boolean viewLesserThanBuffer() {
-    return modifiedViewSize() <= modifiedBufferSize();
+    return modifiedViewSize() < modifiedBufferSize();
   }
 
 }
