@@ -10,12 +10,12 @@ import net.jterminal.text.Combiner;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.component.Resizeable;
-import net.jterminal.ui.component.scrollbar.VirtualScrollBar;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.special.ListItemInteractEvent;
 import net.jterminal.ui.event.special.ListItemShowEvent;
 import net.jterminal.ui.graphics.TermGraphics;
+import net.jterminal.ui.scrollbar.ScrollBar;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.ui.util.ViewShifter.Type;
@@ -29,7 +29,7 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
   protected List<String> elements = new ArrayList<>();
   protected TextStyle cursorStyle = TextStyle.create(
       null, null, TextFont.REVERSED);
-  private VirtualScrollBar scrollBar;
+  private ScrollBar scrollBar;
 
   public void cursorStyle(@NotNull TextStyle cursorStyle) {
     this.cursorStyle = cursorStyle;
@@ -43,13 +43,13 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
     return new ArrayList<>(elements);
   }
 
-  public @Nullable VirtualScrollBar scrollBar() {
+  public @Nullable ScrollBar scrollBar() {
     return scrollBar;
   }
 
-  public @NotNull VirtualScrollBar attachScrollBar() {
+  public @NotNull ScrollBar attachScrollBar() {
     synchronized (lock) {
-      this.scrollBar = new VirtualScrollBar(Axis.VERTICAL);
+      this.scrollBar = ScrollBar.create(Axis.VERTICAL);
       updateScrollBar();
       repaint();
       return this.scrollBar;
@@ -67,8 +67,7 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
     if(scrollBar == null) {
       return;
     }
-    scrollBar.setup(viewShifter, false);
-    scrollBar.endShrinkLevel(viewShifter.viewSize() / 4);
+    scrollBar.update(viewShifter, false);
   }
 
   public void elements(List<String> elements) {
@@ -96,10 +95,9 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
       graphics.resetStyle();
     }
     if(scrollBar != null) {
-      scrollBar.size(len);
       TermGraphics innerGraphics = TermGraphics.create(1, len);
       innerGraphics.style(defaultStyle);
-      scrollBar.draw(innerGraphics);
+      scrollBar.draw(innerGraphics, len);
       graphics.draw(currentDimension().width(), 1, innerGraphics);
     }
   }

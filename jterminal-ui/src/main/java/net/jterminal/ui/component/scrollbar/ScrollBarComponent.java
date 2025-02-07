@@ -8,39 +8,39 @@ import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.layout.Layout.DimensionValue;
 import net.jterminal.ui.layout.Layout.Modifier;
+import net.jterminal.ui.scrollbar.ScrollBar;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public class ScrollBarComponent extends Component implements Resizeable {
 
-  private final VirtualScrollBar virtualScrollBar;
+  private final ScrollBar scrollBar;
 
   public ScrollBarComponent(@NotNull Axis axis) {
-    this.virtualScrollBar = new VirtualScrollBar(axis);
+    this.scrollBar = ScrollBar.create(axis);
   }
 
-  public @NotNull VirtualScrollBar virtualScrollBar() {
-    return virtualScrollBar;
+  public @NotNull ScrollBar scrollBar() {
+    return scrollBar;
   }
 
   @Override
   public void paint(@NotNull TermGraphics graphics) {
-    int len = virtualScrollBar.axis() == Axis.HORIZONTAL ?
+    int len = scrollBar.axis() == Axis.HORIZONTAL ?
         currentDimension().width() : currentDimension().height();
-    virtualScrollBar.size(len);
-    virtualScrollBar.draw(graphics);
+    scrollBar.draw(graphics, len);
   }
 
   @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
     if(event.action() == Action.WHEEL_UP) {
-      virtualScrollBar.scrollUp(1);
+      scrollBar.scrollUp(1);
       repaint();
       return;
     }
     if(event.action() == Action.WHEEL_DOWN) {
-      virtualScrollBar.scrollDown(1);
+      scrollBar.scrollDown(1);
       repaint();
       return;
     }
@@ -51,40 +51,53 @@ public class ScrollBarComponent extends Component implements Resizeable {
     int x = position.x();
     int y = position.y();
     if(x == 1 && y == 1) {
-      virtualScrollBar.scrollUp(1);
+      scrollBar.scrollUp(1);
       repaint();
       return;
     }
-    if(virtualScrollBar.suffixCharPosition(new TermPos()).equals(position)) {
-      virtualScrollBar.scrollDown(1);
+    int len = scrollBar.axis() == Axis.HORIZONTAL ?
+        currentDimension().width() : currentDimension().height();
+    TermPos suffixPosition = suffixPosition(len);
+    if(suffixPosition.equals(position)) {
+      scrollBar.scrollDown(1);
       repaint();
+      return;
     }
+    scrollBar.indexStep(scrollBar.axis() == Axis.HORIZONTAL ? x - 1 : y - 1, len);
+    repaint();
+  }
+
+  private @NotNull TermPos suffixPosition(int len) {
+    if(scrollBar.axis() == Axis.VERTICAL) {
+      return new TermPos(1, len);
+    }
+    return new TermPos(len, 1);
   }
 
   @Override
   public void height(int value, Modifier... modifiers) {
-    if(virtualScrollBar.axis() == Axis.VERTICAL) {
+    if(scrollBar.axis() == Axis.VERTICAL) {
       super.setHeight(value, modifiers);
     }
   }
 
   @Override
   public void height(DimensionValue positionValue, Modifier... modifiers) {
-    if(virtualScrollBar.axis() == Axis.VERTICAL) {
+    if(scrollBar.axis() == Axis.VERTICAL) {
       super.setHeight(positionValue, modifiers);
     }
   }
 
   @Override
   public void width(int value, Modifier... modifiers) {
-    if(virtualScrollBar.axis() == Axis.HORIZONTAL) {
+    if(scrollBar.axis() == Axis.HORIZONTAL) {
       super.setWidth(value, modifiers);
     }
   }
 
   @Override
   public void width(DimensionValue positionValue, Modifier... modifiers) {
-    if(virtualScrollBar.axis() == Axis.HORIZONTAL) {
+    if(scrollBar.axis() == Axis.HORIZONTAL) {
       super.setWidth(positionValue, modifiers);
     }
   }

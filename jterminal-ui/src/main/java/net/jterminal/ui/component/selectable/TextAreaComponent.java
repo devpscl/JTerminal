@@ -19,13 +19,13 @@ import net.jterminal.text.termstring.TermString;
 import net.jterminal.text.termstring.TermStringBuilder;
 import net.jterminal.text.termstring.TermStringJoiner;
 import net.jterminal.ui.component.Resizeable;
-import net.jterminal.ui.component.scrollbar.VirtualScrollBar;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.special.TextChangedEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
+import net.jterminal.ui.scrollbar.ScrollBar;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.ui.util.ViewShifter.Type;
@@ -47,8 +47,8 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
 
   private CursorType cursorType = CursorType.BLINKING;
 
-  private VirtualScrollBar verticalScrollbar;
-  private VirtualScrollBar horizontalScrollbar;
+  private ScrollBar verticalScrollbar;
+  private ScrollBar horizontalScrollbar;
 
   public TextAreaComponent() {
     backgroundColor(TerminalColor.GRAY);
@@ -64,15 +64,17 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     repaint();
   }
 
-  public @NotNull VirtualScrollBar attachScrollBar(@NotNull Axis axis) {
+  public @NotNull ScrollBar attachScrollBar(@NotNull Axis axis) {
     synchronized (lock) {
       if(axis == Axis.VERTICAL) {
-        verticalScrollbar = new VirtualScrollBar(axis);
+        verticalScrollbar = ScrollBar.create(Axis.VERTICAL)
+                .barShrinkFactor(0.35F);
         updateScrollBar();
         repaint();
         return verticalScrollbar;
       }
-      horizontalScrollbar = new VirtualScrollBar(axis);
+      horizontalScrollbar = ScrollBar.create(Axis.HORIZONTAL)
+          .barShrinkFactor(0.35F);
       updateScrollBar();
       repaint();
       return horizontalScrollbar;
@@ -94,12 +96,10 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   public void updateScrollBar() {
     fixXShifter();
     if(verticalScrollbar != null) {
-      verticalScrollbar.setup(yShifter, false);
-      verticalScrollbar.endShrinkLevel(xShifter.viewSize());
+      verticalScrollbar.update(yShifter, false);
     }
     if(horizontalScrollbar != null) {
-      horizontalScrollbar.setup(xShifter, false);
-      horizontalScrollbar.endShrinkLevel(xShifter.viewSize());
+      horizontalScrollbar.update(xShifter, false);
     }
   }
 
@@ -240,18 +240,16 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     }
     int width = currentDimension().width();
     int height = currentDimension().height();
-    if(verticalScrollbar != null && yShifter.viewLesserThanBuffer()) {
-      verticalScrollbar.size(height - 1);
+    if(verticalScrollbar != null && verticalScrollbar.isScrollable()) {
       TermGraphics innerGraphics = TermGraphics.create(1, height - 1);
       innerGraphics.style(initStyle);
-      verticalScrollbar.draw(innerGraphics);
+      verticalScrollbar.draw(innerGraphics, height - 1);
       graphics.draw(width, 1, innerGraphics);
     }
-    if(horizontalScrollbar != null && xShifter.viewLesserThanBuffer()) {
-      horizontalScrollbar.size(width - 1);
+    if(horizontalScrollbar != null && horizontalScrollbar.isScrollable()) {
       TermGraphics innerGraphics = TermGraphics.create(width - 1, 1);
       innerGraphics.style(initStyle);
-      horizontalScrollbar.draw(innerGraphics);
+      horizontalScrollbar.draw(innerGraphics, width - 1);
       graphics.draw(1, height, innerGraphics);
     }
   }
@@ -264,7 +262,6 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     terminalState.cursorPosition(new TermPos().addX(x).addY(y));
     terminalState.cursorType(cursorType);
   }
-
 
   protected void performMoveLeft() {
     xShifter.backward(1);
