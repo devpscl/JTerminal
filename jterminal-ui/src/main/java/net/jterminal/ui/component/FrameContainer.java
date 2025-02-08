@@ -86,7 +86,7 @@ public class FrameContainer extends PaneContainer {
     if(!title.isEmpty()) {
       int x;
       if(titleAlignment == TextAlignment.CENTER) {
-        x = (size.width() / 2) - (title.length() / 2) + titleOffset;
+        x = (size.width() / 2) - (title.length() / 2) + 1 + titleOffset;
       } else if(titleAlignment == TextAlignment.RIGHT) {
         x = size.width() - titleOffset - title.length();
       } else {
