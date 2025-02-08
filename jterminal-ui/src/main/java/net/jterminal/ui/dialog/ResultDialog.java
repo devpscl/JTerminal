@@ -27,24 +27,21 @@ public class ResultDialog extends TermDialog {
   public static final int BUTTON_NO = 3;
   public static final int BUTTON_CANCEL = 4;
 
-  private int buttonSpace = 2;
+  private int buttonSpace = 1;
   private final OptionType type;
   private Consumer<Integer> action = null;
   private final FrameContainer frameContainer = new FrameContainer();
   private final LabelComponent labelComponent = new LabelComponent();
 
-  public ResultDialog(@NotNull String title, OptionType type) {
+  public ResultDialog(@NotNull String title, OptionType type, int buttonSpace) {
     this.type = type;
+    this.buttonSpace = buttonSpace;
     frameContainer.title(title);
     init();
   }
 
   public int spaceBetweenButtons() {
     return buttonSpace;
-  }
-
-  public void spaceBetweenButtons(int buttonSpace) {
-    this.buttonSpace = buttonSpace;
   }
 
   public @NotNull String title() {
@@ -114,19 +111,18 @@ public class ResultDialog extends TermDialog {
       return;
     }
     length -= buttonSpace;
-
     int halfLength = length / 2;
     ButtonComponent lastComponent = null;
     for (ButtonComponent buttonComponent : buttonComponents) {
       buttonComponent.y(Layout.relative(Anchor.BOTTOM));
       if(lastComponent == null) {
-        buttonComponent.x(Layout.relative(Anchor.RIGHT), Layout.scale(0.5F),
-            Layout.offset(-halfLength));
+        buttonComponent.x(Layout.center(),
+            Layout.offset(-halfLength + 1));
         frameContainer.add(buttonComponent);
         lastComponent = buttonComponent;
         continue;
       }
-      buttonComponent.x(Layout.relative(lastComponent, Anchor.RIGHT), Layout.offset(1));
+      buttonComponent.x(Layout.dock(lastComponent, Anchor.RIGHT), Layout.offset(buttonSpace));
       lastComponent = buttonComponent;
       frameContainer.add(buttonComponent);
     }

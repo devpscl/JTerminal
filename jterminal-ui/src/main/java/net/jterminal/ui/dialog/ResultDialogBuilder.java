@@ -74,9 +74,8 @@ public class ResultDialogBuilder {
   }
 
   public @NotNull ResultDialog build() {
-    final ResultDialog dialog = new ResultDialog(title, optionType);
+    final ResultDialog dialog = new ResultDialog(title, optionType, spaceBetweenButtons);
     dialog.message(message);
-    dialog.spaceBetweenButtons(spaceBetweenButtons);
     dialog.width(Layout.fill(), Layout.scale(widthScale));
     dialog.height(Layout.fill(), Layout.scale(heightScale), Layout.min(5));
     dialog.action(intValue -> {
