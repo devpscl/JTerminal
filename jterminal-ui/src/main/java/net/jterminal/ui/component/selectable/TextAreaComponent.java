@@ -49,10 +49,19 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
 
   private ScrollBar verticalScrollbar;
   private ScrollBar horizontalScrollbar;
+  private boolean editable = true;
 
   public TextAreaComponent() {
     backgroundColor(TerminalColor.GRAY);
     foregroundColor(TerminalColor.BLACK);
+  }
+
+  public boolean editable() {
+    return editable;
+  }
+
+  public void editable(boolean editable) {
+    this.editable = editable;
   }
 
   public @NotNull CursorType cursorType() {
@@ -295,6 +304,9 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   }
 
   protected void performNewLine() {
+    if(!editable) {
+      return;
+    }
     int lineIndex = cursorLine();
     int charIndex = cursorChar();
     TermString line = getLine(lineIndex);
@@ -311,6 +323,9 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   }
 
   protected void performBackspace() {
+    if(!editable) {
+      return;
+    }
     int lineIndex = cursorLine();
     TermString line = getLine(lineIndex);
     if(cursorChar() > 0) {
@@ -339,6 +354,9 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   }
 
   protected void performCharInput(char c) {
+    if(!editable) {
+      return;
+    }
     if(!charFilter.isAccept(c)) {
       return;
     }
