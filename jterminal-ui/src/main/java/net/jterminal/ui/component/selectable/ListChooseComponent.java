@@ -5,7 +5,7 @@ import net.jterminal.text.Combiner;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.ui.event.special.ListItemInteractEvent;
-import net.jterminal.ui.event.special.ListItemSelectedEvent;
+import net.jterminal.ui.event.special.ListItemChooseEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -33,12 +33,12 @@ public class ListChooseComponent extends ListViewComponent {
       if(elements.isEmpty()) {
         this.selectedIndex = -1;
         repaint();
-        eventBus.post(new ListItemSelectedEvent(this, selectedIndex));
+        eventBus.post(new ListItemChooseEvent(this, selectedIndex));
         return;
       }
       this.selectedIndex = Math.max(-1, Math.min(selected, elements.size()));
       repaint();
-      eventBus.post(new ListItemSelectedEvent(this, selectedIndex));
+      eventBus.post(new ListItemChooseEvent(this, selectedIndex));
     }
   }
 
