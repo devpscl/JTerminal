@@ -44,7 +44,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   TermScreen activeScreen = null;
   private final ScreenRenderer screenRenderer;
-  private final Object lock = new Object();
+  private final Object screenLock = new Object();
   private final ReentrantLock renderLock = new ReentrantLock();
   private long lastRenderTime = 0L;
 
@@ -63,7 +63,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @Override
   public void openScreen(@NotNull TermScreen screen) {
-    synchronized (lock) {
+    synchronized (screenLock) {
       if(activeScreen != null) {
         closeScreen();
       }
@@ -76,7 +76,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @Override
   public void closeScreen() {
-    synchronized (lock) {
+    synchronized (screenLock) {
       TermScreen oldScreen = activeScreen;
       activeScreen = null;
       clear();
@@ -103,9 +103,7 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
 
   @Override
   public void drawScreen() {
-    synchronized (lock) {
-      renderScreenSync();
-    }
+    renderScreenSync();
   }
 
   private void renderScreenSync() {
