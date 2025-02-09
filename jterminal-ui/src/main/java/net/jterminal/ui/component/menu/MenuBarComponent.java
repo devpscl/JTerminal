@@ -180,10 +180,6 @@ public class MenuBarComponent extends SelectableComponent
     int key = event.key();
     int currentIndex = findIndex(selectedTab);
     int count = tabCount();
-    if(key == Keyboard.KEY_ESCAPE) {
-      unselect();
-      return;
-    }
     if(key == Keyboard.KEY_ARROW_LEFT) {
       if(event.event().state() == State.CONTROL) {
         return;

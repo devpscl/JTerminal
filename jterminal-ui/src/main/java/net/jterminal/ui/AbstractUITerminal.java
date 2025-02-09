@@ -258,6 +258,11 @@ public class AbstractUITerminal<T extends Terminal> extends AbstractNativeTermin
     int key = e.key();
     SelectionResult result;
     switch (key) {
+      case Keyboard.KEY_ESCAPE:
+        if(selectedComponent != null) {
+          selectedComponent.unselect();
+        }
+        break;
       case Keyboard.KEY_TAB:
         rootContainer.selectNext();
         break;
