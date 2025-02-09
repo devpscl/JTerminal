@@ -5,7 +5,6 @@ import net.jterminal.input.Mouse.Action;
 import net.jterminal.input.Mouse.Button;
 import net.jterminal.text.style.TextFont;
 import net.jterminal.text.termstring.TermString;
-import net.jterminal.ui.component.Resizeable;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
 import net.jterminal.ui.event.special.CheckBoxChangeEvent;
@@ -13,7 +12,7 @@ import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
-public class CheckBoxComponent extends SelectableComponent implements Resizeable {
+public class CheckBoxComponent extends SelectableComponent {
 
   private String text;
   private boolean checked = false;
@@ -22,13 +21,19 @@ public class CheckBoxComponent extends SelectableComponent implements Resizeable
     this("");
   }
 
-  public CheckBoxComponent(String text) {
-    this.text = text;
+  public CheckBoxComponent(@NotNull String text) {
+    text(text);
   }
 
   public void text(@NotNull String text) {
     this.text = text;
+    setWidth(preferredWidth());
+    setHeight(1);
     repaint();
+  }
+
+  public int preferredWidth() {
+    return text.length() + 4;
   }
 
   public @NotNull String text() {
