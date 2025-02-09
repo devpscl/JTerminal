@@ -2,7 +2,6 @@ package net.jterminal.test.example.scenario;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import net.jterminal.Terminal;
 import net.jterminal.ui.component.FrameContainer;
 import net.jterminal.ui.component.progressbar.LegacyProgressBarStyle;
 import net.jterminal.ui.component.progressbar.ProgressBarComponent;
@@ -49,22 +48,17 @@ public class ProgressBarScenarioContainer extends FrameContainer {
   }
 
   private void timerEvent() {
-    try {
+    float progress = progressBar1.progress();
+    progress += 0.01F;
+    progressBar1.progress(progress % 1.01F);
 
-      float progress = progressBar1.progress();
-      progress += 0.01F;
-      progressBar1.progress(progress % 1.01F);
+    progress = progressBar2.progress();
+    progress += 0.02F;
+    progressBar2.progress(progress % 1.01F);
 
-      progress = progressBar2.progress();
-      progress += 0.02F;
-      progressBar2.progress(progress % 1.01F);
-
-      progress = progressBar3.progress();
-      progress += 0.06F;
-      progressBar3.progress(progress % 1.01F);
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
+    progress = progressBar3.progress();
+    progress += 0.06F;
+    progressBar3.progress(progress % 1.01F);
   }
 
 }
