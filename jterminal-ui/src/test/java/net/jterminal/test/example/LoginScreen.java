@@ -52,16 +52,16 @@ public class LoginScreen extends TermScreen {
     textField = new TextFieldComponent();
     textField.width(25);
     textField.x(Layout.relative(nameFieldLabel, Anchor.LEFT));
-    textField.y(Layout.relative(nameFieldLabel, Anchor.BOTTOM));
+    textField.y(Layout.dock(nameFieldLabel, Anchor.BOTTOM));
 
     passwordFieldLabel = new LabelComponent(TermString.value("Passwort:"));
     passwordFieldLabel.x(Layout.relative(textField, Anchor.LEFT));
-    passwordFieldLabel.y(Layout.relative(textField, Anchor.BOTTOM), Layout.offset(4));
+    passwordFieldLabel.y(Layout.dock(textField, Anchor.BOTTOM), Layout.offset(4));
 
     passwordField = new PasswordFieldComponent();
     passwordField.width(Layout.relativeTo(textField, Anchor.RIGHT));
     passwordField.x(Layout.relative(passwordFieldLabel, Anchor.LEFT));
-    passwordField.y(Layout.relative(passwordFieldLabel, Anchor.BOTTOM));
+    passwordField.y(Layout.dock(passwordFieldLabel, Anchor.BOTTOM));
 
     loginButton = new ButtonComponent("Login");
     loginButton.x(Layout.relative(passwordField, Anchor.LEFT));
