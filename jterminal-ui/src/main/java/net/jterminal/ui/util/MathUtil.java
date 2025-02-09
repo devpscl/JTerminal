@@ -6,6 +6,10 @@ public class MathUtil {
     return Math.min(max, Math.max(value, min));
   }
 
+  public static float range(float value, float min, float max) {
+    return Math.min(max, Math.max(value, min));
+  }
+
   public static int nonNegative(int value) {
     return Math.max(value, 0);
   }
