@@ -35,17 +35,33 @@ public class ActiveContainer extends Container implements Resizeable {
   }
 
   public void activeContainer(@Nullable Container container) {
+    super.removeAll();
     this.container = container;
-    if(container == null) {
-      super.removeAll();
-      repaint();
-      return;
+    if(container != null) {
+      super.add(container);
     }
-    super.add(container);
     repaint();
   }
 
   public boolean hasActiveContainer() {
     return container != null;
+  }
+
+  @Deprecated
+  @Override
+  public void add(@NotNull Component component) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public boolean remove(@NotNull Component component) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Deprecated
+  @Override
+  public void removeAll() {
+    throw new UnsupportedOperationException();
   }
 }
