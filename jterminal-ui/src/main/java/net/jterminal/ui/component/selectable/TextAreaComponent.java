@@ -466,7 +466,6 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
           xShifter.shift(index);
           fixXShifter();
           repaint();
-          return;
         }
       }
 
