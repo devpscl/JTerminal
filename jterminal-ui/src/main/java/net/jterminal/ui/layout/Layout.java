@@ -10,7 +10,11 @@ import org.jetbrains.annotations.Range;
 public interface Layout {
 
   static @NotNull PositionValue center() {
-    return new CenterPositionValue();
+    return new CenterPositionValue(0);
+  }
+
+  static @NotNull PositionValue center(int length) {
+    return new CenterPositionValue(length);
   }
 
   static @NotNull DimensionValue fill() {
