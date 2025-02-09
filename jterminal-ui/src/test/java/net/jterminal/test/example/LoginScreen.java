@@ -31,7 +31,7 @@ public class LoginScreen extends TermScreen {
   private FrameContainer infoFrameContainer;
   private LabelComponent infoLabel;
 
-  private ExampleApp instance;
+  private final ExampleApp instance;
 
   public LoginScreen(@NotNull ExampleApp exampleApp) {
     this.instance = exampleApp;

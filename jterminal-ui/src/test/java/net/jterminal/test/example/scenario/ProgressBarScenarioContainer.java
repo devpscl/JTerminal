@@ -14,9 +14,9 @@ public class ProgressBarScenarioContainer extends FrameContainer {
 
   private final Timer timer = new Timer();
 
-  private ProgressBarComponent progressBar1 = new ProgressBarComponent(0.3F);
-  private ProgressBarComponent progressBar2 = new ProgressBarComponent(0);
-  private ProgressBarComponent progressBar3 = new ProgressBarComponent(0.6F);
+  private final ProgressBarComponent progressBar1 = new ProgressBarComponent(0.3F);
+  private final ProgressBarComponent progressBar2 = new ProgressBarComponent(0);
+  private final ProgressBarComponent progressBar3 = new ProgressBarComponent(0.6F);
 
   public void create() {
     progressBar1.style(new ShadeProgressBarStyle());

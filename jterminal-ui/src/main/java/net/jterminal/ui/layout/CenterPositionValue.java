@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 final class CenterPositionValue implements PositionValue {
 
-  private int offLength;
+  private final int offLength;
 
   public CenterPositionValue(int offLength) {
     this.offLength = offLength;
