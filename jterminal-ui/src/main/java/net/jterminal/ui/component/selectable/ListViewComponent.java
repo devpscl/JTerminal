@@ -19,6 +19,7 @@ import net.jterminal.ui.scrollbar.ScrollBar;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.ui.util.ViewShifter.Type;
+import net.jterminal.util.TermDim;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,7 +95,7 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
       paintItem(graphics, pos, x, item, selected);
       graphics.resetStyle();
     }
-    if(scrollBar != null) {
+    if(scrollBar != null && scrollBar.isScrollable()) {
       TermGraphics innerGraphics = TermGraphics.create(1, len);
       innerGraphics.style(defaultStyle);
       scrollBar.draw(innerGraphics, len);
@@ -168,7 +169,13 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
   @Override
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
     super.processMouseEvent(event);
+    Button button = event.button();
+    Action action = event.action();
     TermPos position = event.position();
+    TermDim currentDimension = currentDimension();
+    int width = currentDimension.width();
+    int height = currentDimension.height();
+
     if(event.action() == Action.WHEEL_UP) {
       viewShifter.shiftBackward(1);
       performItemShow();
@@ -180,12 +187,28 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
       performItemShow();
       repaint();
     }
-    if(event.action() == Action.PRESS && event.button() == Button.LEFT) {
-      int bufIdx = viewShifter.viewIndexToBufferIndex(position.y() - 1);
-      if(isSelected() && viewShifter.cursor() == bufIdx) {
-        eventBus.post(new ListItemInteractEvent(this, bufIdx));
+    if(event.action() == Action.PRESS) {
+      if(button == Button.LEFT && position.x() < width) {
+        int bufIdx = viewShifter.viewIndexToBufferIndex(position.y() - 1);
+        if(isSelected() && viewShifter.cursor() == bufIdx) {
+          eventBus.post(new ListItemInteractEvent(this, bufIdx));
+        }
+        cursor(bufIdx);
+        return;
       }
-      cursor(bufIdx);
+    }
+    if((action == Action.PRESS || action == Action.MOVE) && button == Button.LEFT) {
+      if(scrollBar == null || !scrollBar.isScrollable()) {
+        return;
+      }
+      if(position.x() == width) {
+        if(scrollBar.performInteract(position, height)) {
+          int index = scrollBar.index();
+          viewShifter.shift(index);
+          repaint();
+        }
+      }
+
     }
   }
 }

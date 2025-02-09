@@ -44,7 +44,8 @@ public class ScrollBarComponent extends Component implements Resizeable {
       repaint();
       return;
     }
-    if((event.action() != Action.PRESS) || event.button() != Button.LEFT) {
+    if((event.action() != Action.PRESS && event.action() != Action.MOVE)
+        || event.button() != Button.LEFT) {
       return;
     }
     TermPos position = event.position();
@@ -57,14 +58,10 @@ public class ScrollBarComponent extends Component implements Resizeable {
     }
     int len = scrollBar.axis() == Axis.HORIZONTAL ?
         currentDimension().width() : currentDimension().height();
-    TermPos suffixPosition = suffixPosition(len);
-    if(suffixPosition.equals(position)) {
-      scrollBar.scrollDown(1);
+    if (scrollBar.performInteract(position, len)) {
       repaint();
-      return;
     }
-    scrollBar.indexStep(scrollBar.axis() == Axis.HORIZONTAL ? x - 1 : y - 1, len);
-    repaint();
+
   }
 
   private @NotNull TermPos suffixPosition(int len) {

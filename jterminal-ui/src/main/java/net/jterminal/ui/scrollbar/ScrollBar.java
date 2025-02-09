@@ -4,6 +4,7 @@ import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.IntRange;
 import net.jterminal.ui.util.ViewShifter;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 public interface ScrollBar {
@@ -41,6 +42,8 @@ public interface ScrollBar {
   @NotNull ScrollBar indexStep(int index, int size);
 
   @NotNull ScrollBar barShrinkFactor(float value);
+
+  boolean performInteract(@NotNull TermPos originPos, int size);
 
   @NotNull IntRange createRegion(int size);
 

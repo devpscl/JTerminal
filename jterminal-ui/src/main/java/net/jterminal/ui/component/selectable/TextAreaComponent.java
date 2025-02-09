@@ -417,8 +417,15 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
   public void processMouseEvent(@NotNull ComponentMouseEvent event) {
     super.processMouseEvent(event);
     updateViewSize();
-    if(event.action() == Action.PRESS && event.button() == Button.LEFT) {
-      TermPos position = event.position();
+    Button button = event.button();
+    Action action = event.action();
+    TermPos position = event.position();
+    TermDim currentDimension = currentDimension();
+    int width = currentDimension.width();
+    int height = currentDimension.height();
+
+
+    if(action == Action.PRESS && button == Button.LEFT) {
       int x = position.x() - 1;
       int y = position.y() - 1;
 
@@ -428,18 +435,41 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
       yShifter.cursor(bufY);
       fixXShifter();
       repaint();
-      return;
     }
-    if(event.action() == Action.WHEEL_UP) {
+    if(action == Action.WHEEL_UP) {
       yShifter.shiftBackward(1);
       fixXShifter();
       repaint();
       return;
     }
-    if(event.action() == Action.WHEEL_DOWN) {
+    if(action == Action.WHEEL_DOWN) {
       yShifter.shiftForward(1);
       fixXShifter();
       repaint();
+      return;
+    }
+    if((action == Action.PRESS || action == Action.MOVE) && button == Button.LEFT) {
+      if(verticalScrollbar != null && verticalScrollbar.isScrollable()
+          && position.x() == width) {
+        if(verticalScrollbar.performInteract(position, height - 1)) {
+          int index = verticalScrollbar.index();
+          yShifter.shift(index);
+          fixXShifter();
+          repaint();
+          return;
+        }
+      }
+      if(horizontalScrollbar != null && horizontalScrollbar.isScrollable()
+          && position.y() == height) {
+        if(horizontalScrollbar.performInteract(position, width - 1)) {
+          int index = horizontalScrollbar.index();
+          xShifter.shift(index);
+          fixXShifter();
+          repaint();
+          return;
+        }
+      }
+
     }
   }
 }

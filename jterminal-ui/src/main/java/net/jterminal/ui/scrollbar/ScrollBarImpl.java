@@ -5,6 +5,7 @@ import net.jterminal.ui.util.Axis;
 import net.jterminal.ui.util.IntRange;
 import net.jterminal.ui.util.MathUtil;
 import net.jterminal.ui.util.ViewShifter;
+import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
 
 class ScrollBarImpl implements ScrollBar {
@@ -118,6 +119,29 @@ class ScrollBarImpl implements ScrollBar {
   public @NotNull ScrollBar barShrinkFactor(float value) {
     this.shrinkFactor = Math.max(0F, value);
     return this;
+  }
+
+  @Override
+  public boolean performInteract(@NotNull TermPos originPos, int size) {
+    final int x = originPos.x();
+    final int y = originPos.y();
+    final int start = 2;
+    final int end = size - 1;
+    final int c = axis == Axis.HORIZONTAL ? x : y;
+    if(c == 1) {
+      scrollUp(1);
+      return true;
+    }
+    if(c == size) {
+      scrollDown(1);
+      return true;
+    }
+    if(c < start || c > end) {
+      return false;
+    }
+    int step = c - 1;
+    indexStep(step, size);
+    return true;
   }
 
   @Override
