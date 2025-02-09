@@ -1,5 +1,9 @@
 package net.jterminal.ui.component;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import net.devpscl.eventbus.EventBus;
 import net.jterminal.Terminal;
@@ -27,6 +31,7 @@ public abstract class Component implements Displayable, Comparable<Component> {
 
   private static final AtomicLong idCounter = new AtomicLong(1);
 
+  private final Set<ComponentGroup> memberGroups = new HashSet<>();
   private Container parent;
   private int priority;
   private boolean visible = true;
@@ -51,6 +56,22 @@ public abstract class Component implements Displayable, Comparable<Component> {
   public Component() {
      id = idCounter.getAndIncrement();
      eventBus.register(this);
+  }
+
+  void addGroup(@NotNull ComponentGroup group) {
+    synchronized (lock) {
+      memberGroups.add(group);
+    }
+  }
+
+  void removeGroup(@NotNull ComponentGroup group) {
+    synchronized (lock) {
+      memberGroups.remove(group);
+    }
+  }
+
+  public @NotNull Collection<ComponentGroup> memberGroups() {
+    return new ArrayList<>(memberGroups);
   }
 
   public @NotNull Component asComponent() {
