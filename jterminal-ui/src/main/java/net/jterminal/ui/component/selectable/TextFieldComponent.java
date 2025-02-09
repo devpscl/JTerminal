@@ -35,7 +35,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   private CursorType cursorType = CursorType.BLINKING;
 
   public TextFieldComponent(@NotNull String value) {
-    value("");
+    value(value);
     backgroundColor(TerminalColor.GRAY);
     foregroundColor(TerminalColor.BLACK);
   }
