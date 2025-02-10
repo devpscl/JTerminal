@@ -3,8 +3,8 @@ package net.jterminal.cli.commodore;
 import java.util.function.Function;
 import net.jterminal.cli.command.CommandArgument;
 import net.jterminal.cli.commodore.CommodoreFunctional.StyleEditor;
-import net.jterminal.cli.exception.CommandExecuteException;
 import net.jterminal.text.Combiner;
+import net.jterminal.text.ForegroundColor;
 import net.jterminal.text.TerminalColor;
 import net.jterminal.text.style.TextStyle;
 import net.jterminal.text.termstring.TermString;
@@ -36,6 +36,11 @@ public interface CommodoreHelper<T extends CommandArgument> {
             .build();
       }
     };
+  }
+
+  default @NotNull StyleEditor<T> highlightStyle(@NotNull ForegroundColor foregroundColor) {
+    TextStyle textStyle = TextStyle.create(foregroundColor, null);
+    return modifiedStyle((state) -> textStyle);
   }
 
   default @NotNull StyleEditor<T> passwordStyle() {
