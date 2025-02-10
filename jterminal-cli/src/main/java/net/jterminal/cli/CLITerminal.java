@@ -21,6 +21,8 @@ public interface CLITerminal extends NativeTerminal {
 
   void commandHandler(@Nullable CommandHandler<?> commandHandler);
 
+  void unsetCommandHandler();
+
   @NotNull CommandArgument[] parseArguments(@NotNull String input) throws CommandParseException;
 
   @NotNull TermString modifyCommandLineView(@NotNull TermString termString, @NotNull String input);

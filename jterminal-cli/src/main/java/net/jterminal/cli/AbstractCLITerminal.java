@@ -77,6 +77,11 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
   }
 
   @Override
+  public void unsetCommandHandler() {
+    this.commandHandler = null;
+  }
+
+  @Override
   public @NotNull CommandArgument[] parseArguments(@NotNull String input)
       throws CommandParseException {
     if(commandHandler == null) {
