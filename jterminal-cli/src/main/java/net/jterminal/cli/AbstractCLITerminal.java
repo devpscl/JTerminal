@@ -14,6 +14,7 @@ import net.jterminal.cli.line.DefaultLineReader;
 import net.jterminal.cli.line.InternalLineReader;
 import net.jterminal.cli.line.LineReader;
 import net.jterminal.cli.line.LineView;
+import net.jterminal.cli.line.PrefixedLineRenderer;
 import net.jterminal.cli.tab.TabCompleter;
 import net.jterminal.cli.util.RecordingBuffer;
 import net.jterminal.exception.TerminalProviderException;
@@ -215,7 +216,7 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
         return;
       }
       TerminalBuffer buffer = new TerminalBuffer();
-      lineView = lineReader.lineRenderer().print(this, lineReader, buffer);
+      lineView = lineReader.lineRenderer().print(this, lineReader, buffer, true);
       FD_OUT.write(buffer.toBytes());
     } catch (IOException e) {
       LOGGER.error("Failed to print line", e);
@@ -278,6 +279,32 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
     updateLine();
   }
 
+  @Override
+  public @NotNull String readLine(@NotNull String prefix) throws IOException {
+    return readLine(prefix, LineReader.DEFAULT_FLAGS);
+  }
+
+  @Override
+  public @NotNull String readPassword(@NotNull String prefix) throws IOException {
+    return readLine(prefix, LineReader.FLAG_INSERT_MODE | LineReader.FLAG_KEEP_LINE);
+  }
+
+  @Override
+  public @NotNull String readLine(@NotNull String prefix, int flags) throws IOException {
+    LineReader prevReader = lineReader();
+    try {
+      DefaultLineReader newLineReader = new DefaultLineReader();
+      newLineReader.flags(flags);
+      newLineReader.lineRenderer(new PrefixedLineRenderer(prefix));
+      lineReader(newLineReader);
+      return newLineReader.readLine();
+    } catch (InterruptedException e) {
+      throw new IOException("Failed to read line", e);
+    } finally {
+      lineReader(prevReader);
+    }
+  }
+
   protected void updateWindowSize(@NotNull TermDim windowSize) {
     lock.lock();
     try {
@@ -289,6 +316,12 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
     } finally {
       lock.unlock();
     }
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    printLine();
   }
 
   @Override

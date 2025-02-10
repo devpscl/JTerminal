@@ -1,5 +1,6 @@
 package net.jterminal.cli;
 
+import java.io.IOException;
 import net.jterminal.NativeTerminal;
 import net.jterminal.Terminal;
 import net.jterminal.cli.command.CommandArgument;
@@ -53,6 +54,12 @@ public interface CLITerminal extends NativeTerminal {
 
   @Override
   void update();
+
+  @NotNull String readLine(@NotNull String prefix) throws IOException;
+
+  @NotNull String readPassword(@NotNull String prefix) throws IOException;
+
+  @NotNull String readLine(@NotNull String prefix, int flags) throws IOException;
 
   static @NotNull CLITerminal create() throws TerminalInitializeException {
     return Terminal.create(CLITerminalProvider.class);

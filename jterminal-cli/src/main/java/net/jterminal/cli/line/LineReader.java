@@ -57,4 +57,8 @@ public interface LineReader {
 
   void updateDisplay();
 
+  @NotNull String readLine() throws InterruptedException;
+
+  @Nullable String readLine(long timeout) throws InterruptedException;
+
 }

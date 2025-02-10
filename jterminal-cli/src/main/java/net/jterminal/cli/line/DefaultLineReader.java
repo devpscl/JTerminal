@@ -1,6 +1,10 @@
 package net.jterminal.cli.line;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jterminal.cli.CLITerminal;
 import net.jterminal.cli.history.InputHistory;
 import net.jterminal.cli.tab.TabCompleter;
@@ -17,7 +21,7 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
 
   private StringBuilder input = new StringBuilder();
   private String inputCache = "";
-  private int flags = FLAG_ECHO_MODE | FLAG_NAVIGABLE_CURSOR | FLAG_INSERT_MODE;
+  private int flags = DEFAULT_FLAGS;
   private CharFilter charFilter = new CharFilter(CharType.DIGIT,
       CharType.WHITESPACE, CharType.LETTERS_LOWERCASE,
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
@@ -27,6 +31,10 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   InputHistory inputHistory = null;
   TabCompleter tabCompleter = null;
   boolean tabbing = false;
+
+  private final ReentrantLock lineReadLock = new ReentrantLock();
+  private final Condition condition = lineReadLock.newCondition();
+  private final AtomicReference<String> lastReleasedLine = new AtomicReference<>();
 
   protected final SetLock<CLITerminal> terminalSetLock = new SetLock<>("Terminal");
 
@@ -168,6 +176,30 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     }
   }
 
+  @Override
+  public @NotNull String readLine() throws InterruptedException {
+    lineReadLock.lock();
+    try {
+      condition.await();
+      return lastReleasedLine.get();
+    } finally {
+      lineReadLock.unlock();
+    }
+  }
+
+  @Override
+  public @Nullable String readLine(long timeout) throws InterruptedException {
+    lineReadLock.lock();
+    try {
+      if(!condition.await(timeout, TimeUnit.MILLISECONDS)) {
+        return null;
+      }
+      return lastReleasedLine.get();
+    } finally {
+      lineReadLock.unlock();
+    }
+  }
+
   protected void insertTabSuggestion() {
     if(tabCompleter == null) {
       return;
@@ -248,7 +280,6 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     } else {
       setEditingInput(inputCache);
     }
-
   }
 
   protected void performCharInput(char inputChar) {
