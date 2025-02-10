@@ -3,7 +3,6 @@ package net.jterminal.cli.commodore;
 import java.util.HashMap;
 import java.util.Map;
 import net.jterminal.cli.command.CommandArgument;
-import net.jterminal.cli.exception.CommandExecuteException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
