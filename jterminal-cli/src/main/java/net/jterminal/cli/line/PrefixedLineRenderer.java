@@ -14,6 +14,14 @@ public class PrefixedLineRenderer extends DefaultLineRenderer {
     this.prefixSupply = prefixSupply;
   }
 
+  public PrefixedLineRenderer(@NotNull TermString termString) {
+    this.prefixSupply = () -> termString;
+  }
+
+  public PrefixedLineRenderer(@NotNull String value) {
+    this.prefixSupply = () -> TermString.value(value);
+  }
+
   @Override
   public @NotNull LineView view(@NotNull CLITerminal terminal, @NotNull LineReader lineReader) {
     TermString prefixTermString = prefixSupply.get();
@@ -25,19 +33,11 @@ public class PrefixedLineRenderer extends DefaultLineRenderer {
         .append(prefixTermString)
         .append(termString)
         .build();
+    int cursor = (lineReader.flags() & LineReader.FLAG_ECHO_MODE) != 0
+        ? lineReader.cursor() : 0;
 
-    return LineView.create(viewString, lineReader.cursor()
+    return LineView.create(viewString, cursor
         + prefixTermString.length(), winSize, viewString.length());
-  }
-
-  @Override
-  public @NotNull TermString legacyView(@NotNull CLITerminal terminal,
-      @NotNull LineReader lineReader) {
-    TermString prefixTermString = prefixSupply.get();
-    return TermString.builder()
-        .append(prefixTermString)
-        .append(lineReader.displayingInput())
-        .build();
   }
 
 }
