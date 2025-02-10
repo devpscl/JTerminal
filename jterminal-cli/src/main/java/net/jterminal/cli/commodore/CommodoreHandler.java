@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.jterminal.Terminal;
 import net.jterminal.cli.CLITerminal;
 import net.jterminal.cli.command.CommandArgument;
 import net.jterminal.cli.command.CommandHandler;
