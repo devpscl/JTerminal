@@ -34,12 +34,13 @@ public abstract class CommodoreHandler<T extends CommandArgument>
     this.parser = parser;
   }
 
-  public void build() {
+  public CommodoreHandler<T> build() {
     try {
       build(commodoreManager);
     } catch (CommandBuildException e) {
       CLITerminal.LOGGER.error("Failed to build command structure", e);
     }
+    return this;
   }
 
   protected abstract void build(@NotNull CommodoreManager<T> manager) throws CommandBuildException;
