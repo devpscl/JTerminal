@@ -11,8 +11,11 @@ public interface LineReader {
   int FLAG_INSERT_MODE      = 0x1;
   int FLAG_ECHO_MODE        = 0x2;
   int FLAG_QUICK_DELETE     = 0x4;
-  int FLAG_PRINT_LEGACY     = 0x8;
+  int FLAG_KEEP_LINE        = 0x8;
   int FLAG_NAVIGABLE_CURSOR = 0x10;
+
+  int DEFAULT_FLAGS = FLAG_ECHO_MODE | FLAG_NAVIGABLE_CURSOR
+      | FLAG_INSERT_MODE | FLAG_KEEP_LINE;
 
   @Nullable TabCompleter tabCompleter();
 

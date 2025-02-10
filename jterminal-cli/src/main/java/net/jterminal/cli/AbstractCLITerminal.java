@@ -224,14 +224,15 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
     }
   }
 
-  protected void printLegacyLine() {
+  protected void printDeathLine() {
     lock.lock();
     try {
       TerminalBuffer buffer = new TerminalBuffer();
-      lineReader.lineRenderer().printLegacy(this, lineReader, buffer);
-      write(new String(buffer.toBytes()));
+      lineView = lineReader.lineRenderer().print(this, lineReader, buffer, false);
+      buffer.append("\n");
+      FD_OUT.write(buffer.toBytes());
     } catch (IOException e) {
-      LOGGER.error("Failed to print legacy line", e);
+      LOGGER.error("Failed to print line", e);
     } finally {
       lock.unlock();
     }
@@ -262,7 +263,7 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
       }
       TerminalBuffer buffer = new TerminalBuffer();
       lineReader.lineRenderer().remove(this, lineReader, buffer, lineView);
-      lineView = lineReader.lineRenderer().print(this, lineReader, buffer);
+      lineView = lineReader.lineRenderer().print(this, lineReader, buffer, true);
       FD_OUT.write(buffer.toBytes());
     } catch (IOException e) {
       LOGGER.error("Failed to update line", e);
@@ -292,8 +293,8 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
 
   @Override
   public void eventReleaseLine(@NotNull String line) {
-    if((lineReader.flags() & LineReader.FLAG_PRINT_LEGACY) == LineReader.FLAG_PRINT_LEGACY) {
-      printLegacyLine();
+    if((lineReader.flags() & LineReader.FLAG_KEEP_LINE) == LineReader.FLAG_KEEP_LINE) {
+      printDeathLine();
     }
     eventBus.post(new LineReleaseEvent(line));
   }

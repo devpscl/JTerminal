@@ -12,7 +12,7 @@ public class DefaultLineRenderer implements LineRenderer {
 
   @Override
   public @NotNull LineView print(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
-      @NotNull TerminalBuffer buffer) {
+      @NotNull TerminalBuffer buffer, boolean cursor) {
     LineView lineView = view(terminal, lineReader);
     TermString termString = lineView.view();
     TermPos cursorPos = lineView.cursorPos(new TermPos(0, 0));
@@ -20,24 +20,14 @@ public class DefaultLineRenderer implements LineRenderer {
         .resetStyle()
         .append("\r")
         .cursorSave()
-        .append(termString)
-        .cursorRestore()
-        .cursorDown(cursorPos.y())
-        .cursorRight(cursorPos.x())
-        .command(CursorCommand.show());
+        .append(termString);
+    if(cursor) {
+      buffer.cursorRestore()
+          .cursorDown(cursorPos.y())
+          .cursorRight(cursorPos.x());
+    }
+    buffer.command(CursorCommand.show());
     return lineView;
-  }
-
-  @Override
-  public void printLegacy(@NotNull CLITerminal terminal, @NotNull LineReader lineReader,
-      @NotNull TerminalBuffer buffer) {
-    TermString termString = legacyView(terminal, lineReader);
-    buffer.command(CursorCommand.hide())
-        .resetStyle()
-        .append("\r")
-        .append(termString)
-        .append("\n")
-        .command(CursorCommand.show());
   }
 
   @Override
@@ -60,13 +50,9 @@ public class DefaultLineRenderer implements LineRenderer {
     TermDim winSize = terminal.windowSize();
     TermString termString = TermString.value(lineReader.displayingInput());
     termString = terminal.modifyCommandLineView(termString, lineReader.displayingInput());
-
-    return LineView.create(termString, lineReader.cursor(), winSize, termString.length());
+    int cursor = (lineReader.flags() & LineReader.FLAG_ECHO_MODE) != 0
+        ? lineReader.cursor() : 0;
+    return LineView.create(termString, cursor, winSize, termString.length());
   }
 
-  @Override
-  public @NotNull TermString legacyView(@NotNull CLITerminal terminal,
-      @NotNull LineReader lineReader) {
-    return TermString.value(lineReader.displayingInput());
-  }
 }

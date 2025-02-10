@@ -136,22 +136,28 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   @Override
   public void releaseLine(boolean event) {
     synchronized (syncLock) {
-      String str = input();
-      boolean strBlank = str.isBlank();
-      if (!strBlank) {
-        inputHistory.add(str);
-      }
-      if(event && terminalSetLock.isSet()) {
-        CLITerminal terminal = terminalSetLock.get();
-        terminal.eventReleaseLine(str);
-        if(!strBlank) {
+      lineReadLock.lock();
+      try {
+        String str = input();
+        lastReleasedLine.set(str);
+        condition.signal();
+        boolean strBlank = str.isBlank();
+        if (!strBlank && inputHistory != null) {
+          inputHistory.add(str);
+        }
+        if(event && terminalSetLock.isSet()) {
+          CLITerminal terminal = terminalSetLock.get();
           terminal.lineReading(false);
-          terminal.dispatchCommand(str);
+          terminal.eventReleaseLine(str);
+          if(!strBlank) {
+            terminal.dispatchCommand(str);
+          }
           terminal.lineReading(true);
         }
-
+        clear();
+      } finally {
+        lineReadLock.unlock();
       }
-      clear();
     }
   }
 
