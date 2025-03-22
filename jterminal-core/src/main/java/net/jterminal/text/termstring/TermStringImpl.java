@@ -59,10 +59,12 @@ class TermStringImpl implements TermString {
   public @NotNull TermString replace(@NotNull String from, @NotNull String to) {
     UnsafeTermStringBuilder builder = (UnsafeTermStringBuilder)
         TermString.builder(value, indexedStyleData);
+    int start = 0;
     int index;
-    while ((index = value.indexOf(from)) != -1) {
+    while ((index = builder.stringBuilder().indexOf(from)) != -1 && index >= start) {
       int end = index + from.length();
       builder.replace(index, end, to);
+      start = end;
     }
     return builder.getNoCopy();
   }
@@ -71,10 +73,12 @@ class TermStringImpl implements TermString {
   public @NotNull TermString replace(@NotNull String from, @NotNull TermString to) {
     UnsafeTermStringBuilder builder = (UnsafeTermStringBuilder)
         TermString.builder(value, indexedStyleData);
+    int start = 0;
     int index;
-    while ((index = value.indexOf(from)) != -1) {
+    while ((index = builder.stringBuilder().indexOf(from)) != -1 && index >= start) {
       int end = index + from.length();
       builder.replace(index, end, to);
+      start = end;
     }
     return builder.getNoCopy();
   }
