@@ -439,12 +439,12 @@ public interface Terminal {
   }
 
   /**
-   * Create @ not null t.
+   * Create a new terminal by type. The terminal will not set automatically.
    *
    * @param <T>           the type parameter
    * @param instanceClass the instance class
-   * @return the @ not null t
-   * @throws TerminalInitializeException the terminal initialize exception
+   * @return the terminal
+   * @throws TerminalInitializeException terminal initialize exception
    */
   @SuppressWarnings("unchecked")
   static <T extends Terminal> @NotNull
@@ -462,7 +462,8 @@ public interface Terminal {
   }
 
   /**
-   * Auto terminal.
+   * Setup automatically terminal. If native supported, {@link NativeTerminal} is set. Else
+   * {@link NonNativeTerminalProvider} is set.
    *
    * @return the terminal
    * @throws TerminalInitializeException the terminal initialize exception
@@ -522,7 +523,7 @@ public interface Terminal {
   }
 
   /**
-   * Set.
+   * Set new terminal instance.
    *
    * @param <T>      the type parameter
    * @param terminal the terminal
@@ -546,7 +547,7 @@ public interface Terminal {
   }
 
   /**
-   * Get terminal.
+   * Get current terminal instance.
    *
    * @return the terminal
    */
