@@ -80,7 +80,7 @@ public class FileDialog extends TermDialog {
     fullPathFieldLabel.y(2);
 
     fullPathInputComponent = new TextFieldComponent();
-    fullPathInputComponent.x(Layout.relative(fullPathFieldLabel, Anchor.RIGHT), Layout.offset(1));
+    fullPathInputComponent.x(Layout.dock(fullPathFieldLabel, Anchor.RIGHT), Layout.offset(1));
     fullPathInputComponent.y(Layout.relative(fullPathFieldLabel, Anchor.TOP));
     fullPathInputComponent.width(Layout.fill(), Layout.offset(-2));
     fullPathInputComponent.backgroundColor(TerminalColor.WHITE);
