@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.jterminal.cli.CLITerminal;
 import net.jterminal.cli.history.InputHistory;
 import net.jterminal.cli.tab.TabCompleter;
+import net.jterminal.cli.tab.TabCompletion;
 import net.jterminal.input.KeyboardInputEvent;
 import net.jterminal.util.CharFilter;
 import net.jterminal.util.CharFilter.CharType;
@@ -29,6 +30,7 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
 
   int cursor = 0;
   InputHistory inputHistory = null;
+  TabCompletion tabCompletion = null;
   TabCompleter tabCompleter = null;
   boolean tabbing = false;
 
@@ -61,14 +63,21 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   }
 
   @Override
+  public @Nullable TabCompletion tabCompletion() {
+    return tabCompletion;
+  }
+
+  protected void tabCompletion(@Nullable TabCompletion tabCompletion) {
+    this.tabCompletion = tabCompletion;
+    this.tabbing = false;
+  }
+
   public @Nullable TabCompleter tabCompleter() {
     return tabCompleter;
   }
 
-  @Override
   public void tabCompleter(@Nullable TabCompleter tabCompleter) {
     this.tabCompleter = tabCompleter;
-    this.tabbing = false;
   }
 
   @Override
@@ -201,12 +210,15 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
   }
 
   protected void insertTabSuggestion() {
-    if(tabCompleter == null) {
+    if(tabCompletion == null) {
+      return;
+    }
+    if(input.length() < tabCompletion.position()) {
       return;
     }
     String newInput = input()
-        .substring(0, tabCompleter.position())
-        .concat(tabCompleter.suggestion());
+        .substring(0, tabCompletion.position())
+        .concat(tabCompletion.suggestion());
     setEditingInput(newInput);
   }
 
@@ -218,10 +230,10 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
 
   protected void performTabEvent() {
     if(tabbing) {
-      if(tabCompleter == null) {
+      if(tabCompletion == null) {
         return;
       }
-      tabCompleter.next();
+      tabCompletion.next();
       insertTabSuggestion();
       return;
     }
@@ -229,19 +241,18 @@ public class DefaultLineReader implements LineReader, InternalLineReader {
     if(!tsl.isSet()) {
       return;
     }
-
     CLITerminal terminal = tsl.get();
-    TabCompleter completer = terminal.generateTabCompleter(input(), cursor);
-    if(completer == null || completer.empty()) {
+    TabCompletion completion = tabCompleter == null ? null : tabCompleter.generate(input(), cursor);
+    if(completion == null || completion.empty()) {
       return;
     }
-    tabCompleter = completer;
+    tabCompletion = completion;
     insertTabSuggestion();
     tabbing = true;
   }
 
   protected void performNonTabEvent() {
-    tabCompleter(null);
+    tabCompletion(null);
   }
 
   protected void performEditEvent() {
