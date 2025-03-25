@@ -3,13 +3,13 @@ package net.jterminal.cli.tab;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-class TabCompleterImpl implements TabCompleter {
+class TabCompletionImpl implements TabCompletion {
 
   private final List<String> list;
   private final int position;
   private int suggestionIndex = 0;
 
-  public TabCompleterImpl(List<String> list, int position) {
+  public TabCompletionImpl(List<String> list, int position) {
     this.list = list;
     this.position = position;
   }
