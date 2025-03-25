@@ -15,7 +15,7 @@ import net.jterminal.cli.line.InternalLineReader;
 import net.jterminal.cli.line.LineReader;
 import net.jterminal.cli.line.LineView;
 import net.jterminal.cli.line.PrefixedLineRenderer;
-import net.jterminal.cli.tab.TabCompleter;
+import net.jterminal.cli.tab.TabCompletion;
 import net.jterminal.cli.util.RecordingBuffer;
 import net.jterminal.exception.TerminalProviderException;
 import net.jterminal.input.KeyboardInputEvent;
@@ -107,35 +107,6 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
       LOGGER.error(e);
     }
     return termString;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public @Nullable TabCompleter generateTabCompleter(@NotNull String input, int cursor) {
-    if(commandHandler == null) {
-      return null;
-    }
-    try {
-      CommandArgument[] args = parseArguments(input);
-      CommandHandler<CommandArgument> raw = (CommandHandler<CommandArgument>)
-          commandHandler;
-      List<String> tabCompletions = raw.getTabCompletions(args, cursor);
-      int position;
-      if(args.length == 0) {
-        position = 0;
-      } else {
-        CommandArgument arg = args[args.length - 1];
-        if(arg.positionEnd() < cursor) {
-          position = cursor;
-        } else {
-          position = arg.positionStart();
-        }
-      }
-      return TabCompleter.create(tabCompletions, position);
-    } catch (CommandParseException e) {
-      LOGGER.error(e);
-    }
-    return null;
   }
 
   @Override
