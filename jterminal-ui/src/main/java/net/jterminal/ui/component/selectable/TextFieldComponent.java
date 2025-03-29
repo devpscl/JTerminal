@@ -15,6 +15,7 @@ import net.jterminal.ui.graphics.TerminalState;
 import net.jterminal.ui.graphics.TerminalState.CursorType;
 import net.jterminal.ui.layout.Layout.DimensionValue;
 import net.jterminal.ui.layout.Layout.Modifier;
+import net.jterminal.ui.util.MathUtil;
 import net.jterminal.ui.util.ViewShifter;
 import net.jterminal.ui.util.ViewShifter.Type;
 import net.jterminal.util.CharFilter;
@@ -33,6 +34,7 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
   private String value;
   private final ViewShifter viewShifter = new ViewShifter(Type.POINTER_SHIFTER);
   private CursorType cursorType = CursorType.BLINKING;
+  private int limitLength = Integer.MAX_VALUE;
 
   public TextFieldComponent(@NotNull String value) {
     value(value);
@@ -54,6 +56,14 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
       viewShifter.bufferSize(value.length());
       cursor(value.length());
     }
+  }
+
+  public void limitLength(int limit) {
+    limitLength = MathUtil.nonNegative(limit);
+  }
+
+  public int limitLength() {
+    return limitLength;
   }
 
   public void cursor(int cursor) {
@@ -121,6 +131,9 @@ public class TextFieldComponent extends SelectableComponent implements Resizeabl
 
   protected boolean performCharInput(char c) {
     if(!charFilter.isAccept(c)) {
+      return false;
+    }
+    if(viewShifter.bufferSize() >= limitLength) {
       return false;
     }
     StringBuilder stringBuilder = new StringBuilder(value);
