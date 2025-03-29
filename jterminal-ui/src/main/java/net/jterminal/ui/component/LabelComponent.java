@@ -61,6 +61,11 @@ public class LabelComponent extends Component implements Resizeable {
     return text;
   }
 
+  public void text(@NotNull TermString text) {
+    this.text = text;
+    repaint();
+  }
+
   public void text(@NotNull TermString text, boolean updateSize) {
     this.text = text;
     if(updateSize) {
