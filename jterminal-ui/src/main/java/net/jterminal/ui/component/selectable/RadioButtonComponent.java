@@ -9,6 +9,7 @@ import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.component.ComponentGroup;
 import net.jterminal.ui.event.component.ComponentKeyEvent;
 import net.jterminal.ui.event.component.ComponentMouseEvent;
+import net.jterminal.ui.event.special.RadioButtonChangeEvent;
 import net.jterminal.ui.graphics.TermGraphics;
 import net.jterminal.util.TermPos;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,7 @@ public class RadioButtonComponent extends SelectableComponent {
 
   public void checked(boolean checked) {
     this.checked = checked;
+    eventBus.post(new RadioButtonChangeEvent(this, checked));
     if(checked) {
       for (ComponentGroup memberGroup : memberGroups()) {
         uncheckGroup(memberGroup);
