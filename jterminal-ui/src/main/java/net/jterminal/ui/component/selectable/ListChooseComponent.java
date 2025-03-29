@@ -28,6 +28,10 @@ public class ListChooseComponent extends ListViewComponent {
     return selectedStyle.copy();
   }
 
+  public int selectedIndex() {
+    return selectedIndex;
+  }
+
   public void select(int selected) {
     synchronized (lock) {
       if(elements.isEmpty()) {
