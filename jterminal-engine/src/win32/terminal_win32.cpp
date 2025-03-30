@@ -89,6 +89,7 @@ void Terminal::renewStdin() {
         nullptr);
   SetStdHandle(STD_INPUT_HANDLE, hStdin);
 }
+
 void Terminal::writeFlags(uint8_t flags, uint8_t cursor_flags) {
   DWORD mode = 0;
   mode |= ENABLE_EXTENDED_FLAGS;
@@ -148,6 +149,8 @@ void Terminal::create(Settings settings) {
   signal(SIGINT, signalSigInt);
   signal(SIGABRT, signalSigAbrt);
   update();
+  SetConsoleCP(CP_UTF8);
+  SetConsoleOutputCP(CP_UTF8);
 }
 
 void Terminal::write(const char* cstr) {
