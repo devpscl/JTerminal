@@ -13,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 subprojects {
 
     apply plugin: "java"
+    apply plugin: "maven-publish"
     apply plugin: "com.github.johnrengelman.shadow"
 
     repositories {
@@ -26,8 +27,8 @@ subprojects {
         implementation 'net.devpscl:jeventbus:1.1.0'
     }
 
-    project.group = 'net.' + project.name
-    project.version = '1.0-SNAPSHOT'
+    project.group = 'net.' + "jterminal"
+    project.version = '1.0.0'
 
     compileJava.options.encoding = "UTF-8"
     compileTestJava.options.encoding = "UTF-8"
@@ -55,5 +56,23 @@ subprojects {
     }
 
     println(project.name + " is configured")
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+        repositories {
+            maven {
+                url "http://devpscl.de:8081/repository/maven-releases/"
+                credentials {
+                    username credentialsUser
+                    password credentialsPassphrase
+                }
+                allowInsecureProtocol = true
+            }
+        }
+    }
 
 }
