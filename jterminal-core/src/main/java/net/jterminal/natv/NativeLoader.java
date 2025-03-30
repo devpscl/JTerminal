@@ -77,7 +77,10 @@ public class NativeLoader {
             dir.getAbsolutePath());
       }
     }
-    if(!file.exists() || Terminal.PropertyManager.isNoLibraryCache()) {
+    if(Terminal.PropertyManager.isNoLibraryCache()) {
+      file.delete();
+    }
+    if(!file.exists()) {
       try {
         library.copy();
       } catch (IOException e) {
