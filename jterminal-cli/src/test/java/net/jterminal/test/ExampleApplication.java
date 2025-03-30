@@ -7,6 +7,7 @@ import net.jterminal.cli.history.InputHistory;
 import net.jterminal.cli.line.DefaultLineReader;
 import net.jterminal.cli.line.LineReader;
 import net.jterminal.cli.line.PrefixedLineRenderer;
+import net.jterminal.cli.tab.CommandTabCompleter;
 import net.jterminal.exception.TerminalInitializeException;
 import net.jterminal.exception.TerminalProviderException;
 import net.jterminal.test.user.User;
@@ -70,6 +71,7 @@ public class ExampleApplication {
     LineReader lineReader = new DefaultLineReader();
     lineReader.inputHistory(InputHistory.create(true));
     lineReader.lineRenderer(new PrefixedLineRenderer(this::prefix));
+    lineReader.tabCompleter(new CommandTabCompleter(terminal));
     terminal.lineReader(lineReader);
     terminal.lineReading(true);
     terminal.commandHandler(new ExampleCommandHandler(terminal, this).build());
