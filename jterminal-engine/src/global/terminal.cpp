@@ -103,7 +103,7 @@ void Terminal::disposeInputStream(InputStreamPtr input_stream) {
 }
 
 bool Terminal::isEnabled() {
-  return enabled_;
+  return enabled_ && !closed_;
 }
 
 bool Terminal::isClosed() {
