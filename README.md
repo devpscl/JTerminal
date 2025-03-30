@@ -1,4 +1,9 @@
 # JTerminal
+<p>
+<img src="https://img.shields.io/static/v1?label=Version&message=1.0.0&color=12c970&logoColor=white" alt="Version"/>
+<img src="https://img.shields.io/static/v1?label=License&message=MIT&color=4287f5&logoColor=white" alt="License"/>
+</p>
+
 A library to create smart console applications like commandline systems and user-interfaces.
 
 
