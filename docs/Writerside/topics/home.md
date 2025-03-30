@@ -1,5 +1,5 @@
 # JTerminal
-<img src="https://img.shields.io/static/v1?label=Version&message=%version%&color=12c970&logoColor=white" alt="Version"/>
+<img src="https://img.shields.io/static/v1?label=Version&amp;message=%version%&amp;color=12c970&amp;logoColor=white" alt="Version"/>
 
 A library to create smart console applications like commandline systems and user-interfaces.
 The integrated console engine allows the execution of non java methods for the console to expand the library
