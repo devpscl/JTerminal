@@ -27,7 +27,7 @@ container.unselect();
 </code-block>
 
 ## SelectableComponent
-All components with `SelectableComponent` as Superklasse, are selectabe if it enabled
+All components with `SelectableComponent` as superclass, are selectabe if it enabled
 (`Component#enabled()`) and visible (`Component#visible()`).
 
 ## Container

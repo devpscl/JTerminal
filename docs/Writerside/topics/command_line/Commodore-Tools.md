@@ -3,7 +3,7 @@
 The Commodore framework offers the possibility to define several commands and provides a
 clear structure in programming.
 
-### Vorbereitung
+### Preparation
 <code-block lang="java">
 terminal.commandHandler(new ExampleCommandHandler()); //see next code block
 LineReader lineReader = terminal.lineReader();
