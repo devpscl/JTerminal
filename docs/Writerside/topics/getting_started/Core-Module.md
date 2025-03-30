@@ -15,7 +15,7 @@ to your project via Gradle or Maven.
 </code-block>
 </tab>
 <tab title="Gradle (Kotlin)">
-<code-block lang="groovy">
+<code-block lang="gradle">
 dependencies {
     implementation("net.jterminal:jterminal-core:1.0.0")
  }
