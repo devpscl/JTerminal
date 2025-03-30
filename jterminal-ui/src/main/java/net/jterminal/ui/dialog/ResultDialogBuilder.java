@@ -6,13 +6,14 @@ import java.util.function.Consumer;
 import net.jterminal.text.termstring.TermString;
 import net.jterminal.ui.dialog.ResultDialog.OptionType;
 import net.jterminal.ui.layout.Layout;
+import net.jterminal.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ResultDialogBuilder {
 
-  private String title;
-  private TermString message;
-  private ResultDialog.OptionType optionType;
+  private String title = StringUtil.EMPTY_STRING;
+  private TermString message = TermString.empty();
+  private ResultDialog.OptionType optionType = OptionType.OK_TYPE;
   private float widthScale = 0.5F;
   private float heightScale = 0.2F;
   private final Map<Integer, Consumer<ResultDialog>> eventMap = new HashMap<>();
