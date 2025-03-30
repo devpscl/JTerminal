@@ -13,7 +13,7 @@ checkBoxComponent.checked(...);
 | Method                              | Description                 |
 |-------------------------------------|-----------------------------|
 | <code>void text(String)</code>      | Sets the display text       |
-| <code>String text()</code>          | Retuns the display text     |
+| <code>String text()</code>          | Returns the display text    |
 | <code>int preferredWidth()</code>   | Returns the recommend width |
 | <code>void checked(boolean)</code>  | Sets the status             |
 | <code>boolean checked()</code>      | Returns the current status  |
