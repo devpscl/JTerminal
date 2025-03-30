@@ -52,7 +52,7 @@ public class AbstractCLITerminal extends AbstractNativeTerminal<CLITerminal>
   public void initialize() throws TerminalProviderException {
     super.initialize();
     inputEventListenerEnabled(true);
-    flags(FLAG_EXTENDED_INPUT | FLAG_WINDOW_INPUT);
+    flags(FLAG_EXTENDED_INPUT | FLAG_WINDOW_INPUT | FLAG_SIGNAL_INPUT);
     eventBus().register(this);
   }
 
