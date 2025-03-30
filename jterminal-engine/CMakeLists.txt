@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.18)
 project(jterminal_engine)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -62,6 +62,7 @@ ELSEIF(UNIX)
     set(SOURCE_FILES ${SOURCE_FILES} ${NATIVE_SOURCE_FILES_GLOBAL} ${NATIVE_SOURCE_FILES_UNIX})
     add_compile_definitions(TERMINAL_UNIX)
     include_directories("${JAVA_HOME}/include" "${JAVA_HOME}/include/linux")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -shared")
 ENDIF()
 
 IF(DEBUG_MODE)
