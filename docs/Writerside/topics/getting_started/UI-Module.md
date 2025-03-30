@@ -28,11 +28,12 @@ dependencies {
 dependencies {
     implementation "net.jterminal:jterminal-ui:1.0.0"
  }
-</code-block>w
+</code-block>
 </tab>
 </tabs>
 
 ### UI instance
+
 <code-block lang="java">
 UITerminal terminal = Terminal.create(UITerminalProvider.class);
 Terminal.set(terminal);
