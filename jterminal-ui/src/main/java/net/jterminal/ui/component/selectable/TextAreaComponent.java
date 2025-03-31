@@ -37,19 +37,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class TextAreaComponent extends SelectableComponent implements Resizeable {
 
-  private static final CharFilter charFilter = new CharFilter(CharType.DIGIT,
+  protected static final CharFilter charFilter = new CharFilter(CharType.DIGIT,
       CharType.WHITESPACE, CharType.LETTERS_LOWERCASE,
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
 
-  private final List<TermString> lines = new ArrayList<>();
-  private final ViewShifter xShifter = new ViewShifter(Type.POINTER_SHIFTER);
-  private final ViewShifter yShifter = new ViewShifter(Type.INDEX_SHIFTER);
+  protected final List<TermString> lines = new ArrayList<>();
+  protected final ViewShifter xShifter = new ViewShifter(Type.POINTER_SHIFTER);
+  protected final ViewShifter yShifter = new ViewShifter(Type.INDEX_SHIFTER);
 
-  private CursorType cursorType = CursorType.BLINKING;
+  protected CursorType cursorType = CursorType.BLINKING;
 
-  private ScrollBar verticalScrollbar;
-  private ScrollBar horizontalScrollbar;
-  private boolean editable = true;
+  protected ScrollBar verticalScrollbar;
+  protected ScrollBar horizontalScrollbar;
+  protected boolean editable = true;
 
   public TextAreaComponent() {
     backgroundColor(TerminalColor.GRAY);
@@ -112,18 +112,18 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     }
   }
 
-  private void updateShifters() {
+  protected void updateShifters() {
     xShifter.bufferSize(maxLineWidth());
     yShifter.bufferSize(lines.size());
   }
 
-  private void fixXShifter() {
+  protected void fixXShifter() {
     int line = cursorLine();
     int max = getLine(line).length();
     xShifter.cursor(Math.min(max, xShifter.cursor()));
   }
 
-  private int maxLineWidth() {
+  protected int maxLineWidth() {
     int count = 0;
     int len;
     for (TermString line : lines) {
@@ -133,25 +133,25 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     return count;
   }
 
-  private @NotNull TermString getLine(int index) {
+  protected @NotNull TermString getLine(int index) {
     if(lines.size() <= index) {
       return TermString.empty();
     }
     return lines.get(index);
   }
 
-  private void setLine(int index, @NotNull TermString termString) {
+  protected void setLine(int index, @NotNull TermString termString) {
     while(lines.size() <= index) {
       lines.add(TermString.empty());
     }
     lines.set(index, termString);
   }
 
-  private void insertLine(int index, @NotNull TermString value) {
+  protected void insertLine(int index, @NotNull TermString value) {
     lines.add(index, value);
   }
 
-  private void removeLine(int index) {
+  protected void removeLine(int index) {
     lines.remove(index);
     if(lines.isEmpty()) {
       lines.add(index, TermString.empty());
@@ -223,7 +223,7 @@ public class TextAreaComponent extends SelectableComponent implements Resizeable
     return list;
   }
 
-  private void updateViewSize() {
+  protected void updateViewSize() {
     int width = currentDimension().width();
     int height = currentDimension().height();
     if(verticalScrollbar != null) {

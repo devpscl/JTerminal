@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class SliderComponent extends SelectableComponent implements Resizeable {
 
-  private float value = 1.0F;
+  protected float value = 1.0F;
 
   public SliderComponent() {
     setHeight(1);

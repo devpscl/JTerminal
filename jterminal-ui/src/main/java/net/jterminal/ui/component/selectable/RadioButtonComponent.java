@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class RadioButtonComponent extends SelectableComponent {
 
-  private String text;
-  private boolean checked = false;
+  protected String text;
+  protected boolean checked = false;
 
   public RadioButtonComponent() {
     this("");

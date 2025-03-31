@@ -30,13 +30,13 @@ import org.jetbrains.annotations.Nullable;
 public class MenuBarComponent extends SelectableComponent
     implements HeadSurfacePainter {
 
-  private TextStyle selectedStyle = TextStyle.create(
+  protected TextStyle selectedStyle = TextStyle.create(
       null, null, TextFont.UNDERLINE);
 
-  private final List<MenuTab> tabs = new ArrayList<>();
-  private MenuTab selectedTab = null;
-  private int itemCursor = -1;
-  private int minimumMenuWidth = 10;
+  protected final List<MenuTab> tabs = new ArrayList<>();
+  protected MenuTab selectedTab = null;
+  protected int itemCursor = -1;
+  protected int minimumMenuWidth = 10;
 
   public MenuBarComponent() {
     super.x(1);
@@ -55,7 +55,7 @@ public class MenuBarComponent extends SelectableComponent
     this.minimumMenuWidth = minimumMenuWidth;
   }
 
-  private int findIndex(@Nullable MenuTab menuTab) {
+  protected int findIndex(@Nullable MenuTab menuTab) {
     synchronized (lock) {
       int index = 0;
       for (MenuTab tab : tabs) {

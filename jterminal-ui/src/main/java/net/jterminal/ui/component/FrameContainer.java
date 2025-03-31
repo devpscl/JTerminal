@@ -12,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class FrameContainer extends PaneContainer {
 
-  private TextAlignment titleAlignment = TextAlignment.LEFT;
-  private String title = "";
-  private int titleOffset = 0;
-  private BoxCharacter.Type boxLineType = Type.NORMAL;
+  protected TextAlignment titleAlignment = TextAlignment.LEFT;
+  protected String title = "";
+  protected int titleOffset = 0;
+  protected BoxCharacter.Type boxLineType = Type.NORMAL;
 
   public FrameContainer() {
 

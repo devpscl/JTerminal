@@ -30,7 +30,7 @@ public class ListViewComponent extends SelectableComponent implements Resizeable
   protected List<String> elements = new ArrayList<>();
   protected TextStyle cursorStyle = TextStyle.create(
       null, null, TextFont.REVERSED);
-  private ScrollBar scrollBar;
+  protected ScrollBar scrollBar;
 
   public void cursorStyle(@NotNull TextStyle cursorStyle) {
     this.cursorStyle = cursorStyle;

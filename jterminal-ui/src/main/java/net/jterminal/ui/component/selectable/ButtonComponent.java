@@ -13,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class ButtonComponent extends SelectableComponent {
 
-  private String text;
-  private Runnable action;
+  protected String text;
+  protected Runnable action;
 
   public ButtonComponent() {
     this("Button");

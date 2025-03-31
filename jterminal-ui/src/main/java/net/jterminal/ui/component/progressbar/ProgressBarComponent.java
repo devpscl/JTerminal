@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Range;
 
 public class ProgressBarComponent extends Component implements Resizeable {
 
-  private ProgressBarStyle style = new LegacyProgressBarStyle();
-  private float progress;
+  protected ProgressBarStyle style = new LegacyProgressBarStyle();
+  protected float progress;
 
   public ProgressBarComponent() {
     this(0F);

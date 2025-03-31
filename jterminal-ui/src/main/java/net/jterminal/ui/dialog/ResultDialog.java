@@ -27,9 +27,9 @@ public class ResultDialog extends TermDialog {
   public static final int BUTTON_NO = 3;
   public static final int BUTTON_CANCEL = 4;
 
-  private int buttonSpace = 1;
-  private final OptionType type;
-  private Consumer<Integer> action = null;
+  protected final int buttonSpace;
+  protected final OptionType type;
+  protected Consumer<Integer> action = null;
   private final FrameContainer frameContainer = new FrameContainer();
   private final LabelComponent labelComponent = new LabelComponent();
 

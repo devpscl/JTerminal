@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class MenuTab {
 
-  private final List<MenuItem> items = new ArrayList<>();
-  private final String name;
+  protected final List<MenuItem> items = new ArrayList<>();
+  protected final String name;
 
   public MenuTab(@NotNull String name) {
     this.name = name;

@@ -27,14 +27,14 @@ import static net.jterminal.input.Keyboard.*;
 
 public class TextFieldComponent extends SelectableComponent implements Resizeable  {
 
-  private static final CharFilter charFilter = new CharFilter(CharType.DIGIT,
+  protected static final CharFilter charFilter = new CharFilter(CharType.DIGIT,
       CharType.WHITESPACE, CharType.LETTERS_LOWERCASE,
       CharType.LETTERS_UPPERCASE, CharType.REGULAR_SYMBOL, CharType.OTHER_SYMBOL);
 
-  private String value;
-  private final ViewShifter viewShifter = new ViewShifter(Type.POINTER_SHIFTER);
-  private CursorType cursorType = CursorType.BLINKING;
-  private int limitLength = Integer.MAX_VALUE;
+  protected String value;
+  protected final ViewShifter viewShifter = new ViewShifter(Type.POINTER_SHIFTER);
+  protected CursorType cursorType = CursorType.BLINKING;
+  protected int limitLength = Integer.MAX_VALUE;
 
   public TextFieldComponent(@NotNull String value) {
     value(value);

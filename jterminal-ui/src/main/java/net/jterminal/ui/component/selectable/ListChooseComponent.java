@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class ListChooseComponent extends ListViewComponent {
 
-  private TextStyle selectedStyle = TextStyle.create(
+  protected TextStyle selectedStyle = TextStyle.create(
       null, null, TextFont.UNDERLINE);
-  private int selectedIndex = -1;
+  protected int selectedIndex = -1;
 
   public ListChooseComponent() {
     eventBus.subscribe(ListItemInteractEvent.class, this::onInteract);

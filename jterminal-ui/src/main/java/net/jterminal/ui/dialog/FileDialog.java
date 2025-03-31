@@ -38,8 +38,8 @@ public class FileDialog extends TermDialog {
     CHOOSE
   }
 
-  private File dir;
-  private List<File> viewFileList = new ArrayList<>();
+  protected File dir;
+  protected List<File> viewFileList = new ArrayList<>();
 
   private FrameContainer frameContainer;
   private ButtonComponent actionButton;
@@ -51,10 +51,10 @@ public class FileDialog extends TermDialog {
   private LabelComponent nameFieldLabel;
   private TextFieldComponent nameInputComponent;
 
-  private BoxCharacter.Type boxType = BoxCharacter.Type.NORMAL;
-  private FileFilter fileFilter;
-  private final ChooseType chooseType;
-  private final Action action;
+  protected BoxCharacter.Type boxType = BoxCharacter.Type.NORMAL;
+  protected FileFilter fileFilter;
+  protected final ChooseType chooseType;
+  protected final Action action;
   private Consumer<File> resultEvent;
 
   public FileDialog(@NotNull File dir, @NotNull String title,
@@ -199,7 +199,7 @@ public class FileDialog extends TermDialog {
     return new File(dir, nameInputComponent.value());
   }
 
-  private void updateList() {
+  protected void updateList() {
     int cursor = listViewComponent.cursor();
     viewFileList.clear();
     List<String> itemList = createItemList(dir, viewFileList);
@@ -207,7 +207,7 @@ public class FileDialog extends TermDialog {
     listViewComponent.cursor(cursor);
   }
 
-  private void updateFullPath() {
+  protected void updateFullPath() {
     fullPathInputComponent.value(dir.getAbsolutePath());
   }
 
@@ -269,7 +269,7 @@ public class FileDialog extends TermDialog {
     }
   }
 
-  private void performLeaveDirectory() {
+  protected void performLeaveDirectory() {
     synchronized (lock) {
       File parentFile = dir.getParentFile();
       if(parentFile != null) {
@@ -280,7 +280,7 @@ public class FileDialog extends TermDialog {
     }
   }
 
-  private void performInteractDirectory(@NotNull File file) {
+  protected void performInteractDirectory(@NotNull File file) {
     synchronized (lock) {
       dir = file;
       updateFullPath();
@@ -288,7 +288,7 @@ public class FileDialog extends TermDialog {
     }
   }
 
-  private void performSelectFile(@NotNull File file) {
+  protected void performSelectFile(@NotNull File file) {
     if(chooseType == ChooseType.FILE_CHOOSER && file.isFile()) {
       nameInputComponent.value(file.getName());
       return;

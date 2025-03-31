@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ScrollBarComponent extends Component implements Resizeable {
 
-  private final ScrollBar scrollBar;
+  protected final ScrollBar scrollBar;
 
   public ScrollBarComponent(@NotNull Axis axis) {
     this.scrollBar = ScrollBar.create(axis);
@@ -64,7 +64,7 @@ public class ScrollBarComponent extends Component implements Resizeable {
 
   }
 
-  private @NotNull TermPos suffixPosition(int len) {
+  protected @NotNull TermPos suffixPosition(int len) {
     if(scrollBar.axis() == Axis.VERTICAL) {
       return new TermPos(1, len);
     }
