@@ -45,4 +45,8 @@ public class StringUtil {
     return new String(arr);
   }
 
+  public static int countOfChar(@NotNull String str, char symbol) {
+    return (int) str.chars().filter(ch -> ch == symbol).count();
+  }
+
 }
