@@ -1,4 +1,4 @@
-package net.jterminal.ui.component.log4j;
+package net.jterminal.ui.log4j;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
