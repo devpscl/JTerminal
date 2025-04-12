@@ -42,6 +42,11 @@ public class ResultDialogBuilder {
     return this;
   }
 
+  public @NotNull ResultDialogBuilder message(@NotNull String message) {
+    this.message = TermString.value(message);
+    return this;
+  }
+
   public @NotNull OptionType optionType() {
     return optionType;
   }
