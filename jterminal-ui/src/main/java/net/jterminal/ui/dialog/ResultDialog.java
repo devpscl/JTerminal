@@ -56,6 +56,10 @@ public class ResultDialog extends TermDialog {
     return labelComponent.text();
   }
 
+  public void message(@NotNull String message) {
+    message(TermString.value(message));
+  }
+
   public void message(@NotNull TermString message) {
     labelComponent.text(message, true);
     labelComponent.width(Layout.fill());
