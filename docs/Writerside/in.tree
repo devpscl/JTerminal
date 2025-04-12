@@ -43,5 +43,7 @@
     </toc-element>
     <toc-element topic="Layout.md"/>
     <toc-element topic="Graphics.md"/>
+    <toc-element topic="Dialog.md"/>
+    <toc-element topic="Log4J.md"/>
   </toc-element>
 </instance-profile>
