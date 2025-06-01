@@ -16,20 +16,20 @@ import org.jetbrains.annotations.Nullable;
 
 public class NativeLoader {
 
-  private static final File dir;
+  private static LibraryDestination libraryDestination
+      = new TempDirLibraryDestination();
   private static final Set<NativeLink> linkList = new HashSet<>();
-
-  static {
-    File tempDir = new File(System.getProperty("java.io.tmpdir"));
-    dir = new File(tempDir, "javan");
-  }
-
-  public static @NotNull File temporaryRootDir() {
-    return dir;
-  }
 
   public @NotNull Collection<NativeLink> links() {
     return new ArrayList<>(linkList);
+  }
+
+  public static @NotNull LibraryDestination libraryDestination() {
+    return libraryDestination;
+  }
+
+  public static void libraryDestination(@NotNull LibraryDestination destination) {
+    libraryDestination = destination;
   }
 
   public @Nullable Collection<NativeLink> get(@NotNull String libraryName) {
@@ -69,16 +69,11 @@ public class NativeLoader {
     if(!library.isSupportedForCurrent()) {
       throw new UnsupportedSystemException(SystemInfo.current().toString());
     }
-    NativeLink link = new NativeLink(library, nativeTypeClass);
-    File file = library.temporaryFile();
-    if(!dir.exists()) {
-      if(!dir.mkdir()) {
-        Terminal.LOGGER.warn("Failed to create java native directory: {}",
-            dir.getAbsolutePath());
-      }
-    }
+    File file = library.destinationFile();
     if(Terminal.PropertyManager.isNoLibraryCache()) {
-      file.delete();
+      if(!file.delete()) {
+        Terminal.LOGGER.error("Failed to delete old library file: {}", file.getName());
+      }
     }
     if(!file.exists()) {
       try {
@@ -87,8 +82,14 @@ public class NativeLoader {
         throw new NativeException("Failed to copy library into temp directory", e);
       }
     }
+    return link(library, nativeTypeClass, file);
+  }
+
+  private static @NotNull NativeLink link(@NotNull NativeLibrary library,
+      @NotNull Class<?> nativeTypeClass, @NotNull File libraryFile) throws NativeException {
+    NativeLink link = new NativeLink(library, nativeTypeClass);
     try {
-      link.callNativeLoader(file.getAbsolutePath());
+      link.callNativeLoader(libraryFile.getAbsolutePath());
     } catch (UnsatisfiedLinkError e) {
       throw new NativeException("Failed to link", e);
     }

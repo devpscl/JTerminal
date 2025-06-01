@@ -45,7 +45,7 @@ public final class NativeLibrary {
         + SystemInfo.current().dynamicLibFileEnd();
   }
 
-  public @NotNull String temporaryFileName() {
+  public @NotNull String uniqueFileName() {
     String sysId = SystemInfo.current().sysId();
     return name.toLowerCase()
         + sysId
@@ -55,8 +55,8 @@ public final class NativeLibrary {
         + SystemInfo.current().dynamicLibFileEnd();
   }
 
-  public @NotNull File temporaryFile() {
-    return new File(NativeLoader.temporaryRootDir(), temporaryFileName());
+  public @NotNull File destinationFile() {
+    return NativeLoader.libraryDestination().getDestination(this);
   }
 
   public boolean isResourceExists() {
@@ -70,7 +70,7 @@ public final class NativeLibrary {
     if (ressourceInputStream == null) {
       throw new FileNotFoundException("Jar resource required: " + resourceFilePath());
     }
-    FileOutputStream outputStream = new FileOutputStream(temporaryFile());
+    FileOutputStream outputStream = new FileOutputStream(destinationFile());
     StreamUtil.transfer(ressourceInputStream, outputStream, 1024, true);
     outputStream.close();
   }
