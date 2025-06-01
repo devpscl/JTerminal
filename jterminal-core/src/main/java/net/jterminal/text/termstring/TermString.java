@@ -3,6 +3,7 @@ package net.jterminal.text.termstring;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 import net.jterminal.buffer.ByteBuf;
+import net.jterminal.text.TerminalColor;
 import net.jterminal.text.element.TextElement;
 import net.jterminal.text.style.TextStyle;
 import org.intellij.lang.annotations.RegExp;
@@ -385,6 +386,28 @@ public interface TermString {
    */
   static @NotNull TermString create(@Nullable String value, @Nullable IndexedStyleData data) {
     return new TermStringImpl(value, data);
+  }
+
+  static @NotNull TermString createWithForeground(@NotNull String value,
+      @Nullable TerminalColor color) {
+    if(color == null) {
+      return value(value);
+    }
+    return builder().foregroundColor(color)
+        .append(value)
+        .foregroundColor(null)
+        .build();
+  }
+
+  static @NotNull TermString createWithBackground(@NotNull String value,
+      @Nullable TerminalColor color) {
+    if(color == null) {
+      return value(value);
+    }
+    return builder().backgroundColor(color)
+        .append(value)
+        .foregroundColor(null)
+        .build();
   }
 
   /**
